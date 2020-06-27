@@ -1,0 +1,29 @@
+package logrules
+
+import com.alarm.eagle.util.DateUtil;
+import com.alarm.eagle.log.LogEntry;
+import org.slf4j.Logger;
+import com.alarm.eagle.util.Md5Util;
+import com.alarm.eagle.util.RegexUtil
+import java.util.Date;
+
+global Logger LOG;
+
+rule "log_app_2 log rules"
+    no-loop true
+    salience 100
+    when
+        $log : LogEntry( index == "log_app_2", $msg : message)
+    then
+        LOG.debug("receive log_app_2 log, id:[{}]", $log.getId());
+        String logTime = RegexUtil.extractString("(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2})", $msg);
+        if (logTime == null) {
+            LOG.warn("invalid date or time, log: {}", $msg);
+            return;
+        }
+        Date date = DateUtil.convertFromString("yyyy-MM-dd HH:mm:ss", logTime);
+        $log.setTimestamp(date != null ? date : $log.getAtTimestamp());
+
+        $log.dealDone();
+        LOG.debug("out -----log_app_2------");
+end
