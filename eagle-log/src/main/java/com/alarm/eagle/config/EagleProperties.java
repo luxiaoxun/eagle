@@ -14,14 +14,14 @@ public class EagleProperties {
     private static final Logger logger = LoggerFactory.getLogger(EagleProperties.class);
 
     private ParameterTool parameter;
-    private static boolean isDev = false;
+    private static String mode = "";
 
     private static class PropertiesHolder {
         private static final EagleProperties holder = new EagleProperties();
     }
 
-    public static EagleProperties getInstance(boolean isDebug) {
-        isDev = isDebug;
+    public static EagleProperties getInstance(String flinkMode) {
+        mode = flinkMode;
         return PropertiesHolder.holder;
     }
 
@@ -33,10 +33,21 @@ public class EagleProperties {
         try {
             logger.info("load parameters from system ...");
             Map<String, String> map = new HashMap<>();
-            if (isDev) {
-                map.put(ConfigConstant.FLINK_MODE, ConfigConstant.MODE_DEV);
-            } else {
-                map.put(ConfigConstant.FLINK_MODE, "test");
+            switch (mode) {
+                case ConfigConstant.MODE_DEV:
+                    map.put(ConfigConstant.FLINK_MODE, ConfigConstant.MODE_DEV);
+                    map.put(ConfigConstant.KAFKA_BOOTSTRAP_SERVERS, "168.61.45.26:9092,168.61.45.27:9092,168.61.45.28:9092");
+                    map.put(ConfigConstant.KAFKA_GROUP_ID, "log-dev");
+                    map.put(ConfigConstant.KAFKA_TOPIC, "YWKF-ISCS-LOG");
+                    map.put(ConfigConstant.KAFKA_TOPIC_PARALLELISM, "3");
+                    break;
+                case ConfigConstant.MODE_TEST:
+                    map.put(ConfigConstant.FLINK_MODE, ConfigConstant.MODE_TEST);
+                    map.put(ConfigConstant.KAFKA_BOOTSTRAP_SERVERS, "168.61.45.26:9092,168.61.45.27:9092,168.61.45.28:9092");
+                    map.put(ConfigConstant.KAFKA_GROUP_ID, "log-test");
+                    map.put(ConfigConstant.KAFKA_TOPIC, "YWKF-ISCS-LOG");
+                    map.put(ConfigConstant.KAFKA_TOPIC_PARALLELISM, "10");
+                    break;
             }
             map.put(ConfigConstant.FLINK_PARALLELISM, "2");
             map.put(ConfigConstant.FLINK_ENABLE_CHECKPOINT, "true");
@@ -48,11 +59,6 @@ public class EagleProperties {
             map.put(ConfigConstant.REDIS_WINDOW_TRIGGER_COUNT, "10000");
             map.put(ConfigConstant.REDIS_CLUSTER_HOSTS, "168.61.45.26:7000,168.61.45.26:7003,168.61.45.27:7001,168.61.45.27:7004,168.61.45.28:7002,168.61.45.28:7005");
             map.put(ConfigConstant.REDIS_SINK_PARALLELISM, "2");
-
-            map.put(ConfigConstant.KAFKA_BOOTSTRAP_SERVERS, "168.61.45.26:9092,168.61.45.27:9092,168.61.45.28:9092");
-            map.put(ConfigConstant.KAFKA_GROUP_ID, "log-test");
-            map.put(ConfigConstant.KAFKA_TOPIC, "YWKF-ISCS-LOG");
-            map.put(ConfigConstant.KAFKA_TOPIC_PARALLELISM, "10");
 
             map.put(ConfigConstant.ELASTICSEARCH_HOSTS, "168.61.45.26:9200");
             map.put(ConfigConstant.ELASTICSEARCH_BULK_FLUSH_MAX_ACTIONS, "5000");

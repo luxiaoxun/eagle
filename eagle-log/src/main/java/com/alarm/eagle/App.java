@@ -63,10 +63,9 @@ public class App {
     public static void main(String[] args) {
         try {
             boolean isDebug = false;
-            if (args.length > 0 && args[0].equals("--dev")) {
-                isDebug = true;
-            }
-            ParameterTool parameter = EagleProperties.getInstance(isDebug).getParameter();
+            ParameterTool parameterTool = ParameterTool.fromArgs(args);
+            String mode = parameterTool.get("mode");
+            ParameterTool parameter = EagleProperties.getInstance(mode).getParameter();
             showConf(parameter);
 
             // Build stream DAG

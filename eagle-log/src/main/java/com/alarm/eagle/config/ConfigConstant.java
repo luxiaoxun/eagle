@@ -5,8 +5,10 @@ package com.alarm.eagle.config;
  */
 public interface ConfigConstant {
 
-    String FLINK_MODE = "flink.mode";
+    String FLINK_MODE = "mode";
     String MODE_DEV = "dev";
+    String MODE_TEST = "test";
+    String MODE_PROD = "prod";
 
     String FLINK_PARALLELISM = "flink.parallelism";
     String FLINK_ENABLE_CHECKPOINT = "flink.enable.checkpoint";
