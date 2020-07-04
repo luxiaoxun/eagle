@@ -15,7 +15,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
 import javax.activation.MimetypesFileTypeMap;
 
 import org.apache.http.HttpEntity;
@@ -33,30 +32,25 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 
 /**
- * http 请求工具类
- * @author huangzexiang
- *
+ * Created by luxiaoxun on 18/1/17.
  */
-public abstract class HttpUtil {
+public class HttpUtil {
 
     /**
-     *
-     * @param url 请求地址
-     * @param names 参数名称[]
+     * @param url    请求地址
+     * @param names  参数名称[]
      * @param values 参数值[]
      * @return 返回请求结果
      */
-    public static String post(String url,String [] names ,Object [] values ){
-
+    public static String post(String url, String[] names, Object[] values) {
         String result = null;//返回结果集
-
         List<NameValuePair> formParams = new ArrayList<NameValuePair>();
-        if(names != null ){
-            if(values == null || names.length != values.length)
+        if (names != null) {
+            if (values == null || names.length != values.length)
                 throw new RuntimeException("参数和值的数组长度不相等");
             //post参数
-            for(int i = 0;i < names.length ;i ++){
-                if(values[i]==null){
+            for (int i = 0; i < names.length; i++) {
+                if (values[i] == null) {
                     values[i] = "";
                 }
                 NameValuePair param = new BasicNameValuePair(names[i], values[i].toString());
@@ -80,7 +74,7 @@ public abstract class HttpUtil {
             CloseableHttpResponse response = httpClient.execute(httppost);
             try {
                 HttpEntity entity = response.getEntity();
-                if(entity != null) {
+                if (entity != null) {
                     result = EntityUtils.toString(entity, "UTF-8");
                 }
             } finally {
@@ -104,26 +98,22 @@ public abstract class HttpUtil {
     }
 
     /**
-     *
      * @param url 请求地址
      * @return 返回请求结果
      */
-    public static String postBody(String url,String body){
-
+    public static String postBody(String url, String body) {
         String result = null;//返回结果集
-
         //创建连接
         CloseableHttpClient httpClient = HttpClients.createDefault();
         HttpPost httppost = new HttpPost(url);
         try {
-            httppost.setHeader("Content-type","application/json; charset=utf-8");
+            httppost.setHeader("Content-type", "application/json; charset=utf-8");
             //发送请求，得到结果
             httppost.setEntity(new StringEntity(body, "UTF-8"));
-
             CloseableHttpResponse response = httpClient.execute(httppost);
             try {
                 HttpEntity entity = response.getEntity();
-                if(entity != null) {
+                if (entity != null) {
                     result = EntityUtils.toString(entity, "UTF-8");
                 }
             } finally {
@@ -155,7 +145,7 @@ public abstract class HttpUtil {
      * @return
      */
     @SuppressWarnings("rawtypes")
-    public static String formUpload(String urlStr, Map<String, String> textMap,Map<String, String> fileMap) {
+    public static String formUpload(String urlStr, Map<String, String> textMap, Map<String, String> fileMap) {
         String res = "";
         HttpURLConnection conn = null;
         String BOUNDARY = "---------------------------123821742118716"; //boundary就是request头和上传文件内容的分隔符
@@ -169,11 +159,8 @@ public abstract class HttpUtil {
             conn.setUseCaches(false);
             conn.setRequestMethod("POST");
             conn.setRequestProperty("Connection", "Keep-Alive");
-            conn
-                    .setRequestProperty("User-Agent",
-                            "Mozilla/5.0 (Windows; U; Windows NT 6.1; zh-CN; rv:1.9.2.6)");
-            conn.setRequestProperty("Content-Type",
-                    "multipart/form-data; boundary=" + BOUNDARY);
+            conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows; U; Windows NT 6.1; zh-CN; rv:1.9.2.6)");
+            conn.setRequestProperty("Content-Type", "multipart/form-data; boundary=" + BOUNDARY);
 
             OutputStream out = new DataOutputStream(conn.getOutputStream());
             // text
@@ -187,10 +174,8 @@ public abstract class HttpUtil {
                     if (inputValue == null) {
                         continue;
                     }
-                    strBuf.append("\r\n").append("--").append(BOUNDARY).append(
-                            "\r\n");
-                    strBuf.append("Content-Disposition: form-data; name=\""
-                            + inputName + "\"\r\n\r\n");
+                    strBuf.append("\r\n").append("--").append(BOUNDARY).append("\r\n");
+                    strBuf.append("Content-Disposition: form-data; name=\"" + inputName + "\"\r\n\r\n");
                     strBuf.append(inputValue);
                 }
                 out.write(strBuf.toString().getBytes());
@@ -218,17 +203,14 @@ public abstract class HttpUtil {
                     }
 
                     StringBuffer strBuf = new StringBuffer();
-                    strBuf.append("\r\n").append("--").append(BOUNDARY).append(
-                            "\r\n");
-                    strBuf.append("Content-Disposition: form-data; name=\""
-                            + inputName + "\"; filename=\"" + filename
-                            + "\"\r\n");
+                    strBuf.append("\r\n").append("--").append(BOUNDARY).append("\r\n");
+                    strBuf.append("Content-Disposition: form-data; name=\"" + inputName + "\"; filename=\""
+                            + filename + "\"\r\n");
                     strBuf.append("Content-Type:" + contentType + "\r\n\r\n");
 
                     out.write(strBuf.toString().getBytes());
 
-                    DataInputStream in = new DataInputStream(
-                            new FileInputStream(file));
+                    DataInputStream in = new DataInputStream(new FileInputStream(file));
                     int bytes = 0;
                     byte[] bufferOut = new byte[1024];
                     while ((bytes = in.read(bufferOut)) != -1) {
@@ -245,8 +227,7 @@ public abstract class HttpUtil {
 
             // 读取返回数据
             StringBuffer strBuf = new StringBuffer();
-            BufferedReader reader = new BufferedReader(new InputStreamReader(
-                    conn.getInputStream()));
+            BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
             String line = null;
             while ((line = reader.readLine()) != null) {
                 strBuf.append(line).append("\n");
@@ -271,7 +252,7 @@ public abstract class HttpUtil {
      * @param url 请求地址
      * @return 返回请求结果
      */
-    public static String get(String url){
+    public static String get(String url) {
         String result = null;//返回结果集
         //创建连接
         CloseableHttpClient httpClient = HttpClients.createDefault();
@@ -281,7 +262,7 @@ public abstract class HttpUtil {
             CloseableHttpResponse response = httpClient.execute(httpget);
             try {
                 HttpEntity entity = response.getEntity();
-                if(entity != null) {
+                if (entity != null) {
                     result = EntityUtils.toString(entity, "UTF-8");
                 }
             } finally {
