@@ -18,7 +18,7 @@ mvn package -Dmaven.test.skip=true
 
 eagle-log
 ```
-java -jar eagle-log.jar --dev
+flink run -m yarn-cluster -ynm eagle-log -j eagle-log.jar -c com.alarm.eagle.App -arg "--mode test" 
 ```
 
 eagle-api
