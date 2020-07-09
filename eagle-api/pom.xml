@@ -11,6 +11,10 @@
     <name>eagle-api</name>
     <url>http://maven.apache.org</url>
 
+    <properties>
+        <swagger.version>2.9.2</swagger.version>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>com.alarm.eagle</groupId>
@@ -68,6 +72,17 @@
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
+        </dependency>
+        <!--swagger-->
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger2</artifactId>
+            <version>${swagger.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger-ui</artifactId>
+            <version>${swagger.version}</version>
         </dependency>
     </dependencies>
 

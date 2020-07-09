@@ -5,6 +5,8 @@ import com.alarm.eagle.api.domain.LogRuleDo;
 import com.alarm.eagle.api.service.LogRuleService;
 import com.alarm.eagle.response.Response;
 import com.alarm.eagle.response.ResponseUtil;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +19,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/log")
+@Api(tags = "log")
 public class LogRuleController {
     private static final Logger logger = LoggerFactory.getLogger(LogRuleController.class);
 
@@ -29,12 +32,14 @@ public class LogRuleController {
         return ResponseUtil.success();
     }
 
+    @ApiOperation(value = "查询所有的规则", notes = "查询所有的规则")
     @GetMapping("/rules")
     public Response getRules() {
         List<LogRule> logRuleList = logRuleService.queryAllRules();
         return ResponseUtil.success(logRuleList);
     }
 
+    @ApiOperation(value = "查询规则", notes = "查询规则")
     @GetMapping("/rules")
     public Response getRuleById(@RequestParam int id) {
         LogRule logRule = logRuleService.queryRuleById(id);
@@ -45,6 +50,7 @@ public class LogRuleController {
         }
     }
 
+    @ApiOperation(value = "保存或更新规则", notes = "保存或更新规则")
     @PostMapping("/rules")
     public Response saveOrUpdateRules(@RequestBody LogRuleDo logRuleDo) {
         logger.info("logRuleDo={}", logRuleDo);
@@ -52,6 +58,7 @@ public class LogRuleController {
         return ResponseUtil.success(ret);
     }
 
+    @ApiOperation(value = "删除规则", notes = "删除规则")
     @DeleteMapping("/rules/{id}")
     public Response deleteRule(@PathVariable("id") int id) {
         logger.info("deleteRuleById={}", id);
