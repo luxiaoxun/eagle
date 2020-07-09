@@ -8,6 +8,7 @@ import com.alarm.eagle.response.Response;
 import com.alarm.eagle.response.ResponseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -29,7 +30,7 @@ public class DataController {
     @Resource
     private NotifyService notifyService;
 
-    @RequestMapping("/sink")
+    @PostMapping("/sink")
     public Response sink(@RequestBody DataSinkDo sinkDo) {
         logger.info("sinkDo={}", sinkDo);
         dataSinkRepository.save(sinkDo);
@@ -44,7 +45,7 @@ public class DataController {
         return ResponseUtil.success();
     }
 
-    @RequestMapping("/test")
+    @PostMapping("/test")
     public Response test() {
         DataSinkDo sinkDo = new DataSinkDo();
         sinkDo.setAppId(1);

@@ -4,6 +4,7 @@ import com.alarm.eagle.api.service.TaskService;
 import com.alarm.eagle.api.bean.Task;
 import com.alarm.eagle.response.Response;
 import com.alarm.eagle.response.ResponseUtil;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -19,7 +20,7 @@ public class TaskController {
     @Resource
     public TaskService taskService;
 
-    @RequestMapping("/query")
+    @GetMapping("/query")
     public Response queryTask(@RequestParam Integer taskId) {
         Task task = taskService.queryTask(taskId);
         return ResponseUtil.success(task);
