@@ -23,5 +23,6 @@ flink run -m yarn-cluster -ynm eagle-log -j eagle-log.jar -c com.alarm.eagle.App
 
 eagle-api
 ```
+http://localhost:8080/eagle-api/swagger-ui.html
 http://localhost:8080/eagle-api/log/rules
 ```
