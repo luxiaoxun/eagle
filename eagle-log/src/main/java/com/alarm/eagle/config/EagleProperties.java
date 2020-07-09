@@ -14,14 +14,16 @@ public class EagleProperties {
     private static final Logger logger = LoggerFactory.getLogger(EagleProperties.class);
 
     private ParameterTool parameter;
+    private static ParameterTool params;
     private static String mode = "";
 
     private static class PropertiesHolder {
         private static final EagleProperties holder = new EagleProperties();
     }
 
-    public static EagleProperties getInstance(String flinkMode) {
-        mode = flinkMode;
+    public static EagleProperties getInstance(ParameterTool parameterTool) {
+        params = parameterTool;
+        mode = params.get(ConfigConstant.FLINK_MODE);
         return PropertiesHolder.holder;
     }
 
@@ -36,17 +38,17 @@ public class EagleProperties {
             switch (mode) {
                 case ConfigConstant.MODE_DEV:
                     map.put(ConfigConstant.FLINK_MODE, ConfigConstant.MODE_DEV);
-                    map.put(ConfigConstant.KAFKA_BOOTSTRAP_SERVERS, "168.61.45.26:9092,168.61.45.27:9092,168.61.45.28:9092");
+                    map.put(ConfigConstant.KAFKA_BOOTSTRAP_SERVERS, "168.11.101.22:9092,168.11.101.23:9092,168.11.101.24:9092");
                     map.put(ConfigConstant.KAFKA_GROUP_ID, "log-dev");
-                    map.put(ConfigConstant.KAFKA_TOPIC, "YWKF-ISCS-LOG");
+                    map.put(ConfigConstant.KAFKA_TOPIC, "eagle-log");
                     map.put(ConfigConstant.KAFKA_TOPIC_PARALLELISM, "3");
                     break;
                 case ConfigConstant.MODE_TEST:
                     map.put(ConfigConstant.FLINK_MODE, ConfigConstant.MODE_TEST);
-                    map.put(ConfigConstant.KAFKA_BOOTSTRAP_SERVERS, "168.61.45.26:9092,168.61.45.27:9092,168.61.45.28:9092");
+                    map.put(ConfigConstant.KAFKA_BOOTSTRAP_SERVERS, "168.11.101.22:9092,168.11.101.23:9092,168.11.101.24:9092");
                     map.put(ConfigConstant.KAFKA_GROUP_ID, "log-test");
-                    map.put(ConfigConstant.KAFKA_TOPIC, "YWKF-ISCS-LOG");
-                    map.put(ConfigConstant.KAFKA_TOPIC_PARALLELISM, "10");
+                    map.put(ConfigConstant.KAFKA_TOPIC, "eagle-log");
+                    map.put(ConfigConstant.KAFKA_TOPIC_PARALLELISM, "6");
                     break;
             }
             map.put(ConfigConstant.FLINK_PARALLELISM, "2");
@@ -57,17 +59,20 @@ public class EagleProperties {
 
             map.put(ConfigConstant.REDIS_WINDOW_TIME_SECONDS, "60");
             map.put(ConfigConstant.REDIS_WINDOW_TRIGGER_COUNT, "10000");
-            map.put(ConfigConstant.REDIS_CLUSTER_HOSTS, "168.61.45.26:7000,168.61.45.26:7003,168.61.45.27:7001,168.61.45.27:7004,168.61.45.28:7002,168.61.45.28:7005");
+            map.put(ConfigConstant.REDIS_CLUSTER_HOSTS, "168.11.102.26:7000,168.11.102.27:7000");
             map.put(ConfigConstant.REDIS_SINK_PARALLELISM, "2");
 
-            map.put(ConfigConstant.ELASTICSEARCH_HOSTS, "168.61.45.26:9200");
+            map.put(ConfigConstant.ELASTICSEARCH_HOSTS, "168.11.103.28:9200");
             map.put(ConfigConstant.ELASTICSEARCH_BULK_FLUSH_MAX_ACTIONS, "5000");
             map.put(ConfigConstant.ELASTICSEARCH_BULK_FLUSH_MAX_SIZE_MB, "50");
             map.put(ConfigConstant.ELASTICSEARCH_BULK_FLUSH_INTERVAL_MS, "1000");
             map.put(ConfigConstant.ELASTICSEARCH_SINK_PARALLELISM, "2");
             map.put(ConfigConstant.ELASTICSEARCH_INDEX_POSTFIX, "_log-test");
 
+            Map<String, String> paramsMap = params.toMap();
+            map.putAll(paramsMap);
             parameter = ParameterTool.fromMap(map);
+
         } catch (Exception ex) {
             logger.error("load parameters from system error: " + ex.toString());
         }
