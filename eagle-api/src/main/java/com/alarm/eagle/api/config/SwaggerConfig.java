@@ -18,7 +18,7 @@ public class SwaggerConfig {
         return new Docket(DocumentationType.SWAGGER_2)
                 .apiInfo(apiInfo())
                 .select()
-                .apis(RequestHandlerSelectors.basePackage("com.alarm.eagle"))
+                .apis(RequestHandlerSelectors.basePackage("com.alarm.eagle.api"))
                 .paths(PathSelectors.any())
                 .build();
     }

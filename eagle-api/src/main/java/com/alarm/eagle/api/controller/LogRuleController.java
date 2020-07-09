@@ -9,9 +9,9 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.Resource;
 import java.util.List;
 
 /**
@@ -23,14 +23,8 @@ import java.util.List;
 public class LogRuleController {
     private static final Logger logger = LoggerFactory.getLogger(LogRuleController.class);
 
-    @Resource
+    @Autowired
     private LogRuleService logRuleService;
-
-    @PostMapping("/trace")
-    public Response receive(@RequestParam String data) {
-        logger.info("data={}", data);
-        return ResponseUtil.success();
-    }
 
     @ApiOperation(value = "查询所有的规则", notes = "查询所有的规则")
     @GetMapping("/rules")
@@ -40,8 +34,8 @@ public class LogRuleController {
     }
 
     @ApiOperation(value = "查询规则", notes = "查询规则")
-    @GetMapping("/rules")
-    public Response getRuleById(@RequestParam int id) {
+    @GetMapping("/rule/{id}")
+    public Response getRuleById(@PathVariable("id") long id) {
         LogRule logRule = logRuleService.queryRuleById(id);
         if (logRule != null) {
             return ResponseUtil.success(logRule);
@@ -51,7 +45,7 @@ public class LogRuleController {
     }
 
     @ApiOperation(value = "保存或更新规则", notes = "保存或更新规则")
-    @PostMapping("/rules")
+    @PostMapping("/rule")
     public Response saveOrUpdateRules(@RequestBody LogRuleDo logRuleDo) {
         logger.info("logRuleDo={}", logRuleDo);
         LogRuleDo ret = logRuleService.saveOrUpdateRule(logRuleDo);
@@ -59,8 +53,8 @@ public class LogRuleController {
     }
 
     @ApiOperation(value = "删除规则", notes = "删除规则")
-    @DeleteMapping("/rules/{id}")
-    public Response deleteRule(@PathVariable("id") int id) {
+    @DeleteMapping("/rule/{id}")
+    public Response deleteRule(@PathVariable("id") long id) {
         logger.info("deleteRuleById={}", id);
         boolean ret = logRuleService.deleteRuleById(id);
         if (ret) {

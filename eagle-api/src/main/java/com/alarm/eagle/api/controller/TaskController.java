@@ -4,6 +4,7 @@ import com.alarm.eagle.api.service.TaskService;
 import com.alarm.eagle.api.bean.Task;
 import com.alarm.eagle.response.Response;
 import com.alarm.eagle.response.ResponseUtil;
+import io.swagger.annotations.Api;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -16,6 +17,7 @@ import javax.annotation.Resource;
  */
 @RestController
 @RequestMapping("/task")
+@Api(tags = "task")
 public class TaskController {
     @Resource
     public TaskService taskService;

@@ -32,7 +32,7 @@ public class LogRuleService {
         return results;
     }
 
-    public LogRule queryRuleById(int id) {
+    public LogRule queryRuleById(long id) {
         Optional<LogRuleDo> logRuleDo = logRuleRepository.findById(id);
         if (logRuleDo.isPresent()) {
             return new LogRule(logRuleDo.get());
@@ -44,7 +44,7 @@ public class LogRuleService {
         return logRuleRepository.saveAndFlush(logRuleDo);
     }
 
-    public boolean deleteRuleById(int id) {
+    public boolean deleteRuleById(long id) {
         boolean ret = false;
         try {
             logRuleRepository.deleteById(id);

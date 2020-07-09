@@ -6,6 +6,7 @@ import com.alarm.eagle.api.service.NotifyService;
 import com.alarm.eagle.api.bean.DataSink;
 import com.alarm.eagle.response.Response;
 import com.alarm.eagle.response.ResponseUtil;
+import io.swagger.annotations.Api;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,6 +22,7 @@ import java.util.Date;
  */
 @RestController
 @RequestMapping("/data")
+@Api(tags = "data")
 public class DataController {
     private static final Logger logger = LoggerFactory.getLogger(DataController.class);
 

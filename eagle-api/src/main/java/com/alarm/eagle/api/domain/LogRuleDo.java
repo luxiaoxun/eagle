@@ -1,8 +1,6 @@
 package com.alarm.eagle.api.domain;
 
 import com.alarm.eagle.util.JsonUtil;
-import org.springframework.data.annotation.Id;
-
 import javax.persistence.*;
 import java.util.Date;
 

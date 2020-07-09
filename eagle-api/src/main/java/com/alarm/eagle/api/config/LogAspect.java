@@ -14,8 +14,8 @@ import org.springframework.context.annotation.Configuration;
 /**
  * Created by luxiaoxun on 18/1/3.
  */
-@Aspect
-@Configuration
+//@Aspect
+//@Configuration
 public class LogAspect {
     private static final Logger logger = LoggerFactory.getLogger(LogAspect.class);
 
