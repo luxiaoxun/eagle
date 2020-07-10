@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -48,6 +49,7 @@ public class LogRuleController {
     @PostMapping("/rule")
     public Response saveOrUpdateRules(@RequestBody LogRuleDo logRuleDo) {
         logger.info("logRuleDo={}", logRuleDo);
+        logRuleDo.setUpdateTime(new Date());
         LogRuleDo ret = logRuleService.saveOrUpdateRule(logRuleDo);
         return ResponseUtil.success(ret);
     }
