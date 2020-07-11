@@ -4,6 +4,7 @@ import com.alarm.eagle.api.service.AlertPolicyService;
 import com.alarm.eagle.response.Response;
 import com.alarm.eagle.response.ResponseUtil;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -21,6 +22,7 @@ public class AlertController {
     @Resource
     private AlertPolicyService alertService;
 
+    @ApiOperation(value = "查询告警策略", notes = "查询告警策略")
     @GetMapping("/query")
     public Response queryPolicyAlert(@RequestParam Integer policyId) {
         return ResponseUtil.success(alertService.queryPolicyAlert(policyId));

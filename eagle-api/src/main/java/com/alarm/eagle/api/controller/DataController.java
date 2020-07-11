@@ -7,6 +7,7 @@ import com.alarm.eagle.api.bean.DataSink;
 import com.alarm.eagle.response.Response;
 import com.alarm.eagle.response.ResponseUtil;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -32,6 +33,7 @@ public class DataController {
     @Resource
     private NotifyService notifyService;
 
+    @ApiOperation(value = "保存策略结果", notes = "保存策略结果")
     @PostMapping("/sink")
     public Response sink(@RequestBody DataSinkDo sinkDo) {
         logger.info("sinkDo={}", sinkDo);
