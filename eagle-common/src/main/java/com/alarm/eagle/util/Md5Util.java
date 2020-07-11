@@ -1,7 +1,5 @@
 package com.alarm.eagle.util;
 
-import org.apache.commons.codec.binary.StringUtils;
-
 import java.nio.charset.Charset;
 import java.security.MessageDigest;
 

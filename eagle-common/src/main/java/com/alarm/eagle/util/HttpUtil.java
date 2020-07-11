@@ -78,14 +78,11 @@ public class HttpUtil {
 
     public static String doGet(String urlPath, Charset charset, Map<String, String> params, Map<String, String> headers) {
         String response = null;
-
         try {
             GetMethod e = new GetMethod(urlPath);
-            Iterator stream;
             Map.Entry map;
             if (headers != null && !headers.isEmpty()) {
-                stream = headers.entrySet().iterator();
-
+                Iterator stream = headers.entrySet().iterator();
                 while (stream.hasNext()) {
                     map = (Map.Entry) stream.next();
                     e.addRequestHeader((String) map.getKey(), (String) map.getValue());
@@ -93,8 +90,7 @@ public class HttpUtil {
             }
 
             if (params != null && !params.isEmpty()) {
-                stream = params.entrySet().iterator();
-
+                Iterator stream = params.entrySet().iterator();
                 while (stream.hasNext()) {
                     map = (Map.Entry) stream.next();
                     e.getParams().setParameter((String) map.getKey(), map.getValue());
@@ -126,14 +122,11 @@ public class HttpUtil {
 
     public static String doPost(String urlPath, Charset charset, Map<String, String> params, Map<String, String> headers) {
         String response = null;
-
         try {
             PostMethod e = new PostMethod(urlPath);
-            Iterator inputStream;
             Map.Entry m;
             if (params != null && !params.isEmpty()) {
-                inputStream = params.entrySet().iterator();
-
+                Iterator inputStream = params.entrySet().iterator();
                 while (inputStream.hasNext()) {
                     m = (Map.Entry) inputStream.next();
                     e.addParameter((String) m.getKey(), (String) m.getValue());
@@ -141,8 +134,7 @@ public class HttpUtil {
             }
 
             if (headers != null && !headers.isEmpty()) {
-                inputStream = headers.entrySet().iterator();
-
+                Iterator inputStream = headers.entrySet().iterator();
                 while (inputStream.hasNext()) {
                     m = (Map.Entry) inputStream.next();
                     e.addRequestHeader((String) m.getKey(), (String) m.getValue());
@@ -156,8 +148,8 @@ public class HttpUtil {
             } else {
                 logger.warn("http post status code error,status {}", Integer.valueOf(e.getStatusCode()));
             }
-        } catch (Exception var8) {
-            var8.printStackTrace();
+        } catch (Exception ex) {
+            logger.error(ex.toString());
         }
 
         return response;
@@ -184,12 +176,10 @@ public class HttpUtil {
 
     public static String doPost(String urlPath, String content, Charset charset, Map<String, String> headers) {
         String response = null;
-
         try {
             PostMethod e = new PostMethod(urlPath);
             if (headers != null && !headers.isEmpty()) {
                 Iterator requestEntity = headers.entrySet().iterator();
-
                 while (requestEntity.hasNext()) {
                     Map.Entry inputStream = (Map.Entry) requestEntity.next();
                     e.addRequestHeader((String) inputStream.getKey(), (String) inputStream.getValue());

@@ -102,24 +102,6 @@ public class DateUtil {
         return null;
     }
 
-    public static long parseTimestamp(String msg) {
-        String[] items = msg.replaceAll("\\.", ":").split(":", 4);
-        long time = 0;
-        try {
-            if (items.length >= 3) {
-                time = Integer.parseInt(items[0].trim()) * 3600000 + Integer.parseInt(items[1].trim()) * 60000
-                        + Integer.parseInt(items[2].trim()) * 1000;
-            }
-            if (items.length == 4) {
-                time += Integer.parseInt(items[3].trim());
-            }
-        } catch (Exception e) {
-            logger.error("Faild to parse time:{}", msg);
-        }
-
-        return time;
-    }
-
     public static long tomorrowZeroTimestampMs(long now, int timeZone) {
         return now - (now + timeZone * 3600000) % 86400000 + 86400000;
     }
