@@ -8,6 +8,7 @@ import org.apache.flink.api.common.state.MapStateDescriptor;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.functions.co.BroadcastProcessFunction;
 import org.apache.flink.util.Collector;
+import org.apache.flink.util.OutputTag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,10 +24,15 @@ public class LogProcessFunction extends BroadcastProcessFunction<LogEntry, RuleB
     private RuleBase latestRuleBase = null;
     private String ruleKeyName = "logRule";
     private transient LogProcessor logProcessor = null;
+    private OutputTag<LogEntry> kafkaOutputTag = null;
+    private String kafkaIndex = null;
 
-    public LogProcessFunction(MapStateDescriptor<String, RuleBase> ruleStateDescriptor, RuleBase ruleBase) {
+    public LogProcessFunction(MapStateDescriptor<String, RuleBase> ruleStateDescriptor, RuleBase ruleBase,
+                              OutputTag<LogEntry> kafkaOutputTag, String kafkaIndex) {
         this.ruleStateDescriptor = ruleStateDescriptor;
         this.latestRuleBase = ruleBase;
+        this.kafkaOutputTag = kafkaOutputTag;
+        this.kafkaIndex = kafkaIndex;
     }
 
     @Override
@@ -48,6 +54,10 @@ public class LogProcessFunction extends BroadcastProcessFunction<LogEntry, RuleB
                     collector.collect(item);
                 } else {
                     logger.debug("Emit the log with id [{}]", item.getId());
+                    //Side output specified index data to kafka
+                    if (kafkaIndex != null && kafkaIndex.equals(item.getIndex())) {
+                        readOnlyContext.output(kafkaOutputTag, item);
+                    }
                     collector.collect(item);
                 }
             }

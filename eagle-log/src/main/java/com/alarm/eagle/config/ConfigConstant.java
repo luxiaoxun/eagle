@@ -33,4 +33,9 @@ public interface ConfigConstant {
     String REDIS_WINDOW_TRIGGER_COUNT = "redis.window.trigger.count";
     String REDIS_CLUSTER_HOSTS = "redis.cluster.hosts";
     String REDIS_SINK_PARALLELISM = "redis.sink.parallelism";
+
+    String KAFKA_SINK_INDEX = "kafka.sink.index";
+    String KAFKA_SINK_BOOTSTRAP_SERVERS = "kafka.sink.bootstrap.servers";
+    String KAFKA_SINK_TOPIC = "kafka.sink.topic";
+    String KAFKA_SINK_TOPIC_PARALLELISM = "kafka.sink.topic.parallelism";
 }

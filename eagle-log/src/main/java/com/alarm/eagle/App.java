@@ -25,10 +25,7 @@ import org.apache.flink.api.java.utils.ParameterTool;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.shaded.guava18.com.google.common.collect.Lists;
 import org.apache.flink.streaming.api.TimeCharacteristic;
-import org.apache.flink.streaming.api.datastream.BroadcastConnectedStream;
-import org.apache.flink.streaming.api.datastream.BroadcastStream;
-import org.apache.flink.streaming.api.datastream.DataStream;
-import org.apache.flink.streaming.api.datastream.WindowedStream;
+import org.apache.flink.streaming.api.datastream.*;
 import org.apache.flink.streaming.api.environment.CheckpointConfig;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.functions.timestamps.BoundedOutOfOrdernessTimestampExtractor;
@@ -38,7 +35,10 @@ import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
 import org.apache.flink.streaming.connectors.elasticsearch.ElasticsearchSinkBase;
 import org.apache.flink.streaming.connectors.elasticsearch6.ElasticsearchSink;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer010;
+import org.apache.flink.streaming.connectors.kafka.FlinkKafkaProducer010;
+import org.apache.flink.streaming.connectors.kafka.FlinkKafkaProducer09;
 import org.apache.flink.util.Collector;
+import org.apache.flink.util.OutputTag;
 import org.apache.http.HttpHost;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,6 +60,10 @@ public class App {
             "rules-state", BasicTypeInfo.STRING_TYPE_INFO, TypeInformation.of(new TypeHint<RuleBase>() {
     }));
 
+    private static final OutputTag<LogEntry> kafkaOutputTag = new OutputTag<LogEntry>("log-kafka-output",
+            TypeInformation.of(LogEntry.class)) {
+    };
+
     public static void main(String[] args) {
         try {
             ParameterTool params = ParameterTool.fromArgs(args);
@@ -70,9 +74,12 @@ public class App {
             StreamExecutionEnvironment env = getStreamExecutionEnvironment(parameter);
             DataStream<LogEntry> dataSource = getKafkaDataSource(parameter, env);
             BroadcastStream<RuleBase> ruleSource = getRuleDataSource(parameter, env);
-            DataStream<LogEntry> processedSource = processLogStream(parameter, dataSource, ruleSource);
-            sinkToRedis(parameter, processedSource);
-            sinkToElasticsearch(parameter, processedSource);
+            SingleOutputStreamOperator<LogEntry> processedStream = processLogStream(parameter, dataSource, ruleSource);
+            sinkToRedis(parameter, processedStream);
+            sinkToElasticsearch(parameter, processedStream);
+
+            DataStream<LogEntry> kafkaOutputStream = processedStream.getSideOutput(kafkaOutputTag);
+            sinkLogToKafka(parameter, kafkaOutputStream);
 
             env.getConfig().setGlobalJobParameters(parameter);
             env.execute("eagle-log");
@@ -127,17 +134,18 @@ public class App {
         return env.addSource(source).name(kafkaTopic).uid(kafkaTopic).setParallelism(kafkaParallelism);
     }
 
-    private static DataStream<LogEntry> processLogStream(ParameterTool parameter, DataStream<LogEntry> dataSource,
-                                                         BroadcastStream<RuleBase> ruleSource) throws Exception {
+    private static SingleOutputStreamOperator<LogEntry> processLogStream(ParameterTool parameter, DataStream<LogEntry> dataSource,
+                                                                         BroadcastStream<RuleBase> ruleSource) throws Exception {
         BroadcastConnectedStream<LogEntry, RuleBase> connectedStreams = dataSource.connect(ruleSource);
         int processParallelism = parameter.getInt(ConfigConstant.STREAM_PROCESS_PARALLELISM);
+        String kafkaIndex = parameter.get(ConfigConstant.KAFKA_SINK_INDEX);
         RuleBase ruleBase = getInitRuleBase(parameter);
         if (ruleBase == null) {
             throw new Exception("Can not init rules base");
         } else {
             String name = "process-log";
             logger.debug("Init rules: " + ruleBase.toString());
-            return connectedStreams.process(new LogProcessFunction(ruleStateDescriptor, ruleBase))
+            return connectedStreams.process(new LogProcessFunction(ruleStateDescriptor, ruleBase, kafkaOutputTag, kafkaIndex))
                     .setParallelism(processParallelism).name(name).uid(name);
         }
     }
@@ -159,6 +167,18 @@ public class App {
 
         RuleBase ruleBase = RuleBase.createRuleBase(resJson);
         return ruleBase;
+    }
+
+    private static void sinkLogToKafka(ParameterTool parameter, DataStream<LogEntry> stream) {
+        String kafkaBootstrapServers = parameter.get(ConfigConstant.KAFKA_SINK_BOOTSTRAP_SERVERS);
+        String kafkaTopic = parameter.get(ConfigConstant.KAFKA_SINK_TOPIC);
+        int kafkaParallelism = parameter.getInt(ConfigConstant.KAFKA_SINK_TOPIC_PARALLELISM);
+        String name = "kafka-sink";
+        FlinkKafkaProducer010<LogEntry> producer = new FlinkKafkaProducer010<>(kafkaBootstrapServers, kafkaTopic,
+                new LogSchema());
+        producer.setFlushOnCheckpoint(true);
+        producer.setLogFailuresOnly(true);
+        stream.addSink(producer).setParallelism(kafkaParallelism).name(name).uid(name);
     }
 
     private static void sinkToElasticsearch(ParameterTool parameter, DataStream<LogEntry> dataSource) {

@@ -42,6 +42,11 @@ public class EagleProperties {
                     map.put(ConfigConstant.KAFKA_GROUP_ID, "log-dev");
                     map.put(ConfigConstant.KAFKA_TOPIC, "eagle-log");
                     map.put(ConfigConstant.KAFKA_TOPIC_PARALLELISM, "3");
+
+                    map.put(ConfigConstant.KAFKA_SINK_INDEX, "log_alarm");
+                    map.put(ConfigConstant.KAFKA_SINK_BOOTSTRAP_SERVERS, "168.11.101.22:9092,168.11.101.23:9092,168.11.101.24:9092");
+                    map.put(ConfigConstant.KAFKA_SINK_TOPIC, "eagle-log-alarm");
+                    map.put(ConfigConstant.KAFKA_SINK_TOPIC_PARALLELISM, "6");
                     break;
                 case ConfigConstant.MODE_TEST:
                     map.put(ConfigConstant.FLINK_MODE, ConfigConstant.MODE_TEST);
@@ -49,6 +54,11 @@ public class EagleProperties {
                     map.put(ConfigConstant.KAFKA_GROUP_ID, "log-test");
                     map.put(ConfigConstant.KAFKA_TOPIC, "eagle-log");
                     map.put(ConfigConstant.KAFKA_TOPIC_PARALLELISM, "6");
+
+                    map.put(ConfigConstant.KAFKA_SINK_INDEX, "log_alarm");
+                    map.put(ConfigConstant.KAFKA_SINK_BOOTSTRAP_SERVERS, "168.11.101.22:9092,168.11.101.23:9092,168.11.101.24:9092");
+                    map.put(ConfigConstant.KAFKA_SINK_TOPIC, "eagle-log-alarm");
+                    map.put(ConfigConstant.KAFKA_SINK_TOPIC_PARALLELISM, "6");
                     break;
             }
             map.put(ConfigConstant.FLINK_PARALLELISM, "2");
