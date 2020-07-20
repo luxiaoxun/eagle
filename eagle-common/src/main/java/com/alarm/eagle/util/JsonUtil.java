@@ -19,8 +19,8 @@ public class JsonUtil {
     private static final ObjectMapper mapper = new ObjectMapper();
 
     static {
-        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES , false);
-        mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS,false);
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
     }
 
     public static ObjectNode createObjectNode() {
@@ -31,19 +31,19 @@ public class JsonUtil {
         return mapper.convertValue(o, valueType);
     }
 
-    public static <T> T decode(String jsonStr, Class<T> valueType){
+    public static <T> T decode(String jsonStr, Class<T> valueType) {
         try {
             return mapper.readValue(jsonStr, valueType);
-        }catch (Exception e) {
+        } catch (Exception e) {
             logger.error("jsonStr={}||valueType={}||error=", jsonStr, valueType, e);
             return null;
         }
     }
 
-    public static <T> T decode(String jsonStr, TypeReference valueTypeRef){
+    public static <T> T decode(String jsonStr, TypeReference valueTypeRef) {
         try {
             return mapper.readValue(jsonStr, valueTypeRef);
-        }catch (Exception e) {
+        } catch (Exception e) {
             logger.error("jsonStr={}||valueTypeRef={}||error=", jsonStr, valueTypeRef, e);
             return null;
         }
@@ -52,7 +52,7 @@ public class JsonUtil {
     public static String encode(Object o) {
         try {
             return mapper.writeValueAsString(o);
-        }catch (Exception e) {
+        } catch (Exception e) {
             logger.error("object={}||error=", o, e);
             return null;
         }
@@ -88,8 +88,8 @@ public class JsonUtil {
         return json;
     }
 
-    public static <type> type jsonToObject(String json, Class<?> cls) {
-        type obj = null;
+    public static <T> T jsonToObject(String json, Class<?> cls) {
+        T obj = null;
         JavaType javaType = mapper.getTypeFactory().constructType(cls);
         try {
             obj = mapper.readValue(json, javaType);
@@ -99,9 +99,10 @@ public class JsonUtil {
         return obj;
     }
 
-    public static <type> type jsonToObjectList(String json,
-                                               Class<?> collectionClass, Class<?>... elementClass) {
-        type obj = null;
+    public static <T> T jsonToObjectList(String json,
+                                         Class<?> collectionClass,
+                                         Class<?>... elementClass) {
+        T obj = null;
         JavaType javaType = mapper.getTypeFactory().constructParametricType(
                 collectionClass, elementClass);
         try {
@@ -112,9 +113,10 @@ public class JsonUtil {
         return obj;
     }
 
-    public static <type> type jsonToObjectHashMap(String json,
-                                                  Class<?> keyClass, Class<?> valueClass) {
-        type obj = null;
+    public static <T> T jsonToObjectHashMap(String json,
+                                            Class<?> keyClass,
+                                            Class<?> valueClass) {
+        T obj = null;
         JavaType javaType = mapper.getTypeFactory().constructParametricType(HashMap.class, keyClass, valueClass);
         try {
             obj = mapper.readValue(json, javaType);
