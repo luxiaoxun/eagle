@@ -130,7 +130,7 @@ public class App {
         properties.setProperty("bootstrap.servers", kafkaBootstrapServers);
         properties.setProperty("group.id", kafkaGroupId);
         FlinkKafkaConsumer010<LogEntry> source = new FlinkKafkaConsumer010<>(kafkaTopic, new LogSchema(), properties);
-
+        source.setCommitOffsetsOnCheckpoints(true);
         return env.addSource(source).name(kafkaTopic).uid(kafkaTopic).setParallelism(kafkaParallelism);
     }
 
@@ -177,7 +177,7 @@ public class App {
         FlinkKafkaProducer010<LogEntry> producer = new FlinkKafkaProducer010<>(kafkaBootstrapServers, kafkaTopic,
                 new LogSchema());
         producer.setFlushOnCheckpoint(true);
-        producer.setLogFailuresOnly(true);
+        producer.setLogFailuresOnly(false);
         stream.addSink(producer).setParallelism(kafkaParallelism).name(name).uid(name);
     }
 
