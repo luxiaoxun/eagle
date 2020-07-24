@@ -4,7 +4,7 @@ Real time log processing system based on flink and drools
 中文详情：[Chinese Details](https://www.cnblogs.com/luxiaoxun/p/13197981.html)
 
 ### Design:
-![design](https://img2020.cnblogs.com/blog/434101/202006/434101-20200627112934739-65447543.png)
+![design](https://github.com/luxiaoxun/eagle/blob/master/picture/eagle-design.png)
 
 ### Modules:
 * eagle-api：基于springboot，提供drools规则引擎的读写服务。
