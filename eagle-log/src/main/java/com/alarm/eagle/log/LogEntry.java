@@ -40,8 +40,8 @@ public class LogEntry implements Serializable {
     private String path;
     private long offset = -1;
 
-    private boolean filter = true;
-    private boolean isJsonLog = false;
+    private boolean wrongLog = true;
+    private boolean jsonLog = false;
     private String jsonStr = null;
 
     private Map<String, Object> fields = new HashMap<>();
@@ -188,16 +188,12 @@ public class LogEntry implements Serializable {
         }
     }
 
-    public void enableJsonLog() {
-        isJsonLog = true;
-    }
-
     public boolean isJsonLog() {
-        return isJsonLog;
+        return jsonLog;
     }
 
-    public void setIsJsonLog(boolean jsonLog) {
-        isJsonLog = jsonLog;
+    public void setJsonLog(boolean jsonLog) {
+        this.jsonLog = jsonLog;
     }
 
     public String getJsonStr() {
@@ -228,7 +224,7 @@ public class LogEntry implements Serializable {
     }
 
     public JSONObject toJSON() {
-        if (isJsonLog) {
+        if (jsonLog) {
             this.setJson("index", index);
             JSONObject jsonObj = (JSONObject) JSONObject.parse(this.jsonStr);
             return jsonObj;
@@ -273,12 +269,12 @@ public class LogEntry implements Serializable {
         return offset;
     }
 
-    public boolean isFilter() {
-        return filter;
+    public boolean isWrongLog() {
+        return wrongLog;
     }
 
-    public void setFilter(boolean filter) {
-        this.filter = filter;
+    public void setWrongLog(boolean wrongLog) {
+        this.wrongLog = wrongLog;
     }
 
     public String getId() {
@@ -324,7 +320,7 @@ public class LogEntry implements Serializable {
     }
 
     public void handleError() {
-        this.isJsonLog = false;
+        this.jsonLog = false;
         if (this.ip == null) {
             this.ip = "0.0.0.0";
         }
@@ -335,12 +331,12 @@ public class LogEntry implements Serializable {
         this.setIndex("error_log");
         this.setTimestamp(this.getAtTimestamp() != null ? this.getAtTimestamp() : this.getTimestamp());
         this.setMessage(this.getJson().toString());
-        this.setFilter(false);
+        this.setWrongLog(false);
     }
 
     public void dealDone() {
         calculateDelayTime();
-        setFilter(false);
+        setWrongLog(false);
     }
 
     public void calculateDelayTime() {
@@ -354,6 +350,6 @@ public class LogEntry implements Serializable {
     public String toString() {
         return "LogEntry [id=" + id + ", type=" + type + ", index=" + index + ", timestamp=" + timestamp
                 + ", atTimestamp=" + atTimestamp + ", ip=" + ip + ", message=" + message + ", path=" + path + ", fields="
-                + fields + ", filter=" + filter + "]";
+                + fields + ", wrongLog=" + wrongLog + "]";
     }
 }

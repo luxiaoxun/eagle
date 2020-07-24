@@ -13,17 +13,33 @@ rule "log_app_2 log rules"
     no-loop true
     salience 100
     when
-        $log : LogEntry( index == "log_app_2", $msg : message)
+        $log : LogEntry(index == "log_app_2", $msg : message)
     then
-        LOG.debug("receive log_app_2 log, id:[{}]", $log.getId());
+        LOG.debug("Receive log_app_2 log, id:[{}]", $log.getId());
         String logTime = RegexUtil.extractString("(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2})", $msg);
         if (logTime == null) {
-            LOG.warn("invalid date or time, log: {}", $msg);
+            LOG.warn("Invalid date or time, log: {}", $msg);
             return;
         }
         Date date = DateUtil.convertFromString("yyyy-MM-dd HH:mm:ss", logTime);
         $log.setTimestamp(date != null ? date : $log.getAtTimestamp());
-
         $log.dealDone();
+
+        //Try to get metric from the log
+        String costTime = RegexUtil.extractString("cost time: (\\d*\\.?\\d*)", $msg);
+        if(costTime != null) {
+            LogEntry logMetric = new LogEntry();
+            logMetric.addField("costTime", Double.valueOf(costTime));
+            //log_app_2_metric
+            logMetric.setIndex($log.getIndex()+"_metric");
+            logMetric.setIp($log.getIp());
+            logMetric.setAtTimestamp($log.getAtTimestamp());
+            logMetric.setTimestamp($log.getTimestamp());
+            logMetric.addField("appLogId", $log.getId());
+            logMetric.setWrongLog(false);
+            //Add metric log to another index
+            insert(logMetric);
+        }
+
         LOG.debug("out -----log_app_2------");
 end
