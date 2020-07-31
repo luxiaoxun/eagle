@@ -3,6 +3,7 @@ package com.alarm.eagle.es;
 import org.apache.flink.streaming.connectors.elasticsearch.ActionRequestFailureHandler;
 import org.apache.flink.streaming.connectors.elasticsearch.RequestIndexer;
 import org.apache.flink.util.ExceptionUtils;
+import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.ElasticsearchParseException;
 import org.elasticsearch.action.ActionRequest;
 import org.elasticsearch.action.index.IndexRequest;
@@ -20,7 +21,10 @@ public class EsActionRequestFailureHandler implements ActionRequestFailureHandle
 
     @Override
     public void onFailure(ActionRequest actionRequest, Throwable throwable, int i, RequestIndexer requestIndexer) throws Throwable {
-        if (ExceptionUtils.findThrowable(throwable, ElasticsearchParseException.class).isPresent()) {
+        if (ExceptionUtils.findThrowable(throwable, ElasticsearchException.class).isPresent()) {
+            IndexRequest indexRequest = (IndexRequest) actionRequest;
+            logger.error("Error log:" + indexRequest.index() + " source: " + indexRequest.sourceAsMap() + " exception: " + throwable.toString());
+        } else if (ExceptionUtils.findThrowable(throwable, ElasticsearchParseException.class).isPresent()) {
             IndexRequest indexRequest = (IndexRequest) actionRequest;
             logger.error("Error log:" + indexRequest.index() + " source: " + indexRequest.sourceAsMap() + " exception: " + throwable.toString());
         } else if (ExceptionUtils.findThrowable(throwable, IOException.class).isPresent()) {
