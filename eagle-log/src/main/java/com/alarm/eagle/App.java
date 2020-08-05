@@ -187,7 +187,7 @@ public class App {
         esSinkBuilder.setBulkFlushInterval(intervalMillis);
         esSinkBuilder.setBulkFlushBackoff(true);
         esSinkBuilder.setBulkFlushBackoffRetries(3);
-        esSinkBuilder.setBulkFlushBackoffType(ElasticsearchSinkBase.FlushBackoffType.CONSTANT);
+        esSinkBuilder.setBulkFlushBackoffType(ElasticsearchSinkBase.FlushBackoffType.EXPONENTIAL);
         esSinkBuilder.setBulkFlushBackoffDelay(1000);
         esSinkBuilder.setFailureHandler(new EsActionRequestFailureHandler());
         dataSource.addSink(esSinkBuilder.build()).setParallelism(esSinkParallelism).name(name).uid(name);
