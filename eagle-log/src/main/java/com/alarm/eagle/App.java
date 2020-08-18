@@ -98,7 +98,7 @@ public class App {
             config.setMinPauseBetweenCheckpoints(30000L);
             config.setCheckpointTimeout(10000L);
             //RETAIN_ON_CANCELLATION则在job cancel的时候会保留externalized checkpoint state
-            config.enableExternalizedCheckpoints(CheckpointConfig.ExternalizedCheckpointCleanup.RETAIN_ON_CANCELLATION);
+            config.enableExternalizedCheckpoints(CheckpointConfig.ExternalizedCheckpointCleanup.DELETE_ON_CANCELLATION);
         }
 
         return env;
@@ -132,10 +132,10 @@ public class App {
         String kafkaIndex = parameter.get(ConfigConstant.KAFKA_SINK_INDEX);
         RuleBase ruleBase = getInitRuleBase(parameter);
         if (ruleBase == null) {
-            throw new Exception("Can not init rules base");
+            throw new Exception("Can not get initial rules");
         } else {
             String name = "process-log";
-            logger.debug("Init rules: " + ruleBase.toString());
+            logger.debug("Initial rules: " + ruleBase.toString());
             return connectedStreams.process(new LogProcessFunction(ruleStateDescriptor, ruleBase, kafkaOutputTag, kafkaIndex))
                     .setParallelism(processParallelism).name(name).uid(name);
         }
@@ -199,17 +199,6 @@ public class App {
         int windowCount = parameter.getInt(ConfigConstant.REDIS_WINDOW_TRIGGER_COUNT);
         int redisSinkParallelism = parameter.getInt(ConfigConstant.REDIS_SINK_PARALLELISM);
         String name = "redis-agg-log";
-//        DataStream<Tuple2<String, List<LogEntry>>> keyedStream = dataSource.keyBy((KeySelector<LogEntry, String>) log -> log.getIndex())
-//                .timeWindow(Time.seconds(windowTime)).trigger(new CountTriggerWithTimeout<>(windowCount, TimeCharacteristic.ProcessingTime))
-//                .process(new ProcessWindowFunction<LogEntry, Tuple2<String, List<LogEntry>>, String, TimeWindow>() {
-//                    @Override
-//                    public void process(String s, Context context, Iterable<LogEntry> iterable, Collector<Tuple2<String, List<LogEntry>>> collector) throws Exception {
-//                        ArrayList<LogEntry> logs = Lists.newArrayList(iterable);
-//                        if (logs.size() > 0) {
-//                            collector.collect(new Tuple2(s, logs));
-//                        }
-//                    }
-//                }).setParallelism(redisSinkParallelism).name(name).uid(name);
         DataStream<LogStatWindowResult> keyedStream = dataSource.keyBy((KeySelector<LogEntry, String>) log -> log.getIndex())
                 .timeWindow(Time.seconds(windowTime))
                 .trigger(new CountTriggerWithTimeout<>(windowCount, TimeCharacteristic.ProcessingTime))
