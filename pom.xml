@@ -13,6 +13,7 @@
         <module>eagle-api</module>
         <module>eagle-common</module>
         <module>eagle-log</module>
+        <module>eagle-alarm</module>
     </modules>
 
     <properties>
@@ -36,6 +37,7 @@
         <springboot.version>2.2.7.RELEASE</springboot.version>
         <mysql.version>8.0.16</mysql.version>
         <jodatime.version>2.9.6</jodatime.version>
+        <lombok.version>1.18.0</lombok.version>
         <groovy.version>2.4.6</groovy.version>
         <drools.version>6.5.0.Final</drools.version>
     </properties>
@@ -124,6 +126,13 @@
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
                 <version>${guava.version}</version>
+            </dependency>
+
+            <!-- lombok -->
+            <dependency>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok</artifactId>
+                <version>${lombok.version}</version>
             </dependency>
 
             <!-- http client -->
