@@ -1,7 +1,7 @@
 # eagle
 Real time log processing system based on flink and drools 
 
-中文详情：[Chinese Details](https://www.cnblogs.com/luxiaoxun/p/13197981.html)
+中文详情：[基于flink和drools的实时日志处理](https://www.cnblogs.com/luxiaoxun/p/13197981.html)
 
 ### Design:
 ![design](https://github.com/luxiaoxun/eagle/blob/master/picture/eagle-design.png)
@@ -10,6 +10,10 @@ Real time log processing system based on flink and drools
 * eagle-api：基于springboot，提供drools规则引擎的读写服务。
 * eagle-common：通用类模块。
 * eagle-log：基于flink的日志处理服务。
+* eagle-alarm：基于flink的交易欺诈检测系统。 
+    1. [Flink 高级应用模式第一辑：欺诈检测系统案例研究](https://www.infoq.cn/article/dR1m9FfB1gEtvggKvlVX)
+    2. [Flink 高级应用模式第二辑：应用模式的动态更新](https://www.infoq.cn/article/KFT2f79afVkNfIy6MRGg)
+    3. [Flink 中的应用部署（三）：自定义窗口处理](https://www.infoq.cn/article/3Xiw36wSyK6J9G40jA9F)
 
 build
 ```
