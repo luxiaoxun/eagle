@@ -5,20 +5,13 @@ import com.alarm.eagle.config.EagleProperties;
 import com.alarm.eagle.es.ElasticsearchUtil;
 import com.alarm.eagle.es.EsActionRequestFailureHandler;
 import com.alarm.eagle.es.EsSinkFunction;
-import com.alarm.eagle.log.CountTriggerWithTimeout;
-import com.alarm.eagle.log.LogEntry;
-import com.alarm.eagle.log.LogProcessFunction;
-import com.alarm.eagle.log.LogSchema;
+import com.alarm.eagle.log.*;
 import com.alarm.eagle.redis.*;
 import com.alarm.eagle.rule.RuleBase;
 import com.alarm.eagle.rule.RuleSourceFunction;
 import com.alarm.eagle.util.HttpUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
-import org.apache.flink.api.common.state.MapStateDescriptor;
-import org.apache.flink.api.common.typeinfo.BasicTypeInfo;
-import org.apache.flink.api.common.typeinfo.TypeHint;
-import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.api.java.utils.ParameterTool;
 import org.apache.flink.configuration.Configuration;
@@ -31,7 +24,6 @@ import org.apache.flink.streaming.connectors.elasticsearch.ElasticsearchSinkBase
 import org.apache.flink.streaming.connectors.elasticsearch6.ElasticsearchSink;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer010;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaProducer010;
-import org.apache.flink.util.OutputTag;
 import org.apache.http.HttpHost;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,15 +37,6 @@ import java.util.Properties;
  */
 public class App {
     private static final Logger logger = LoggerFactory.getLogger(App.class);
-
-    // a map descriptor to store the rules
-    private static final MapStateDescriptor<String, RuleBase> ruleStateDescriptor = new MapStateDescriptor<>(
-            "rules-state", BasicTypeInfo.STRING_TYPE_INFO, TypeInformation.of(new TypeHint<RuleBase>() {
-    }));
-
-    private static final OutputTag<LogEntry> kafkaOutputTag = new OutputTag<LogEntry>("log-kafka-output",
-            TypeInformation.of(LogEntry.class)) {
-    };
 
     public static void main(String[] args) {
         try {
@@ -69,7 +52,7 @@ public class App {
             sinkToRedis(parameter, processedStream);
             sinkToElasticsearch(parameter, processedStream);
 
-            DataStream<LogEntry> kafkaOutputStream = processedStream.getSideOutput(kafkaOutputTag);
+            DataStream<LogEntry> kafkaOutputStream = processedStream.getSideOutput(Descriptors.kafkaOutputTag);
             sinkLogToKafka(parameter, kafkaOutputStream);
 
             env.getConfig().setGlobalJobParameters(parameter);
@@ -108,7 +91,7 @@ public class App {
         String ruleUrl = parameter.get(ConfigConstant.STREAM_RULE_URL);
         String ruleName = "rules-source";
         return env.addSource(new RuleSourceFunction(ruleUrl)).name(ruleName).uid(ruleName).setParallelism(1)
-                .broadcast(ruleStateDescriptor);
+                .broadcast(Descriptors.ruleStateDescriptor);
     }
 
     private static DataStream<LogEntry> getKafkaDataSource(ParameterTool parameter, StreamExecutionEnvironment env) {
@@ -136,7 +119,7 @@ public class App {
         } else {
             String name = "process-log";
             logger.debug("Initial rules: " + ruleBase.toString());
-            return connectedStreams.process(new LogProcessFunction(ruleStateDescriptor, ruleBase, kafkaOutputTag, kafkaIndex))
+            return connectedStreams.process(new LogProcessFunction(ruleBase, kafkaIndex))
                     .setParallelism(processParallelism).name(name).uid(name);
         }
     }
