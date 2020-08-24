@@ -2,13 +2,12 @@
   "ruleId": 1,
   "ruleState": "ACTIVE",
   "groupingKeyNames": [
-    "payerId",
-    "beneficiaryId"
+    "beneficiaryId",
+    "payerId"
   ],
   "aggregateFieldName": "paymentAmount",
   "aggregatorFunctionType": "SUM",
   "limitOperatorType": "GREATER",
-  "limit": 50000,
-  "windowMinutes": 180000,
-  "controlType": "NONE"
+  "limit": 1000000,
+  "windowMinutes": 1440
 }

@@ -181,10 +181,8 @@ public class DynamicAlertFunction extends KeyedBroadcastProcessFunction<
     public void onTimer(final long timestamp, final OnTimerContext ctx, final Collector<Alert> out) throws Exception {
         Rule widestWindowRule = ctx.getBroadcastState(Descriptors.rulesDescriptor).get(WIDEST_RULE_KEY);
 
-        Optional<Long> cleanupEventTimeWindow =
-                Optional.ofNullable(widestWindowRule).map(Rule::getWindowMillis);
-        Optional<Long> cleanupEventTimeThreshold =
-                cleanupEventTimeWindow.map(window -> timestamp - window);
+        Optional<Long> cleanupEventTimeWindow = Optional.ofNullable(widestWindowRule).map(Rule::getWindowMillis);
+        Optional<Long> cleanupEventTimeThreshold = cleanupEventTimeWindow.map(window -> timestamp - window);
 
         cleanupEventTimeThreshold.ifPresent(this::evictAgedElementsFromWindow);
     }
