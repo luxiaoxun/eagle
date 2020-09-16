@@ -1,7 +1,6 @@
 package com.alarm.eagle.api.service;
 
-import com.alarm.eagle.api.bean.LogRule;
-import com.alarm.eagle.api.controller.LogRuleController;
+import com.alarm.eagle.bean.LogRule;
 import com.alarm.eagle.api.domain.LogRuleDo;
 import com.alarm.eagle.api.domain.repository.LogRuleRepository;
 import org.slf4j.Logger;
@@ -9,7 +8,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -27,7 +25,7 @@ public class LogRuleService {
     public List<LogRule> queryAllRules() {
         List<LogRuleDo> logRuleDoList = logRuleRepository.findAll();
         List<LogRule> results = logRuleDoList.stream().map(e -> {
-            return new LogRule(e);
+            return getLogRule(e);
         }).collect(Collectors.toList());
         return results;
     }
@@ -35,9 +33,21 @@ public class LogRuleService {
     public LogRule queryRuleById(long id) {
         Optional<LogRuleDo> logRuleDo = logRuleRepository.findById(id);
         if (logRuleDo.isPresent()) {
-            return new LogRule(logRuleDo.get());
+            return getLogRule(logRuleDo.get());
         }
         return null;
+    }
+
+    private LogRule getLogRule(LogRuleDo logRuleDo) {
+        LogRule logRule = new LogRule();
+        logRule.setId(logRuleDo.getId());
+        logRule.setAppId(logRuleDo.getAppId());
+        logRule.setScript(logRuleDo.getScript());
+        logRule.setType(logRuleDo.getType());
+        logRule.setState(logRuleDo.getState());
+        logRule.setVersion(logRuleDo.getVersion());
+        logRule.setUpdateTime(logRuleDo.getUpdateTime());
+        return logRule;
     }
 
     public LogRuleDo saveOrUpdateRule(LogRuleDo logRuleDo) {

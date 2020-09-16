@@ -1,7 +1,7 @@
 package com.alarm.eagle.api.service.notify;
 
-import com.alarm.eagle.api.bean.AlertPolicy;
-import com.alarm.eagle.api.bean.DataSink;
+import com.alarm.eagle.bean.AlertPolicy;
+import com.alarm.eagle.bean.DataSink;
 import com.alarm.eagle.constants.AlertConstant.*;
 
 /**

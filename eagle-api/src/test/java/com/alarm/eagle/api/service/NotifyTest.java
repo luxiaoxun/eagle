@@ -2,10 +2,10 @@ package com.alarm.eagle.api.service;
 
 import com.alarm.eagle.api.BootTestBase;
 import com.alarm.eagle.api.util.TemplateEngine;
-import com.alarm.eagle.api.bean.AlertPolicy;
-import com.alarm.eagle.api.bean.AlertUser;
-import com.alarm.eagle.api.bean.DataSink;
-import com.alarm.eagle.api.bean.Policy;
+import com.alarm.eagle.bean.AlertPolicy;
+import com.alarm.eagle.bean.AlertUser;
+import com.alarm.eagle.bean.DataSink;
+import com.alarm.eagle.bean.Policy;
 import com.alarm.eagle.api.service.notify.*;
 import com.alarm.eagle.constants.AlertConstant.*;
 

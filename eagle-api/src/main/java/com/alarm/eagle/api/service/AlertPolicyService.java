@@ -2,9 +2,9 @@ package com.alarm.eagle.api.service;
 
 import com.alarm.eagle.api.domain.*;
 import com.alarm.eagle.api.domain.repository.*;
-import com.alarm.eagle.api.bean.AlertPolicy;
-import com.alarm.eagle.api.bean.AlertUser;
-import com.alarm.eagle.api.bean.Policy;
+import com.alarm.eagle.bean.AlertPolicy;
+import com.alarm.eagle.bean.AlertUser;
+import com.alarm.eagle.bean.Policy;
 import com.alarm.eagle.constants.AlertConstant.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

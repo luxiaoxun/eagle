@@ -1,4 +1,4 @@
-package com.alarm.eagle.api.bean;
+package com.alarm.eagle.bean;
 
 import com.alarm.eagle.constants.AlertConstant.Status;
 import com.alarm.eagle.constants.AlertConstant.AlertLevel;

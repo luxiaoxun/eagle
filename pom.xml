@@ -14,6 +14,7 @@
         <module>eagle-common</module>
         <module>eagle-log</module>
         <module>eagle-alarm</module>
+        <module>eagle-policy</module>
     </modules>
 
     <properties>
@@ -40,6 +41,7 @@
         <lombok.version>1.18.0</lombok.version>
         <groovy.version>2.4.6</groovy.version>
         <drools.version>6.5.0.Final</drools.version>
+        <siddhi.version>4.0.0</siddhi.version>
     </properties>
 
     <dependencyManagement>
@@ -167,6 +169,48 @@
                 <groupId>org.drools</groupId>
                 <artifactId>drools-compiler</artifactId>
                 <version>${drools.version}</version>
+            </dependency>
+
+            <!-- siddhi -->
+            <dependency>
+                <groupId>org.wso2.siddhi</groupId>
+                <artifactId>siddhi-core</artifactId>
+                <version>${siddhi.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.siddhi</groupId>
+                <artifactId>siddhi-query-api</artifactId>
+                <version>${siddhi.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.siddhi</groupId>
+                <artifactId>siddhi-query-compiler</artifactId>
+                <version>${siddhi.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.siddhi</groupId>
+                <artifactId>siddhi-annotations</artifactId>
+                <version>${siddhi.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.extension.siddhi.execution.time</groupId>
+                <artifactId>siddhi-execution-time</artifactId>
+                <version>${siddhi.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.extension.siddhi.execution.string</groupId>
+                <artifactId>siddhi-execution-string</artifactId>
+                <version>${siddhi.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.extension.siddhi.execution.math</groupId>
+                <artifactId>siddhi-execution-math</artifactId>
+                <version>${siddhi.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.extension.siddhi.execution.regex</groupId>
+                <artifactId>siddhi-execution-regex</artifactId>
+                <version>${siddhi.version}</version>
             </dependency>
 
             <!--spring boot-->

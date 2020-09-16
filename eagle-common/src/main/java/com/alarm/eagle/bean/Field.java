@@ -1,4 +1,4 @@
-package com.alarm.eagle.api.bean;
+package com.alarm.eagle.bean;
 
 import com.alarm.eagle.util.JsonUtil;
 import org.apache.commons.lang3.builder.EqualsBuilder;

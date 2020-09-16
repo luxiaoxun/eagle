@@ -1,6 +1,5 @@
-package com.alarm.eagle.api.bean;
+package com.alarm.eagle.bean;
 
-import com.alarm.eagle.api.domain.LogRuleDo;
 import com.alarm.eagle.util.JsonUtil;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 
@@ -50,16 +49,6 @@ public class LogRule implements Serializable {
     private Date updateTime;
 
     public LogRule() {
-    }
-
-    public LogRule(LogRuleDo logRuleDo) {
-        this.id = logRuleDo.getId();
-        this.appId = logRuleDo.getAppId();
-        this.script = logRuleDo.getScript();
-        this.type = logRuleDo.getType();
-        this.state = logRuleDo.getState();
-        this.version = logRuleDo.getVersion();
-        this.updateTime = logRuleDo.getUpdateTime();
     }
 
     public Long getId() {
