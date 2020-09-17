@@ -1,4 +1,4 @@
-package com.alarm.eagle.policy;
+package com.alarm.eagle.policy.transform;
 
 import com.alarm.eagle.bean.Datasource;
 import com.alarm.eagle.bean.Task;
@@ -6,7 +6,6 @@ import com.alarm.eagle.policy.constant.PropertiesConstant;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.alarm.eagle.policy.config.EagleProperties;
 import com.alarm.eagle.policy.source.JsonStringSource;
-import com.alarm.eagle.policy.transform.SiddhiFlatMap;
 import com.alarm.eagle.util.DateUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.api.common.functions.MapFunction;

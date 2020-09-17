@@ -4,6 +4,7 @@ import com.alarm.eagle.bean.DataSink;
 import com.alarm.eagle.bean.Task;
 import com.alarm.eagle.policy.config.EagleProperties;
 import com.alarm.eagle.policy.transform.SiddhiOperator;
+import com.alarm.eagle.policy.transform.SiddhiUnionStream;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.alarm.eagle.policy.service.ApiService;
 import com.alarm.eagle.policy.sink.ApiSink;
@@ -76,7 +77,8 @@ public class App {
 
         boolean isEventTime = task.getTimeCharacteristic() == EventTime;
         TypeInformation<DataSink> typeInfo = TypeExtractor.createTypeInfo(DataSink.class);
-        DataStream<DataSink> alertDatastream = unionDatastream.transform("siddhi", typeInfo, new SiddhiOperator(taskId, isEventTime));
+        DataStream<DataSink> alertDatastream = unionDatastream.transform("siddhi", typeInfo,
+                new SiddhiOperator(taskId, isEventTime));
         alertDatastream.addSink(new ApiSink(task));
 
         env.execute();

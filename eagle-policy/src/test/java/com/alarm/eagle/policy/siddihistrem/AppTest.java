@@ -17,13 +17,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-
 /**
  * 启动程序
  */
 public class AppTest {
     public static void main(String[] args) throws Exception {
-
         StreamExecutionEnvironment environment = StreamExecutionEnvironment.getExecutionEnvironment();
 
         // enable event time processing
@@ -82,10 +80,10 @@ public class AppTest {
 
         //构建带streamId的Datastream
         List<DataStream<Tuple2<String, ObjectNode>>> nameDatastreamList = new ArrayList<>();
-
         for (Datasource datasource1 : task.getDatasourceList()) {
             final String streamId = datasource1.getStreamId();
-            DataStream<ObjectNode> dataStream = environment.addSource(new JsonSource(streamId)).assignTimestampsAndWatermarks(
+            DataStream<ObjectNode> dataStream = environment.addSource(new JsonSource(streamId))
+                    .assignTimestampsAndWatermarks(
                     new BoundedOutOfOrdernessTimestampExtractor<ObjectNode>(Time.minutes(1L)) {
                         @Override
                         public long extractTimestamp(ObjectNode jsonNodes) {

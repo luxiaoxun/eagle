@@ -17,7 +17,6 @@ public class CoreApiTest {
     public void testTypeHint() {
         TypeHint<String> typeHint = new TypeHint<String>() {
         };
-
     }
 
     @Test

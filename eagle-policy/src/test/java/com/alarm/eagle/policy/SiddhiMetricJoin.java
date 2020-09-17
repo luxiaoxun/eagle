@@ -10,7 +10,6 @@ import org.wso2.siddhi.core.query.output.callback.QueryCallback;
 import org.wso2.siddhi.core.stream.input.InputHandler;
 import org.wso2.siddhi.core.util.EventPrinter;
 
-
 public class SiddhiMetricJoin {
 
     private static final Logger logger = LoggerFactory.getLogger(SiddhiMetricJoin.class);

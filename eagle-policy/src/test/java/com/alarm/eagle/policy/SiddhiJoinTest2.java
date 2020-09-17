@@ -12,7 +12,6 @@ import org.wso2.siddhi.core.util.EventPrinter;
 
 import java.util.Date;
 
-
 public class SiddhiJoinTest2 {
 
     private static final Logger logger = LoggerFactory.getLogger(SiddhiJoinTest2.class);

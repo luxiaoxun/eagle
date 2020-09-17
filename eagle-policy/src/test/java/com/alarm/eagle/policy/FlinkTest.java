@@ -12,8 +12,6 @@ import org.apache.flink.util.Collector;
  */
 public class FlinkTest {
     public static void main(String[] args) throws Exception {
-
-
         // get the execution environment
         final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
 
