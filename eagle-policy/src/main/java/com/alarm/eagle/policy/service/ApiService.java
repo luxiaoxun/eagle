@@ -25,7 +25,7 @@ public class ApiService {
 
     private static final Logger logger = LoggerFactory.getLogger(ApiService.class);
 
-    private static class ApiServieHolder {
+    private static class ApiServiceHolder {
         private static final ApiService apiServiceHolder = new ApiService();
     }
 
@@ -34,7 +34,7 @@ public class ApiService {
     }
 
     public static ApiService getInstance() {
-        return ApiServieHolder.apiServiceHolder;
+        return ApiServiceHolder.apiServiceHolder;
     }
 
     public Task queryTask(Integer taskId) {

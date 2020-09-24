@@ -21,7 +21,7 @@ public class ApiSink implements SinkFunction<DataSink> {
     }
 
     @Override
-    public void invoke(DataSink dataSink) throws Exception {
+    public void invoke(DataSink dataSink, Context context) throws Exception {
         logger.info("metric=eagle-apiSink||dataSink={}", dataSink);
         ApiService.getInstance().sink(dataSink);
     }
