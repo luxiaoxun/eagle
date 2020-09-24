@@ -1,33 +1,33 @@
 package com.alarm.eagle.response;
 
 public class Response<T> {
-    private int errorCode;
-    private String errorMsg;
+    private int code;
+    private String msg;
     private T data;
 
     public Response() {
     }
 
-    public Response(int errorCode, String errorMsg, T data) {
-        this.errorCode = errorCode;
-        this.errorMsg = errorMsg;
+    public Response(int code, String msg, T data) {
+        this.code = code;
+        this.msg = msg;
         this.data = data;
     }
 
-    public int getErrorCode() {
-        return this.errorCode;
+    public int getCode() {
+        return this.code;
     }
 
-    public void setErrorCode(int errorCode) {
-        this.errorCode = errorCode;
+    public void setCode(int code) {
+        this.code = code;
     }
 
-    public String getErrorMsg() {
-        return this.errorMsg;
+    public String getMsg() {
+        return this.msg;
     }
 
-    public void setErrorMsg(String errorMsg) {
-        this.errorMsg = errorMsg;
+    public void setMsg(String msg) {
+        this.msg = msg;
     }
 
     public T getData() {
@@ -39,7 +39,7 @@ public class Response<T> {
     }
 
     public String toString() {
-        return "Response{errorCode=" + this.errorCode + ", errorMsg=\'" + this.errorMsg + '\'' + ", data=" + this.data + '}';
+        return "Response{code=" + this.code + ", msg=\'" + this.msg + '\'' + ", data=" + this.data + '}';
     }
 }
 
