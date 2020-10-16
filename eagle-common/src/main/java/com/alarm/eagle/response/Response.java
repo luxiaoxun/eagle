@@ -2,15 +2,15 @@ package com.alarm.eagle.response;
 
 public class Response<T> {
     private int code;
-    private String msg;
+    private String message;
     private T data;
 
     public Response() {
     }
 
-    public Response(int code, String msg, T data) {
+    public Response(int code, String message, T data) {
         this.code = code;
-        this.msg = msg;
+        this.message = message;
         this.data = data;
     }
 
@@ -22,12 +22,12 @@ public class Response<T> {
         this.code = code;
     }
 
-    public String getMsg() {
-        return this.msg;
+    public String getMessage() {
+        return this.message;
     }
 
-    public void setMsg(String msg) {
-        this.msg = msg;
+    public void setMessage(String message) {
+        this.message = message;
     }
 
     public T getData() {
@@ -39,7 +39,7 @@ public class Response<T> {
     }
 
     public String toString() {
-        return "Response{code=" + this.code + ", msg=\'" + this.msg + '\'' + ", data=" + this.data + '}';
+        return "Response{code=" + this.code + ", msg=\'" + this.message + '\'' + ", data=" + this.data + '}';
     }
 }
 

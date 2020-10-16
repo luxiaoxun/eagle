@@ -1,21 +1,19 @@
 package com.alarm.eagle.response;
 
-import com.alarm.eagle.enumerate.CodeEnum;
-
 public class ResponseUtil {
     public ResponseUtil() {
     }
 
     public static Response success() {
-        return generateResult(CodeEnum.SUCCESS, (Object)null);
+        return generateResult(ResponseCode.SUCCESS, (Object)null);
     }
 
     public static Response success(Object data) {
-        return generateResult(CodeEnum.SUCCESS, data);
+        return generateResult(ResponseCode.SUCCESS, data);
     }
 
     public static Response fail() {
-        return generateResult(CodeEnum.SERVER_ERROR, (Object)null);
+        return generateResult(ResponseCode.SERVER_ERROR, (Object)null);
     }
 
     public static Response fail(int code, String msg) {
@@ -26,7 +24,7 @@ public class ResponseUtil {
         return new Response(code, msg, data);
     }
 
-    public static Response generateResult(CodeEnum codeEnum, Object data) {
-        return generateResult(codeEnum.getCode(), codeEnum.getMsg(), data);
+    public static Response generateResult(ResponseCode responseCode, Object data) {
+        return generateResult(responseCode.getCode(), responseCode.getMsg(), data);
     }
 }

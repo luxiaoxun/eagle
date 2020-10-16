@@ -1,13 +1,13 @@
-package com.alarm.eagle.enumerate;
+package com.alarm.eagle.response;
 
-public enum CodeEnum {
+public enum ResponseCode {
     SUCCESS(0, "success"),
     SERVER_ERROR(-1, "server_error");
 
     private int code;
     private String msg;
 
-    private CodeEnum(int code, String msg) {
+    private ResponseCode(int code, String msg) {
         this.code = code;
         this.msg = msg;
     }
