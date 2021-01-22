@@ -12,7 +12,7 @@ import org.apache.flink.api.common.serialization.SimpleStringSchema;
 import org.apache.flink.api.java.utils.ParameterTool;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.functions.source.SourceFunction;
-import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer010;
+import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
 
 public class TransactionsSource {
 
@@ -30,8 +30,8 @@ public class TransactionsSource {
                 properties.setProperty("bootstrap.servers", kafkaBootstrapServers);
                 properties.setProperty("group.id", kafkaGroupId);
 
-                FlinkKafkaConsumer010<String> kafkaConsumer =
-                        new FlinkKafkaConsumer010<>(transactionsTopic, new SimpleStringSchema(), properties);
+                FlinkKafkaConsumer<String> kafkaConsumer =
+                        new FlinkKafkaConsumer<>(transactionsTopic, new SimpleStringSchema(), properties);
                 kafkaConsumer.setStartFromLatest();
                 return kafkaConsumer;
             case GENERATOR:

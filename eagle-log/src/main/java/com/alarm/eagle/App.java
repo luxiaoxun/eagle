@@ -22,8 +22,8 @@ import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.streaming.connectors.elasticsearch.ElasticsearchSinkBase;
 import org.apache.flink.streaming.connectors.elasticsearch6.ElasticsearchSink;
-import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer010;
-import org.apache.flink.streaming.connectors.kafka.FlinkKafkaProducer010;
+import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
+import org.apache.flink.streaming.connectors.kafka.FlinkKafkaProducer;
 import org.apache.http.HttpHost;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -103,7 +103,7 @@ public class App {
         Properties properties = new Properties();
         properties.setProperty("bootstrap.servers", kafkaBootstrapServers);
         properties.setProperty("group.id", kafkaGroupId);
-        FlinkKafkaConsumer010<LogEntry> source = new FlinkKafkaConsumer010<>(kafkaTopic, new LogSchema(), properties);
+        FlinkKafkaConsumer<LogEntry> source = new FlinkKafkaConsumer<>(kafkaTopic, new LogSchema(), properties);
         source.setCommitOffsetsOnCheckpoints(true);
         return env.addSource(source).name(kafkaTopic).uid(kafkaTopic).setParallelism(kafkaParallelism);
     }
@@ -148,9 +148,8 @@ public class App {
         String kafkaTopic = parameter.get(ConfigConstant.KAFKA_SINK_TOPIC);
         int kafkaParallelism = parameter.getInt(ConfigConstant.KAFKA_SINK_TOPIC_PARALLELISM);
         String name = "kafka-sink";
-        FlinkKafkaProducer010<LogEntry> producer = new FlinkKafkaProducer010<>(kafkaBootstrapServers, kafkaTopic,
+        FlinkKafkaProducer<LogEntry> producer = new FlinkKafkaProducer<>(kafkaBootstrapServers, kafkaTopic,
                 new LogSchema());
-        producer.setFlushOnCheckpoint(true);
         producer.setLogFailuresOnly(false);
         stream.addSink(producer).setParallelism(kafkaParallelism).name(name).uid(name);
     }

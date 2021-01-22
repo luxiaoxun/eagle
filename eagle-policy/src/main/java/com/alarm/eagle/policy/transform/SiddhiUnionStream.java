@@ -9,6 +9,7 @@ import com.alarm.eagle.policy.source.JsonStringSource;
 import com.alarm.eagle.util.DateUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.api.common.functions.MapFunction;
+import org.apache.flink.api.common.serialization.SimpleStringSchema;
 import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.streaming.api.datastream.DataStream;
@@ -16,8 +17,7 @@ import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.functions.source.SourceFunction;
 import org.apache.flink.streaming.api.functions.timestamps.BoundedOutOfOrdernessTimestampExtractor;
 import org.apache.flink.streaming.api.windowing.time.Time;
-import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer010;
-import org.apache.flink.streaming.util.serialization.SimpleStringSchema;
+import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,7 +70,7 @@ public class SiddhiUnionStream {
             Properties properties = new Properties();
             properties.setProperty(PropertiesConstant.SOURCE_BOOTSTRAP_SERVERS, datasource.getServers());
             properties.setProperty(PropertiesConstant.SOURCE_GROUP_ID, datasource.getGroupId());
-            source = new FlinkKafkaConsumer010<>(datasource.getTopic(), new SimpleStringSchema(), properties);
+            source = new FlinkKafkaConsumer<>(datasource.getTopic(), new SimpleStringSchema(), properties);
         }
 
         DataStream<String> sourceStream = env.addSource(source);

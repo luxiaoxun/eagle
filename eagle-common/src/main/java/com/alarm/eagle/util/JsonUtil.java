@@ -40,7 +40,7 @@ public class JsonUtil {
         }
     }
 
-    public static <T> T decode(String jsonStr, TypeReference valueTypeRef) {
+    public static <T> T decode(String jsonStr, TypeReference<T> valueTypeRef) {
         try {
             return mapper.readValue(jsonStr, valueTypeRef);
         } catch (Exception e) {

@@ -24,10 +24,10 @@
         <slf4j.version>1.7.7</slf4j.version>
         <log4j.version>1.2.17</log4j.version>
         <scala.binary.version>2.11</scala.binary.version>
-        <flink.version>1.10.0</flink.version>
+        <flink.version>1.11.0</flink.version>
         <es.version>6.2.4</es.version>
         <jedis.version>2.9.0</jedis.version>
-        <jackson.version>2.9.10.5</jackson.version>
+        <jackson.version>2.12.1</jackson.version>
         <fastjson.version>1.2.62</fastjson.version>
         <common.lang.version>3.3.2</common.lang.version>
         <common.io.version>2.4</common.io.version>
@@ -83,8 +83,13 @@
             </dependency>
             <dependency>
                 <groupId>org.apache.flink</groupId>
-                <artifactId>flink-connector-kafka-0.10_${scala.binary.version}</artifactId>
+                <artifactId>flink-clients_${scala.binary.version}</artifactId>
                 <version>${flink.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.flink</groupId>
+                <artifactId>flink-connector-kafka_2.11</artifactId>
+                <version>1.11.2</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.flink</groupId>

@@ -9,7 +9,7 @@ import org.apache.flink.api.java.utils.ParameterTool;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.functions.sink.PrintSinkFunction;
 import org.apache.flink.streaming.api.functions.sink.SinkFunction;
-import org.apache.flink.streaming.connectors.kafka.FlinkKafkaProducer010;
+import org.apache.flink.streaming.connectors.kafka.FlinkKafkaProducer;
 
 public class CurrentRulesSink {
 
@@ -21,7 +21,7 @@ public class CurrentRulesSink {
             case KAFKA:
                 String kafkaBootstrapServers = parameter.get(AlarmConfigConstant.KAFKA_RULE_EXPORT_BOOTSTRAP_SERVERS);
                 String ruleExportTopic = parameter.get(AlarmConfigConstant.KAFKA_RULE_EXPORT_TOPIC);
-                return new FlinkKafkaProducer010<>(kafkaBootstrapServers, ruleExportTopic, new SimpleStringSchema());
+                return new FlinkKafkaProducer<>(kafkaBootstrapServers, ruleExportTopic, new SimpleStringSchema());
             case STDOUT:
                 return new PrintSinkFunction<>(true);
             default:
