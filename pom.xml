@@ -13,7 +13,7 @@
         <module>eagle-api</module>
         <module>eagle-common</module>
         <module>eagle-log</module>
-        <module>eagle-alarm</module>
+        <module>eagle-fraud-detection</module>
         <module>eagle-policy</module>
     </modules>
 

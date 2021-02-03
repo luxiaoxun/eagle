@@ -31,8 +31,8 @@ import org.slf4j.LoggerFactory;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-public class AlarmApp {
-    private static final Logger logger = LoggerFactory.getLogger(AlarmApp.class);
+public class FraudDetectionApp {
+    private static final Logger logger = LoggerFactory.getLogger(FraudDetectionApp.class);
 
     public static void main(String[] args) {
         try {
