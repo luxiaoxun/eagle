@@ -7,8 +7,7 @@ CREATE TABLE `eagle_task` (
   `create_time` datetime NOT NULL DEFAULT NOW() COMMENT '创建时间',
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`task_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='预警任务表';
-
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='预警任务表';
 
 CREATE TABLE `eagle_datasource` (
   `datasource_id` int(11) unsigned NOT NULL AUTO_INCREMENT COMMENT '数据源id',
@@ -25,7 +24,7 @@ CREATE TABLE `eagle_datasource` (
   `filter` text COMMENT '过滤表达式',
   PRIMARY KEY (`datasource_id`),
   KEY `idx_task_id` (`task_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='预警任务数据源配置';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='预警任务数据源配置';
 
 CREATE TABLE `eagle_app` (
   `app_id` int(11) unsigned NOT NULL AUTO_INCREMENT COMMENT '应用id',
@@ -36,8 +35,7 @@ CREATE TABLE `eagle_app` (
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`app_id`),
   KEY `idx_task_id` (`task_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='预警任务应用配置';
-
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='预警任务应用配置';
 
 CREATE TABLE `eagle_app_stream_define` (
   `stream_define_id` int(11) unsigned NOT NULL AUTO_INCREMENT COMMENT '自增id',
@@ -48,8 +46,7 @@ CREATE TABLE `eagle_app_stream_define` (
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`stream_define_id`),
   KEY `idx_task_id` (`task_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='预警任务流属性配置';
-
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='预警任务流属性配置';
 
 CREATE TABLE `eagle_app_stream_field` (
   `field_id` int(11) unsigned NOT NULL AUTO_INCREMENT COMMENT '自增id',
@@ -62,7 +59,7 @@ CREATE TABLE `eagle_app_stream_field` (
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`field_id`),
   KEY `idx_task_id` (`task_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='预警任务流属性字段配置';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='预警任务流属性字段配置';
 
 CREATE TABLE `eagle_app_policy` (
   `policy_id` int(11) unsigned NOT NULL AUTO_INCREMENT COMMENT '策略id',
@@ -78,7 +75,7 @@ CREATE TABLE `eagle_app_policy` (
   `prepare_stream` text COMMENT '准备流结构定义',
   PRIMARY KEY (`policy_id`),
   KEY `idx_task_id` (`task_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='预警任务策略配置';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='预警任务策略配置';
 
 CREATE TABLE `eagle_sink` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT '自增id',
@@ -91,7 +88,7 @@ CREATE TABLE `eagle_sink` (
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`id`),
   KEY `idx_task_app_policy` (`create_time`,`policy_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='预警sink结果';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='预警sink结果';
 
 
  CREATE TABLE `eagle_alert_group` (
@@ -100,7 +97,7 @@ CREATE TABLE `eagle_sink` (
   `create_time` datetime NOT NULL DEFAULT NOW() COMMENT '创建时间',
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`group_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='预警告警组';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='预警告警组';
 
 CREATE TABLE `eagle_alert_group_user` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT COMMENT '自增id',
@@ -111,7 +108,7 @@ CREATE TABLE `eagle_alert_group_user` (
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`id`),
   KEY `idx_group_id` (`group_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='预警告警组成员';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='预警告警组成员';
 
 CREATE TABLE `eagle_alert_policy` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT COMMENT '自增id',
@@ -128,8 +125,7 @@ CREATE TABLE `eagle_alert_policy` (
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`id`),
   KEY `idx_policy_id` (`policy_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='policy告警配置';
-
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='policy告警配置';
 
 CREATE TABLE `eagle_alert_user` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT COMMENT '自增id',
@@ -141,5 +137,4 @@ CREATE TABLE `eagle_alert_user` (
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`id`),
   KEY `idx_user_name` (`user_name`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='预警用户配置';
-
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='预警用户配置';
