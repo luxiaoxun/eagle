@@ -30,7 +30,7 @@
         <jackson.version>2.12.1</jackson.version>
         <fastjson.version>1.2.62</fastjson.version>
         <common.lang.version>3.3.2</common.lang.version>
-        <common.io.version>2.4</common.io.version>
+        <common.io.version>2.7</common.io.version>
         <httpclient.version>4.5.3</httpclient.version>
         <httpcore.version>4.4.6</httpcore.version>
         <commons.httpclient.version>3.1</commons.httpclient.version>
