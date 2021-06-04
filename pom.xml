@@ -31,7 +31,7 @@
         <fastjson.version>1.2.62</fastjson.version>
         <common.lang.version>3.3.2</common.lang.version>
         <common.io.version>2.7</common.io.version>
-        <httpclient.version>4.5.3</httpclient.version>
+        <httpclient.version>4.5.13</httpclient.version>
         <httpcore.version>4.4.6</httpcore.version>
         <commons.httpclient.version>3.1</commons.httpclient.version>
         <guava.version>30.1-jre</guava.version>
