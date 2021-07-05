@@ -1,6 +1,7 @@
 package com.alarm.eagle.redis;
 
 import org.apache.flink.api.java.tuple.Tuple5;
+
 import java.util.Map;
 
 /**
@@ -8,6 +9,10 @@ import java.util.Map;
  */
 public class LogStatWindowResult extends Tuple5<String, Long, Long, Long, Map<String, Long>> {
     private static final long serialVersionUID = 1L;
+
+    public LogStatWindowResult() {
+
+    }
 
     public LogStatWindowResult(String key, long count, long startTime, long endTime, Map<String, Long> ipMap) {
         super(key, count, startTime, endTime, ipMap);

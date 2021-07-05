@@ -21,11 +21,11 @@
         <skipTests>true</skipTests>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <junit.version>4.13.1</junit.version>
-        <slf4j.version>1.7.7</slf4j.version>
+        <slf4j.version>1.7.31</slf4j.version>
         <log4j.version>1.2.17</log4j.version>
         <scala.binary.version>2.11</scala.binary.version>
         <flink.version>1.11.0</flink.version>
-        <es.version>6.2.4</es.version>
+        <es.version>7.6.2</es.version>
         <jedis.version>2.9.0</jedis.version>
         <jackson.version>2.12.1</jackson.version>
         <fastjson.version>1.2.62</fastjson.version>
@@ -56,6 +56,11 @@
             <!-- log -->
             <dependency>
                 <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>${slf4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-log4j12</artifactId>
                 <version>${slf4j.version}</version>
             </dependency>
@@ -83,12 +88,12 @@
             </dependency>
             <dependency>
                 <groupId>org.apache.flink</groupId>
-                <artifactId>flink-connector-kafka_2.11</artifactId>
+                <artifactId>flink-connector-kafka_${scala.binary.version}</artifactId>
                 <version>1.11.2</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.flink</groupId>
-                <artifactId>flink-connector-elasticsearch6_${scala.binary.version}</artifactId>
+                <artifactId>flink-connector-elasticsearch7_${scala.binary.version}</artifactId>
                 <version>${flink.version}</version>
             </dependency>
             <!--<dependency>-->
