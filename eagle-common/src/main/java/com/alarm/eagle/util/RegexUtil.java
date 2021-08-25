@@ -33,21 +33,6 @@ public class RegexUtil {
         return result.toArray(new String[0]);
     }
 
-    public static Map<String, String> extractMap(String pattern, String msg) {
-        Map<String, String> result = new HashMap<>();
-        Matcher matcher = Pattern.compile(pattern).matcher(msg);
-        if (matcher.find()) {
-            String[] keys = extractAllStrings("\\(\\?\\<([a-zA-Z]+)\\>", pattern);
-            for (final String key : keys) {
-                String value = matcher.group(key);
-                if (!StringUtils.isEmpty(value)) {
-                    result.put(key, value);
-                }
-            }
-        }
-        return result;
-    }
-
     public static String extractString(String pattern, String msg, int index) {
         try {
             Matcher matcher = Pattern.compile(pattern).matcher(msg);
@@ -69,6 +54,17 @@ public class RegexUtil {
         if (matcher.groupCount() >= 2) {
             while (matcher.find()) {
                 result.add(Pair.of(matcher.group(1), matcher.group(2)));
+            }
+        }
+        return result;
+    }
+
+    public static Map<String, String> extractMap(String pattern, String msg) {
+        Map<String, String> result = new HashMap<>();
+        Matcher matcher = Pattern.compile(pattern).matcher(msg);
+        if (matcher.groupCount() >= 2) {
+            while (matcher.find()) {
+                result.put(matcher.group(1), matcher.group(2));
             }
         }
         return result;
