@@ -58,14 +58,14 @@ public class KieSessionHelper {
         KieBuilder kieBuilder = kieServices.newKieBuilder(kfs).buildAll();
         Results results = kieBuilder.getResults();
 
-        List<String> res = new ArrayList<>();
+        List<String> errorMsgs = new ArrayList<>();
         if (results.hasMessages(Message.Level.ERROR)) {
             for (Message msg : results.getMessages(Message.Level.ERROR)) {
-                logger.error("Compile error:{}", msg.getText());
-                res.add(msg.getText());
+                logger.error("Compile rule error: {}", msg.getText());
+                errorMsgs.add(msg.getText());
             }
         }
-        return res;
+        return errorMsgs;
     }
 
     //compile rules base
@@ -84,25 +84,20 @@ public class KieSessionHelper {
 
         KieFileSystem kfs = kieServices.newKieFileSystem();
         kfs.writeKModuleXML(kieModuleModel.toXML());
-
         for (Rule rule : rb.getRules()) {
             kfs.write("src/main/resources/" + rule.getType() + "/" + rule.getId() + ".drl", rule.getScript());
         }
+
         KieBuilder kieBuilder = kieServices.newKieBuilder(kfs).buildAll();
         Results results = kieBuilder.getResults();
+        List<String> errorMsgs = new ArrayList<>();
         if (results.hasMessages(Message.Level.ERROR)) {
             for (Message msg : results.getMessages(Message.Level.ERROR)) {
-                logger.error("Compile error:{}", msg.getText());
+                logger.error("Compile rule error: {}", msg.getText());
+                errorMsgs.add(msg.getText());
             }
         }
-        List<String> res = new ArrayList<>();
-        if (results.hasMessages(Message.Level.ERROR)) {
-            for (Message msg : results.getMessages(Message.Level.ERROR)) {
-                logger.error("Compile error:{}", msg.getText());
-                res.add(msg.getText());
-            }
-        }
-        return res;
+        return errorMsgs;
     }
 
 }
