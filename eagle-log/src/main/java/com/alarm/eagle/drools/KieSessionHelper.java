@@ -85,7 +85,7 @@ public class KieSessionHelper {
         KieFileSystem kfs = kieServices.newKieFileSystem();
         kfs.writeKModuleXML(kieModuleModel.toXML());
         for (Rule rule : rb.getRules()) {
-            kfs.write("src/main/resources/" + rule.getType() + "/" + rule.getId() + ".drl", rule.getScript());
+            kfs.write("src/main/resources/" + rule.getType() + "/" + rule.getName() + ".drl", rule.getScript());
         }
 
         KieBuilder kieBuilder = kieServices.newKieBuilder(kfs).buildAll();

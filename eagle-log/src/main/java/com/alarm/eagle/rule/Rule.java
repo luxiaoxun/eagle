@@ -8,6 +8,7 @@ import java.io.Serializable;
 public class Rule implements Serializable {
     private static final long serialVersionUID = 8259501552136811964L;
     private String id;
+    private String name;
     private String type;
     private String script;
     private String state;
@@ -18,6 +19,14 @@ public class Rule implements Serializable {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getType() {
@@ -47,10 +56,11 @@ public class Rule implements Serializable {
     @Override
     public String toString() {
         return "Rule{" +
-                "id=" + id +
+                "id='" + id + '\'' +
+                ", name='" + name + '\'' +
                 ", type='" + type + '\'' +
                 ", script='" + script + '\'' +
-                ", state=" + state +
+                ", state='" + state + '\'' +
                 '}';
     }
 }

@@ -20,7 +20,7 @@ public class LogProcessFunction extends BroadcastProcessFunction<LogEntry, RuleB
     private static final Logger logger = LoggerFactory.getLogger(LogProcessFunction.class);
 
     private RuleBase latestRuleBase = null;
-    private String ruleKeyName = "logRule";
+    private final String ruleKeyName = "logRule";
     private transient LogProcessor logProcessor = null;
     private String kafkaIndex = null;
 
@@ -69,6 +69,7 @@ public class LogProcessFunction extends BroadcastProcessFunction<LogEntry, RuleB
         }
         logger.info("Get " + ruleBase.getRules().size() + " rules, rules: " + ruleBase.getName());
         if (logProcessor != null) {
+            logProcessor.destroy();
             if (!logProcessor.loadRules(ruleBase)) {
                 logger.error("Failed to load log rules.");
             } else {
@@ -77,7 +78,7 @@ public class LogProcessFunction extends BroadcastProcessFunction<LogEntry, RuleB
             }
         } else {
             logProcessor = new LogProcessorWithRules(LogProcessor.LOG_PKG);
-            logProcessor.loadRules(latestRuleBase);
+            logProcessor.loadRules(ruleBase);
             latestRuleBase = ruleBase;
         }
     }
