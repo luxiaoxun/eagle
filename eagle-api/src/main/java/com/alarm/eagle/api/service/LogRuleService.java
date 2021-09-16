@@ -41,6 +41,7 @@ public class LogRuleService {
     private LogRule getLogRule(LogRuleDo logRuleDo) {
         LogRule logRule = new LogRule();
         logRule.setId(logRuleDo.getId());
+        logRule.setName(logRuleDo.getName());
         logRule.setAppId(logRuleDo.getAppId());
         logRule.setScript(logRuleDo.getScript());
         logRule.setType(logRuleDo.getType());

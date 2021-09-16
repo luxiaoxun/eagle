@@ -19,6 +19,11 @@ public class LogRule implements Serializable {
     private Long id;
 
     /**
+     * name
+     */
+    private String name;
+
+    /**
      * app id
      */
     private String appId;
@@ -57,6 +62,14 @@ public class LogRule implements Serializable {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getAppId() {

@@ -1,6 +1,7 @@
 package com.alarm.eagle.api.domain;
 
 import com.alarm.eagle.util.JsonUtil;
+
 import javax.persistence.*;
 import java.util.Date;
 
@@ -19,6 +20,12 @@ public class LogRuleDo {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(nullable = false, name = "id")
     private Long id;
+
+    /**
+     * name
+     */
+    @Column(nullable = false, name = "name")
+    private String name;
 
     /**
      * app id
@@ -62,6 +69,14 @@ public class LogRuleDo {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getAppId() {
