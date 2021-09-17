@@ -33,7 +33,10 @@ public class LogProcessFunction extends BroadcastProcessFunction<LogEntry, RuleB
     public void open(Configuration parameters) throws Exception {
         super.open(parameters);
         logProcessor = new LogProcessorWithRules(LogProcessor.LOG_PKG);
-        logProcessor.loadRules(this.latestRuleBase);
+        if (!logProcessor.loadRules(this.latestRuleBase)) {
+            logger.error("Failed to load log rules");
+            throw new Exception("Log processor load error");
+        }
     }
 
     @Override
@@ -71,15 +74,18 @@ public class LogProcessFunction extends BroadcastProcessFunction<LogEntry, RuleB
         if (logProcessor != null) {
             logProcessor.destroy();
             if (!logProcessor.loadRules(ruleBase)) {
-                logger.error("Failed to load log rules.");
+                logger.error("Failed to load log rules");
             } else {
                 logger.info("Log rules are updated, hash:{}", ruleBase.getHash());
                 latestRuleBase = ruleBase;
             }
         } else {
             logProcessor = new LogProcessorWithRules(LogProcessor.LOG_PKG);
-            logProcessor.loadRules(ruleBase);
-            latestRuleBase = ruleBase;
+            if (!logProcessor.loadRules(ruleBase)) {
+                logger.error("Failed to load log rules");
+            } else {
+                latestRuleBase = ruleBase;
+            }
         }
     }
 }
