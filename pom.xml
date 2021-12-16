@@ -32,13 +32,13 @@
         <common.lang.version>3.3.2</common.lang.version>
         <common.io.version>2.7</common.io.version>
         <httpclient.version>4.5.13</httpclient.version>
-        <httpcore.version>4.4.6</httpcore.version>
+        <httpcore.version>4.4.14</httpcore.version>
         <commons.httpclient.version>3.1</commons.httpclient.version>
         <guava.version>30.1-jre</guava.version>
         <springboot.version>2.2.7.RELEASE</springboot.version>
         <mysql.version>8.0.16</mysql.version>
         <jodatime.version>2.9.6</jodatime.version>
-        <lombok.version>1.18.0</lombok.version>
+        <lombok.version>1.18.16</lombok.version>
         <groovy.version>2.4.6</groovy.version>
         <drools.version>6.5.0.Final</drools.version>
         <siddhi.version>4.0.0</siddhi.version>
