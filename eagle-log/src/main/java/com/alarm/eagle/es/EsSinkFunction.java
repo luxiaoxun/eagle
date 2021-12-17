@@ -24,7 +24,8 @@ public class EsSinkFunction implements ElasticsearchSinkFunction<LogEntry> {
     public void process(LogEntry log, RuntimeContext runtimeContext, RequestIndexer requestIndexer) {
         log.setEsIndexPrefix(indexPostfix);
         // Use log id as ES doc id
-        requestIndexer.add(new IndexRequest(log.generateIndexName(), "_doc", log.getId())
+        requestIndexer.add(new IndexRequest(log.generateIndexName())
+                .id(log.getId())
                 .source(log.toJSON().toJSONString(), XContentType.JSON));
     }
 }

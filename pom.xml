@@ -22,7 +22,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <junit.version>4.13.1</junit.version>
         <slf4j.version>1.7.31</slf4j.version>
-        <log4j.version>1.2.17</log4j.version>
+        <log4j2.version>2.16.0</log4j2.version>
         <scala.binary.version>2.11</scala.binary.version>
         <flink.version>1.11.0</flink.version>
         <es.version>7.6.2</es.version>
@@ -53,21 +53,27 @@
                 <version>${junit.version}</version>
                 <scope>test</scope>
             </dependency>
-            <!-- log -->
+            <!-- slf4j -->
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-api</artifactId>
                 <version>${slf4j.version}</version>
             </dependency>
+            <!-- log4j2 -->
             <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-log4j12</artifactId>
-                <version>${slf4j.version}</version>
+                <groupId>org.apache.logging.log4j</groupId>
+                <artifactId>log4j-slf4j-impl</artifactId>
+                <version>${log4j2.version}</version>
             </dependency>
             <dependency>
-                <groupId>log4j</groupId>
-                <artifactId>log4j</artifactId>
-                <version>${log4j.version}</version>
+                <groupId>org.apache.logging.log4j</groupId>
+                <artifactId>log4j-api</artifactId>
+                <version>${log4j2.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.logging.log4j</groupId>
+                <artifactId>log4j-core</artifactId>
+                <version>${log4j2.version}</version>
             </dependency>
 
             <!-- flink -->
@@ -89,18 +95,13 @@
             <dependency>
                 <groupId>org.apache.flink</groupId>
                 <artifactId>flink-connector-kafka_${scala.binary.version}</artifactId>
-                <version>1.11.2</version>
+                <version>${flink.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.flink</groupId>
                 <artifactId>flink-connector-elasticsearch7_${scala.binary.version}</artifactId>
                 <version>${flink.version}</version>
             </dependency>
-            <!--<dependency>-->
-            <!--<groupId>org.apache.bahir</groupId>-->
-            <!--<artifactId>flink-connector-redis_${scala.binary.version}</artifactId>-->
-            <!--<version>1.0</version>-->
-            <!--</dependency>-->
 
             <!-- redis -->
             <dependency>
@@ -221,12 +222,17 @@
             <!--spring boot-->
             <dependency>
                 <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-starter-aop</artifactId>
+                <artifactId>spring-boot-starter-web</artifactId>
                 <version>${springboot.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-starter-web</artifactId>
+                <artifactId>spring-boot-starter-log4j2</artifactId>
+                <version>${springboot.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-aop</artifactId>
                 <version>${springboot.version}</version>
             </dependency>
             <dependency>

@@ -38,15 +38,15 @@ public class EagleProperties {
             switch (mode) {
                 case ConfigConstant.MODE_DEV:
                     map.put(ConfigConstant.FLINK_MODE, ConfigConstant.MODE_DEV);
-                    map.put(ConfigConstant.KAFKA_BOOTSTRAP_SERVERS, "168.11.101.22:9092,168.11.101.23:9092,168.11.101.24:9092");
+                    map.put(ConfigConstant.KAFKA_BOOTSTRAP_SERVERS, "127.0.0.1:9092");
                     map.put(ConfigConstant.KAFKA_GROUP_ID, "log-dev");
                     map.put(ConfigConstant.KAFKA_TOPIC, "eagle-log");
-                    map.put(ConfigConstant.KAFKA_TOPIC_PARALLELISM, "3");
+                    map.put(ConfigConstant.KAFKA_TOPIC_PARALLELISM, "2");
 
                     map.put(ConfigConstant.KAFKA_SINK_INDEX, "log_alarm");
-                    map.put(ConfigConstant.KAFKA_SINK_BOOTSTRAP_SERVERS, "168.11.101.22:9092,168.11.101.23:9092,168.11.101.24:9092");
-                    map.put(ConfigConstant.KAFKA_SINK_TOPIC, "eagle-log-alarm");
-                    map.put(ConfigConstant.KAFKA_SINK_TOPIC_PARALLELISM, "6");
+                    map.put(ConfigConstant.KAFKA_SINK_BOOTSTRAP_SERVERS, "127.0.0.1:9092");
+                    map.put(ConfigConstant.KAFKA_SINK_TOPIC, "test-topic");
+                    map.put(ConfigConstant.KAFKA_SINK_TOPIC_PARALLELISM, "1");
                     break;
                 case ConfigConstant.MODE_TEST:
                     map.put(ConfigConstant.FLINK_MODE, ConfigConstant.MODE_TEST);
@@ -72,7 +72,7 @@ public class EagleProperties {
             map.put(ConfigConstant.REDIS_CLUSTER_HOSTS, "168.11.102.26:7000,168.11.102.27:7000");
             map.put(ConfigConstant.REDIS_SINK_PARALLELISM, "2");
 
-            map.put(ConfigConstant.ELASTICSEARCH_HOSTS, "168.11.103.28:9200");
+            map.put(ConfigConstant.ELASTICSEARCH_HOSTS, "127.0.0.1:9200");
             map.put(ConfigConstant.ELASTICSEARCH_BULK_FLUSH_MAX_ACTIONS, "5000");
             map.put(ConfigConstant.ELASTICSEARCH_BULK_FLUSH_MAX_SIZE_MB, "50");
             map.put(ConfigConstant.ELASTICSEARCH_BULK_FLUSH_INTERVAL_MS, "1000");
