@@ -27,7 +27,7 @@
         <flink.version>1.11.0</flink.version>
         <es.version>7.14.0</es.version>
         <jedis.version>2.9.0</jedis.version>
-        <jackson.version>2.12.4</jackson.version>
+        <jackson.version>2.12.6.1</jackson.version>
         <fastjson.version>1.2.62</fastjson.version>
         <common.lang.version>3.3.2</common.lang.version>
         <common.io.version>2.11.0</common.io.version>
