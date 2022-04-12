@@ -13,24 +13,6 @@
     <name>eagle-policy</name>
     <url>http://maven.apache.org</url>
 
-    <profiles>
-        <profile>
-            <id>dev</id>
-            <properties>
-                <profile.env>dev</profile.env>
-            </properties>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-        </profile>
-        <profile>
-            <id>prod</id>
-            <properties>
-                <profile.env>prod</profile.env>
-            </properties>
-        </profile>
-    </profiles>
-
     <dependencies>
         <dependency>
             <groupId>com.alarm.eagle</groupId>
@@ -128,6 +110,24 @@
         </dependency>
     </dependencies>
 
+    <profiles>
+        <profile>
+            <id>dev</id>
+            <properties>
+                <profile.env>dev</profile.env>
+            </properties>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+        </profile>
+        <profile>
+            <id>prod</id>
+            <properties>
+                <profile.env>prod</profile.env>
+            </properties>
+        </profile>
+    </profiles>
+
     <build>
         <finalName>eagle-policy</finalName>
         <plugins>
@@ -195,19 +195,19 @@
                 </executions>
             </plugin>
         </plugins>
-        <filters>
-            <filter>application-${profile.env}.properties</filter>
-        </filters>
-        <resources>
-            <resource>
-                <directory>src/main/resources</directory>
-                <includes>
-                    <include>**/*.xml</include>
-                    <include>**/*.properties</include>
-                    <include>**/*.conf</include>
-                </includes>
-                <filtering>true</filtering>
-            </resource>
-        </resources>
+<!--        <filters>-->
+<!--            <filter>application-${profile.env}.properties</filter>-->
+<!--        </filters>-->
+<!--        <resources>-->
+<!--            <resource>-->
+<!--                <directory>src/main/resources</directory>-->
+<!--                <includes>-->
+<!--                    <include>**/*.xml</include>-->
+<!--                    <include>**/*.properties</include>-->
+<!--                    <include>**/*.conf</include>-->
+<!--                </includes>-->
+<!--                <filtering>true</filtering>-->
+<!--            </resource>-->
+<!--        </resources>-->
     </build>
 </project>
