@@ -8,6 +8,7 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
  * Created by luxiaoxun on 18/1/2.
  */
 @SpringBootApplication
+@EnableWebMvc
 public class EagleApiApp {
     public static void main(String[] args) {
         SpringApplication.run(EagleApiApp.class, args);

@@ -1,7 +1,7 @@
 package com.alarm.eagle.log;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import org.apache.flink.api.common.serialization.DeserializationSchema;
 import org.apache.flink.api.common.serialization.SerializationSchema;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
@@ -28,7 +28,7 @@ public class LogSchema implements DeserializationSchema<LogEntry>, Serialization
     public LogEntry deserialize(byte[] bytes) {
         String msg = new String(bytes);
         try {
-            LogEntry entry = new LogEntry((JSONObject) JSON.parse(msg));
+            LogEntry entry = new LogEntry((JsonObject) JsonParser.parseString(msg));
             if (logIndex != null) {
                 entry.setIndex(logIndex);
             }

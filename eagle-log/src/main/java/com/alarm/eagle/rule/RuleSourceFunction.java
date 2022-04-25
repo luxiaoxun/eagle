@@ -1,8 +1,8 @@
 package com.alarm.eagle.rule;
 
 import com.alarm.eagle.util.HttpUtil;
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonParser;
 import org.apache.flink.streaming.api.functions.source.RichSourceFunction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,7 +31,7 @@ public class RuleSourceFunction extends RichSourceFunction<RuleBase> {
                 return;
             }
 
-            JSONArray resJson = JSON.parseArray(content);
+            JsonArray resJson = JsonParser.parseString(content).getAsJsonArray();
             if (resJson == null) {
                 logger.error("Failed to parse json:{}", content);
                 return;

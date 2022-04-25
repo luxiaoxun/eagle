@@ -6,6 +6,10 @@ import org.slf4j.LoggerFactory;
 public class StringUtil {
     private static final Logger logger = LoggerFactory.getLogger(StringUtil.class);
 
+    public static boolean isEmpty(Object str) {
+        return str == null || "".equals(str);
+    }
+
     public static String getFirstLine(String msg) {
         return getLineAt(msg, 0);
     }

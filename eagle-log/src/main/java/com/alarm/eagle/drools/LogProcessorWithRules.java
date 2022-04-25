@@ -4,7 +4,8 @@ import com.alarm.eagle.log.LogEntry;
 import com.alarm.eagle.rule.Rule;
 import com.alarm.eagle.rule.RuleBase;
 
-import com.alibaba.fastjson.JSONObject;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import org.drools.core.impl.KnowledgeBaseImpl;
 import org.kie.api.KieBase;
 import org.kie.api.KieBaseConfiguration;
@@ -53,7 +54,7 @@ public class LogProcessorWithRules implements LogProcessor {
 
     @Override
     public List<LogEntry> execute(String msg) {
-        LogEntry entry = new LogEntry((JSONObject) JSONObject.parse(msg));
+        LogEntry entry = new LogEntry((JsonObject) JsonParser.parseString(msg));
         return execute(entry);
     }
 

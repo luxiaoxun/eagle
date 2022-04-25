@@ -1,8 +1,9 @@
 package com.alarm.eagle.rule;
 
 import com.alarm.eagle.util.Md5Util;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -17,15 +18,15 @@ public class RuleBase implements Serializable {
     private String name = "Empty-Name";
     private String hash = "";
 
-    public static RuleBase createRuleBase(JSONArray jsonArray) {
+    public static RuleBase createRuleBase(JsonArray jsonArray) {
         RuleBase ruleBase = new RuleBase();
-        for (Object obj : jsonArray) {
-            JSONObject job = (JSONObject) obj;
+        for (JsonElement obj : jsonArray) {
+            JsonObject job = (JsonObject) obj;
             Rule rule = new Rule();
-            rule.setId(job.getString("id"));
-            rule.setType(job.getString("type"));
-            rule.setScript(job.getString("script"));
-            rule.setState(job.getString("state"));
+            rule.setId(job.get("id").getAsString());
+            rule.setType(job.get("type").getAsString());
+            rule.setScript(job.get("script").getAsString());
+            rule.setState(job.get("state").getAsString());
             ruleBase.rules.add(rule);
         }
         String str = ruleBase.toString();
@@ -34,7 +35,7 @@ public class RuleBase implements Serializable {
         return ruleBase;
     }
 
-    public static RuleBase createRuleBase(JSONArray jsonArray, String name) {
+    public static RuleBase createRuleBase(JsonArray jsonArray, String name) {
         RuleBase ruleBase = createRuleBase(jsonArray);
         ruleBase.name = name;
         return ruleBase;

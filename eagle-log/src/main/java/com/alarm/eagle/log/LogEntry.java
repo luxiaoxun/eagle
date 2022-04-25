@@ -3,7 +3,10 @@ package com.alarm.eagle.log;
 import com.alarm.eagle.util.DateUtil;
 import com.alarm.eagle.util.Md5Util;
 
-import com.alibaba.fastjson.JSONObject;
+import com.alarm.eagle.util.StringUtil;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,33 +53,33 @@ public class LogEntry implements Serializable {
         atTimestamp = new Date();
     }
 
-    public LogEntry(JSONObject json) {
-        jsonStr = json.toJSONString();
+    public LogEntry(JsonObject json) {
+        jsonStr = json.toString();
 
-        if (json.containsKey("ip")) {
-            ip = json.getString("ip");
+        if (json.has("ip")) {
+            ip = json.get("ip").getAsString();
         }
-        if (json.containsKey("index")) {
-            index = json.getString("index");
+        if (json.has("index")) {
+            index = json.get("index").getAsString();
         }
-        if (json.containsKey("message")) {
-            message = json.getString("message");
+        if (json.has("message")) {
+            message = json.get("message").getAsString();
         }
-        if (json.containsKey("type")) {
-            type = json.getString("type");
+        if (json.has("type")) {
+            type = json.get("type").getAsString();
         }
-        if (json.containsKey("@timestamp")) {
-            atTimestamp = DateUtil.toAtTimestampWithZone(json.getString("@timestamp"));
+        if (json.has("@timestamp")) {
+            atTimestamp = DateUtil.toAtTimestampWithZone(json.get("@timestamp").getAsString());
         }
-        if (json.containsKey("source")) {
-            path = json.getString("source");
+        if (json.has("source")) {
+            path = json.get("source").getAsString();
         }
-        if (json.containsKey("timestamp")) {
-            timestamp = DateUtil.toAtTimestampWithZone(json.getString("timestamp"));
+        if (json.has("timestamp")) {
+            timestamp = DateUtil.toAtTimestampWithZone(json.get("timestamp").getAsString());
         }
 
-        if (json.containsKey("offset")) {
-            offset = json.getLongValue("offset");
+        if (json.has("offset")) {
+            offset = json.get("offset").getAsLong();
         }
 
         if (message != null) {
@@ -85,8 +88,8 @@ public class LogEntry implements Serializable {
             id = Md5Util.getMd5(json.toString());
         }
 
-        if (json.containsKey("indexTarget")) {
-            indexTarget = json.getString("indexTarget");
+        if (json.has("indexTarget")) {
+            indexTarget = json.get("indexTarget").getAsString();
         }
 
     }
@@ -182,9 +185,9 @@ public class LogEntry implements Serializable {
         return key != null ? obj : "";
     }
 
-    private void setJson(JSONObject json, String key, Object value) {
-        if (value != null) {
-            json.put(key, value);
+    private void setJson(JsonObject json, String key, Object value) {
+        if (!StringUtil.isEmpty(key) && value != null) {
+            json.add(key, new Gson().toJsonTree(value));
         }
     }
 
@@ -213,29 +216,29 @@ public class LogEntry implements Serializable {
     }
 
     public void setJson(String key, Object value) {
-        JSONObject jsonObj = (JSONObject) JSONObject.parse(this.jsonStr);
+        JsonObject jsonObj = (JsonObject) JsonParser.parseString(this.jsonStr);
         setJson(jsonObj, key, value);
-        this.jsonStr = jsonObj.toJSONString();
+        this.jsonStr = jsonObj.toString();
     }
 
-    public JSONObject getJson() {
-        JSONObject jsonObj = (JSONObject) JSONObject.parse(this.jsonStr);
+    public JsonObject getJson() {
+        JsonObject jsonObj = (JsonObject) JsonParser.parseString(this.jsonStr);
         return jsonObj;
     }
 
-    public JSONObject toJSON() {
+    public JsonObject toJSON() {
         if (jsonLog) {
             this.setJson("index", index);
-            JSONObject jsonObj = (JSONObject) JSONObject.parse(this.jsonStr);
+            JsonObject jsonObj = (JsonObject) JsonParser.parseString(this.jsonStr);
             return jsonObj;
         }
 
-        JSONObject json = new JSONObject();
-        json.put("ip", ip);
-        setJson(json, "index", index);
-        setJson(json, "message", message);
-        setJson(json, "path", path);
-        setJson(json, "source", path);
+        JsonObject json = new JsonObject();
+        json.addProperty("ip", ip);
+        json.addProperty("index", index);
+        json.addProperty("message", message);
+        json.addProperty("path", path);
+        json.addProperty("source", path);
 
         if (atTimestamp != null) {
             setJson(json, "attimestamp", DateUtil.getEsString(atTimestamp.getTime()));
@@ -255,7 +258,7 @@ public class LogEntry implements Serializable {
 
         if (!fields.isEmpty()) {
             for (Map.Entry<String, Object> entry : fields.entrySet()) {
-                json.put(entry.getKey(), entry.getValue());
+                json.add(entry.getKey(), new Gson().toJsonTree(entry.getValue()));
             }
         }
         return json;

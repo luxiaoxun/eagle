@@ -10,8 +10,8 @@ import com.alarm.eagle.redis.*;
 import com.alarm.eagle.rule.RuleBase;
 import com.alarm.eagle.rule.RuleSourceFunction;
 import com.alarm.eagle.util.HttpUtil;
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonParser;
 import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.api.java.utils.ParameterTool;
 import org.apache.flink.configuration.Configuration;
@@ -133,7 +133,7 @@ public class App {
             return null;
         }
 
-        JSONArray resJson = JSON.parseArray(content);
+        JsonArray resJson = JsonParser.parseString(content).getAsJsonArray();
         if (resJson == null) {
             logger.error("Failed to parse json:{}", content);
             return null;
