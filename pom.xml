@@ -40,7 +40,7 @@
         <jodatime.version>2.9.6</jodatime.version>
         <lombok.version>1.18.16</lombok.version>
         <groovy.version>2.4.6</groovy.version>
-        <drools.version>6.5.0.Final</drools.version>
+        <drools.version>7.60.0.Final</drools.version>
         <siddhi.version>4.0.0</siddhi.version>
     </properties>
 
