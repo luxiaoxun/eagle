@@ -35,8 +35,8 @@ import java.util.Properties;
 /**
  * Created by luxiaoxun on 2020/01/27.
  */
-public class App {
-    private static final Logger logger = LoggerFactory.getLogger(App.class);
+public class EagleLogApp {
+    private static final Logger logger = LoggerFactory.getLogger(EagleLogApp.class);
 
     public static void main(String[] args) {
         try {

@@ -23,22 +23,23 @@
         <junit.version>4.13.1</junit.version>
         <slf4j.version>1.7.31</slf4j.version>
         <log4j2.version>2.18.0</log4j2.version>
-        <scala.binary.version>2.11</scala.binary.version>
-        <flink.version>1.11.0</flink.version>
+        <scala.binary.version>2.12</scala.binary.version>
+        <flink.version>1.18.1</flink.version>
+        <flink-kafka.version>3.0.1-1.18</flink-kafka.version>
         <es.version>7.14.0</es.version>
         <jedis.version>2.9.0</jedis.version>
         <jackson.version>2.14.0</jackson.version>
         <gson.version>2.8.9</gson.version>
         <common.lang.version>3.3.2</common.lang.version>
-        <common.io.version>2.11.0</common.io.version>
+        <common-io.version>2.15.1</common-io.version>
         <httpclient.version>4.5.13</httpclient.version>
         <httpcore.version>4.4.14</httpcore.version>
         <commons.httpclient.version>3.1</commons.httpclient.version>
-        <guava.version>32.0.0-jre</guava.version>
-        <springboot.version>2.5.12</springboot.version>
+        <guava.version>32.1.2-jre</guava.version>
+        <spring-boot.version>2.5.12</spring-boot.version>
         <mysql.version>8.0.28</mysql.version>
         <jodatime.version>2.9.6</jodatime.version>
-        <lombok.version>1.18.16</lombok.version>
+        <lombok.version>1.18.30</lombok.version>
         <groovy.version>2.4.6</groovy.version>
         <drools.version>6.5.0.Final</drools.version>
         <siddhi.version>4.0.0</siddhi.version>
@@ -79,8 +80,9 @@
             <!-- flink -->
             <dependency>
                 <groupId>org.apache.flink</groupId>
-                <artifactId>flink-streaming-java_${scala.binary.version}</artifactId>
+                <artifactId>flink-streaming-java</artifactId>
                 <version>${flink.version}</version>
+                <scope>provided</scope>
             </dependency>
             <dependency>
                 <groupId>org.apache.flink</groupId>
@@ -89,18 +91,18 @@
             </dependency>
             <dependency>
                 <groupId>org.apache.flink</groupId>
-                <artifactId>flink-clients_${scala.binary.version}</artifactId>
+                <artifactId>flink-clients</artifactId>
                 <version>${flink.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.flink</groupId>
-                <artifactId>flink-connector-kafka_${scala.binary.version}</artifactId>
-                <version>${flink.version}</version>
+                <artifactId>flink-connector-kafka</artifactId>
+                <version>${flink-kafka.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.flink</groupId>
-                <artifactId>flink-connector-elasticsearch7_${scala.binary.version}</artifactId>
-                <version>${flink.version}</version>
+                <artifactId>flink-connector-elasticsearch7</artifactId>
+                <version>3.0.1-1.17</version>
             </dependency>
 
             <!-- redis -->
@@ -126,7 +128,7 @@
             <dependency>
                 <groupId>commons-io</groupId>
                 <artifactId>commons-io</artifactId>
-                <version>${common.io.version}</version>
+                <version>${common-io.version}</version>
             </dependency>
 
             <!-- guava -->
@@ -223,38 +225,38 @@
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter-web</artifactId>
-                <version>${springboot.version}</version>
+                <version>${spring-boot.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter-log4j2</artifactId>
-                <version>${springboot.version}</version>
+                <version>${spring-boot.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter-aop</artifactId>
-                <version>${springboot.version}</version>
+                <version>${spring-boot.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter-data-jpa</artifactId>
-                <version>${springboot.version}</version>
+                <version>${spring-boot.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter-test</artifactId>
-                <version>${springboot.version}</version>
+                <version>${spring-boot.version}</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter-mail</artifactId>
-                <version>${springboot.version}</version>
+                <version>${spring-boot.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter-freemarker</artifactId>
-                <version>${springboot.version}</version>
+                <version>${spring-boot.version}</version>
             </dependency>
 
             <!-- elasticsearch -->
@@ -320,6 +322,11 @@
     </build>
 
     <repositories>
+        <repository>
+            <id>tencent</id>
+            <name>tencent maven</name>
+            <url>http://mirrors.cloud.tencent.com/nexus/repository/maven-public/</url>
+        </repository>
         <repository>
             <id>wso2.releases</id>
             <name>WSO2 Repository</name>

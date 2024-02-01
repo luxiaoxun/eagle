@@ -122,9 +122,9 @@ public class SiddhiOperator extends AbstractStreamOperator<DataSink> implements 
 
 
     @Override
-    public void dispose() throws Exception {
+    public void close() throws Exception {
         siddhiTaskManager.dispose();
-        super.dispose();
+        super.close();
     }
 
     /**

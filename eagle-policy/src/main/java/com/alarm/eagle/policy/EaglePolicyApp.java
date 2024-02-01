@@ -24,8 +24,8 @@ import static com.alarm.eagle.constants.AlertConstant.TimeCharacteristic.EventTi
 /**
  * 启动程序
  */
-public class App {
-    private static final Logger logger = LoggerFactory.getLogger(App.class);
+public class EaglePolicyApp {
+    private static final Logger logger = LoggerFactory.getLogger(EaglePolicyApp.class);
 
     public static void main(String[] args) throws Exception {
         logger.info("metric=eagle||args={}", args);

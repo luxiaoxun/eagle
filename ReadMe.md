@@ -18,12 +18,18 @@ Real time data processing system based on flink and CEP(drools/siddhi)
 
 build
 ```
-mvn package -Dmaven.test.skip=true
+mvn clean package
 ```
 
 eagle-log
+local mode:
 ```
-flink run -m yarn-cluster -ynm eagle-log -j eagle-log.jar -c com.alarm.eagle.App -arg "--mode test" 
+"Run" => "Edit Configurations...",
+"Build and run" section select "Modify options" => Java => Add dependencies with "Provided" scope to classpath.
+```
+cluster mode:
+```
+flink run -m yarn-cluster -ynm eagle-log -j eagle-log.jar -c com.alarm.eagle.EagleLogApp -arg "--mode test" 
 ```
 
 eagle-api
