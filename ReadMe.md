@@ -21,10 +21,9 @@ build
 mvn clean package
 ```
 
-eagle-log
-local mode:
+debug mode:
 ```
-"Run" => "Edit Configurations...",
+"Run/Debug" => "Edit Configurations...",
 "Build and run" section select "Modify options" => Java => Add dependencies with "Provided" scope to classpath.
 ```
 cluster mode:
