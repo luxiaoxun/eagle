@@ -10,11 +10,18 @@ import com.alarm.eagle.redis.*;
 import com.alarm.eagle.rule.RuleBase;
 import com.alarm.eagle.rule.RuleSourceFunction;
 import com.alarm.eagle.util.HttpUtil;
+import com.alarm.eagle.util.StringUtil;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonParser;
+import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.api.java.utils.ParameterTool;
 import org.apache.flink.configuration.Configuration;
+import org.apache.flink.connector.base.DeliveryGuarantee;
+import org.apache.flink.connector.kafka.sink.KafkaRecordSerializationSchema;
+import org.apache.flink.connector.kafka.sink.KafkaSink;
+import org.apache.flink.connector.kafka.source.KafkaSource;
+import org.apache.flink.connector.kafka.source.enumerator.initializer.OffsetsInitializer;
 import org.apache.flink.streaming.api.TimeCharacteristic;
 import org.apache.flink.streaming.api.datastream.*;
 import org.apache.flink.streaming.api.environment.CheckpointConfig;
@@ -22,9 +29,10 @@ import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.streaming.connectors.elasticsearch.ElasticsearchSinkBase;
 import org.apache.flink.streaming.connectors.elasticsearch7.ElasticsearchSink;
-import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
-import org.apache.flink.streaming.connectors.kafka.FlinkKafkaProducer;
 import org.apache.http.HttpHost;
+import org.apache.kafka.clients.CommonClientConfigs;
+import org.apache.kafka.clients.consumer.OffsetResetStrategy;
+import org.apache.kafka.common.config.SaslConfigs;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -81,7 +89,7 @@ public class EagleLogApp {
             config.setMinPauseBetweenCheckpoints(30000L);
             config.setCheckpointTimeout(10000L);
             //RETAIN_ON_CANCELLATION则在job cancel的时候会保留externalized checkpoint state
-            config.enableExternalizedCheckpoints(CheckpointConfig.ExternalizedCheckpointCleanup.DELETE_ON_CANCELLATION);
+            config.setExternalizedCheckpointCleanup(CheckpointConfig.ExternalizedCheckpointCleanup.DELETE_ON_CANCELLATION);
         }
 
         return env;
@@ -99,13 +107,21 @@ public class EagleLogApp {
         String kafkaGroupId = parameter.get(ConfigConstant.KAFKA_GROUP_ID);
         String kafkaTopic = parameter.get(ConfigConstant.KAFKA_TOPIC);
         int kafkaParallelism = parameter.getInt(ConfigConstant.KAFKA_TOPIC_PARALLELISM);
+        String kafkaUsername = parameter.get(ConfigConstant.KAFKA_SASL_USERNAME);
+        String kafkaPassword = parameter.get(ConfigConstant.KAFKA_SASL_PASSWORD);
+        Properties properties = getProperties(kafkaUsername, kafkaPassword);
+        KafkaSource<LogEntry> source = KafkaSource.<LogEntry>builder()
+                .setBootstrapServers(kafkaBootstrapServers)
+                .setTopics(kafkaTopic)
+                .setGroupId(kafkaGroupId)
+                .setProperties(properties)
+                // Start from committed offset, also use EARLIEST as reset strategy if committed offset doesn't exist
+                .setStartingOffsets(OffsetsInitializer.committedOffsets(OffsetResetStrategy.EARLIEST))
+                .setDeserializer(new LogSchema())
+                .build();
 
-        Properties properties = new Properties();
-        properties.setProperty("bootstrap.servers", kafkaBootstrapServers);
-        properties.setProperty("group.id", kafkaGroupId);
-        FlinkKafkaConsumer<LogEntry> source = new FlinkKafkaConsumer<>(kafkaTopic, new LogSchema(), properties);
-        source.setCommitOffsetsOnCheckpoints(true);
-        return env.addSource(source).name(kafkaTopic).uid(kafkaTopic).setParallelism(kafkaParallelism);
+        return env.fromSource(source, WatermarkStrategy.noWatermarks(), kafkaTopic)
+                .name(kafkaTopic).uid(kafkaTopic).setParallelism(kafkaParallelism);
     }
 
     private static SingleOutputStreamOperator<LogEntry> processLogStream(ParameterTool parameter, DataStream<LogEntry> dataSource,
@@ -147,11 +163,19 @@ public class EagleLogApp {
         String kafkaBootstrapServers = parameter.get(ConfigConstant.KAFKA_SINK_BOOTSTRAP_SERVERS);
         String kafkaTopic = parameter.get(ConfigConstant.KAFKA_SINK_TOPIC);
         int kafkaParallelism = parameter.getInt(ConfigConstant.KAFKA_SINK_TOPIC_PARALLELISM);
+        String kafkaUsername = parameter.get(ConfigConstant.KAFKA_SASL_USERNAME);
+        String kafkaPassword = parameter.get(ConfigConstant.KAFKA_SASL_PASSWORD);
+        Properties properties = getProperties(kafkaUsername, kafkaPassword);
         String name = "kafka-sink";
-        FlinkKafkaProducer<LogEntry> producer = new FlinkKafkaProducer<>(kafkaBootstrapServers, kafkaTopic,
-                new LogSchema());
-        producer.setLogFailuresOnly(false);
-        stream.addSink(producer).setParallelism(kafkaParallelism).name(name).uid(name);
+        KafkaRecordSerializationSchema<LogEntry> recordSerializationSchema = KafkaRecordSerializationSchema.builder()
+                .setTopic(kafkaTopic).setValueSerializationSchema(new LogSchema()).build();
+        KafkaSink<LogEntry> kafkaSink = KafkaSink.<LogEntry>builder()
+                .setBootstrapServers(kafkaBootstrapServers)
+                .setRecordSerializer(recordSerializationSchema)
+                .setKafkaProducerConfig(properties)
+                .setDeliveryGuarantee(DeliveryGuarantee.AT_LEAST_ONCE)
+                .build();
+        stream.sinkTo(kafkaSink).setParallelism(kafkaParallelism).name(name).uid(name);
     }
 
     private static void sinkToElasticsearch(ParameterTool parameter, DataStream<LogEntry> dataSource) {
@@ -188,6 +212,18 @@ public class EagleLogApp {
                 .setParallelism(redisSinkParallelism).name(name).uid(name);
         String sinkName = "redis-sink";
         keyedStream.addSink(new RedisAggSinkFunction()).setParallelism(redisSinkParallelism).name(sinkName).uid(sinkName);
+    }
+
+    private static Properties getProperties(String kafkaUsername, String kafkaPassword) {
+        Properties properties = new Properties();
+        if (!StringUtil.isEmpty(kafkaUsername) && !StringUtil.isEmpty(kafkaPassword)) {
+            properties.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, "SASL_PLAINTEXT");
+            properties.put(SaslConfigs.SASL_MECHANISM, "PLAIN");
+            String jaasTemplate = "org.apache.kafka.common.security.plain.PlainLoginModule required username=\"%s\" password=\"%s\";";
+            String jaasCfg = String.format(jaasTemplate, kafkaUsername, kafkaPassword);
+            properties.put(SaslConfigs.SASL_JAAS_CONFIG, jaasCfg);
+        }
+        return properties;
     }
 
     private static void showConf(ParameterTool parameter) {

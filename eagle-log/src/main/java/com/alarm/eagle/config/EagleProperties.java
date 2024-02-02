@@ -42,10 +42,12 @@ public class EagleProperties {
                     map.put(ConfigConstant.KAFKA_GROUP_ID, "log-dev");
                     map.put(ConfigConstant.KAFKA_TOPIC, "eagle-log");
                     map.put(ConfigConstant.KAFKA_TOPIC_PARALLELISM, "2");
+                    map.put(ConfigConstant.KAFKA_SASL_USERNAME, "admin");
+                    map.put(ConfigConstant.KAFKA_SASL_PASSWORD, "admin@tdp");
 
-                    map.put(ConfigConstant.KAFKA_SINK_INDEX, "log_alarm");
+                    map.put(ConfigConstant.KAFKA_SINK_INDEX, "eagle_log_alarm");
                     map.put(ConfigConstant.KAFKA_SINK_BOOTSTRAP_SERVERS, "127.0.0.1:9092");
-                    map.put(ConfigConstant.KAFKA_SINK_TOPIC, "test-topic");
+                    map.put(ConfigConstant.KAFKA_SINK_TOPIC, "eagle-alarm");
                     map.put(ConfigConstant.KAFKA_SINK_TOPIC_PARALLELISM, "1");
                     break;
                 case ConfigConstant.MODE_TEST:
@@ -55,9 +57,9 @@ public class EagleProperties {
                     map.put(ConfigConstant.KAFKA_TOPIC, "eagle-log");
                     map.put(ConfigConstant.KAFKA_TOPIC_PARALLELISM, "6");
 
-                    map.put(ConfigConstant.KAFKA_SINK_INDEX, "log_alarm");
+                    map.put(ConfigConstant.KAFKA_SINK_INDEX, "eagle_log_alarm");
                     map.put(ConfigConstant.KAFKA_SINK_BOOTSTRAP_SERVERS, "168.11.101.22:9092,168.11.101.23:9092,168.11.101.24:9092");
-                    map.put(ConfigConstant.KAFKA_SINK_TOPIC, "eagle-log-alarm");
+                    map.put(ConfigConstant.KAFKA_SINK_TOPIC, "eagle-alarm");
                     map.put(ConfigConstant.KAFKA_SINK_TOPIC_PARALLELISM, "6");
                     break;
             }
@@ -69,7 +71,9 @@ public class EagleProperties {
 
             map.put(ConfigConstant.REDIS_WINDOW_TIME_SECONDS, "60");
             map.put(ConfigConstant.REDIS_WINDOW_TRIGGER_COUNT, "10000");
-            map.put(ConfigConstant.REDIS_CLUSTER_HOSTS, "168.11.102.26:7000,168.11.102.27:7000");
+            map.put(ConfigConstant.REDIS_HOSTS, "127.0.0.1:6379");
+            map.put(ConfigConstant.REDIS_PASSWORD, "redis-admin");
+            map.put(ConfigConstant.REDIS_CLUSTER_ENABLED, "false");
             map.put(ConfigConstant.REDIS_SINK_PARALLELISM, "2");
 
             map.put(ConfigConstant.ELASTICSEARCH_HOSTS, "127.0.0.1:9200");

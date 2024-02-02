@@ -18,6 +18,9 @@ public interface ConfigConstant {
     String KAFKA_TOPIC = "kafka.topic";
     String KAFKA_TOPIC_PARALLELISM = "kafka.topic.parallelism";
 
+    String KAFKA_SASL_USERNAME = "kafka.sasl.username";
+    String KAFKA_SASL_PASSWORD = "kafka.sasl.password";
+
     String ELASTICSEARCH_HOSTS = "elasticsearch.hosts";
     String ELASTICSEARCH_BULK_FLUSH_MAX_ACTIONS = "elasticsearch.bulk.flush.max.actions";
     String ELASTICSEARCH_BULK_FLUSH_MAX_SIZE_MB = "elasticsearch.bulk.flush.max.size.mb";
@@ -31,7 +34,10 @@ public interface ConfigConstant {
 
     String REDIS_WINDOW_TIME_SECONDS = "redis.window.time.seconds";
     String REDIS_WINDOW_TRIGGER_COUNT = "redis.window.trigger.count";
-    String REDIS_CLUSTER_HOSTS = "redis.cluster.hosts";
+    String REDIS_HOSTS = "redis.hosts";
+    String REDIS_PASSWORD = "redis.password";
+
+    String REDIS_CLUSTER_ENABLED = "redis.cluster.enabled";
     String REDIS_SINK_PARALLELISM = "redis.sink.parallelism";
 
     String KAFKA_SINK_INDEX = "kafka.sink.index";
