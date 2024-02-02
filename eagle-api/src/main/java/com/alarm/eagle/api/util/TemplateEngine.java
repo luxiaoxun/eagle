@@ -2,8 +2,8 @@ package com.alarm.eagle.api.util;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.alarm.eagle.api.constants.Constant;
-import com.alarm.eagle.bean.AlertPolicy;
-import com.alarm.eagle.bean.DataSink;
+import com.alarm.eagle.model.AlertPolicy;
+import com.alarm.eagle.model.DataSink;
 import com.alarm.eagle.util.JsonUtil;
 import freemarker.template.TemplateException;
 import org.springframework.context.ApplicationContextInitializer;

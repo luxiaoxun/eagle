@@ -1,6 +1,6 @@
 package com.alarm.eagle.policy.siddihistrem;
 
-import com.alarm.eagle.bean.*;
+import com.alarm.eagle.model.*;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.alarm.eagle.policy.source.JsonSource;
 import org.apache.flink.api.common.functions.MapFunction;

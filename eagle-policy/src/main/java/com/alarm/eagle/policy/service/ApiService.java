@@ -1,7 +1,7 @@
 package com.alarm.eagle.policy.service;
 
-import com.alarm.eagle.bean.DataSink;
-import com.alarm.eagle.bean.Task;
+import com.alarm.eagle.model.DataSink;
+import com.alarm.eagle.model.Task;
 import com.alarm.eagle.policy.config.EagleProperties;
 import com.alarm.eagle.policy.constant.PropertiesConstant;
 import com.fasterxml.jackson.core.type.TypeReference;

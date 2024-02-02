@@ -1,7 +1,7 @@
 package com.alarm.eagle.api.controller;
 
 import com.alarm.eagle.api.service.TaskService;
-import com.alarm.eagle.bean.Task;
+import com.alarm.eagle.model.Task;
 import com.alarm.eagle.response.Response;
 import com.alarm.eagle.response.ResponseUtil;
 import io.swagger.annotations.Api;

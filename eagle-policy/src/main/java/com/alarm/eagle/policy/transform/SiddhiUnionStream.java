@@ -1,7 +1,7 @@
 package com.alarm.eagle.policy.transform;
 
-import com.alarm.eagle.bean.Datasource;
-import com.alarm.eagle.bean.Task;
+import com.alarm.eagle.model.Datasource;
+import com.alarm.eagle.model.Task;
 import com.alarm.eagle.policy.constant.PropertiesConstant;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.alarm.eagle.policy.config.EagleProperties;

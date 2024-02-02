@@ -3,8 +3,8 @@ package com.alarm.eagle.api.service.notify;
 import static com.alarm.eagle.api.constants.Constant.*;
 
 import com.alarm.eagle.api.util.TemplateEngine;
-import com.alarm.eagle.bean.AlertPolicy;
-import com.alarm.eagle.bean.DataSink;
+import com.alarm.eagle.model.AlertPolicy;
+import com.alarm.eagle.model.DataSink;
 import com.alarm.eagle.constants.AlertConstant.*;
 import freemarker.template.Template;
 import org.apache.commons.lang3.StringUtils;

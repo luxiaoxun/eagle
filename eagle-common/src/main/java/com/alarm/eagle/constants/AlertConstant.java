@@ -11,7 +11,7 @@ public class AlertConstant {
     /**
      * 报警级别
      */
-    public static enum AlertLevel{
+    public enum AlertLevel {
         /**
          * 恢复
          */
@@ -30,8 +30,7 @@ public class AlertConstant {
         /**
          * 严重
          */
-        FATAL(4)
-        ;
+        FATAL(4);
 
         private int id;
 
@@ -44,19 +43,19 @@ public class AlertConstant {
         }
 
         public static AlertLevel resolve(int id) {
-            for(AlertLevel alertLevel : values()) {
-                if(alertLevel.getId() == id) {
+            for (AlertLevel alertLevel : values()) {
+                if (alertLevel.getId() == id) {
                     return alertLevel;
                 }
             }
-            throw new IllegalArgumentException("unknown alert level,id:"+id);
+            throw new IllegalArgumentException("unknown alert level,id:" + id);
         }
     }
 
     /**
      * 状态
      */
-    public static enum Status {
+    public enum Status {
         /**
          * 禁用
          */
@@ -78,12 +77,12 @@ public class AlertConstant {
         }
 
         public static Status resolve(int id) {
-            for(Status status : values()) {
-                if(status.getId() == id) {
+            for (Status status : values()) {
+                if (status.getId() == id) {
                     return status;
                 }
             }
-            throw new IllegalArgumentException("unknown alert status,id: "+id);
+            throw new IllegalArgumentException("unknown alert status,id: " + id);
         }
 
     }
@@ -91,12 +90,13 @@ public class AlertConstant {
     /**
      * flink time类型
      */
-    public static enum TimeCharacteristic {
+    public enum TimeCharacteristic {
         ProcessingTime(0),
         IngestionTime(1),
         EventTime(2);
 
         private int id;
+
         TimeCharacteristic(int id) {
             this.id = id;
         }
@@ -106,19 +106,19 @@ public class AlertConstant {
         }
 
         public static TimeCharacteristic resolve(int id) {
-            for(TimeCharacteristic timeCharacteristic : values()) {
-                if(timeCharacteristic.getId() == id) {
+            for (TimeCharacteristic timeCharacteristic : values()) {
+                if (timeCharacteristic.getId() == id) {
                     return timeCharacteristic;
                 }
             }
-            throw new IllegalArgumentException("unknown timeCharacteristic, id: "+ id);
+            throw new IllegalArgumentException("unknown timeCharacteristic, id: " + id);
         }
     }
 
     /**
      * 告警方式
      */
-    public static enum AlertType {
+    public enum AlertType {
         /**
          * http回调
          */
@@ -137,9 +137,7 @@ public class AlertConstant {
         /**
          * 短信
          */
-        SMS(8)
-
-        ;
+        SMS(8);
 
         private int id;
 
@@ -152,8 +150,8 @@ public class AlertConstant {
         }
 
         public static AlertType resolve(int id) {
-            for(AlertType alertType : values()) {
-                if(alertType.getId() == id) {
+            for (AlertType alertType : values()) {
+                if (alertType.getId() == id) {
                     return alertType;
                 }
             }
@@ -162,13 +160,14 @@ public class AlertConstant {
 
         /**
          * 二进制位解析，如3代表，http回调/邮件
+         *
          * @param mergeId
          * @return
          */
         public static List<AlertType> resolveAll(int mergeId) {
             List<AlertType> alertTypeList = new ArrayList<>();
-            for(AlertType alertType : values()) {
-                if((alertType.getId() & mergeId) != 0) {
+            for (AlertType alertType : values()) {
+                if ((alertType.getId() & mergeId) != 0) {
                     alertTypeList.add(alertType);
                 }
             }

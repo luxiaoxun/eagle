@@ -1,8 +1,8 @@
 package com.alarm.eagle.api.service.notify;
 
 import com.alarm.eagle.api.util.HttpUtil;
-import com.alarm.eagle.bean.AlertPolicy;
-import com.alarm.eagle.bean.DataSink;
+import com.alarm.eagle.model.AlertPolicy;
+import com.alarm.eagle.model.DataSink;
 import com.alarm.eagle.constants.AlertConstant.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

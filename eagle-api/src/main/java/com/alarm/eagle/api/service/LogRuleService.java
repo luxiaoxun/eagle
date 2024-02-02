@@ -1,8 +1,8 @@
 package com.alarm.eagle.api.service;
 
-import com.alarm.eagle.bean.LogRule;
-import com.alarm.eagle.api.domain.LogRuleDo;
-import com.alarm.eagle.api.domain.repository.LogRuleRepository;
+import com.alarm.eagle.model.LogRule;
+import com.alarm.eagle.api.dao.LogRuleDo;
+import com.alarm.eagle.api.dao.repository.LogRuleRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;

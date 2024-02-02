@@ -1,6 +1,6 @@
 package com.alarm.eagle.policy.transform;
 
-import com.alarm.eagle.bean.DataSink;
+import com.alarm.eagle.model.DataSink;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.alarm.eagle.util.DateUtil;
 import org.apache.flink.api.common.state.ListState;

@@ -1,6 +1,6 @@
 package com.alarm.eagle.policy.transform;
 
-import com.alarm.eagle.bean.DataSink;
+import com.alarm.eagle.model.DataSink;
 import org.apache.flink.streaming.api.operators.Output;
 import org.apache.flink.streaming.runtime.streamrecord.StreamRecord;
 import org.wso2.siddhi.query.api.definition.Attribute;

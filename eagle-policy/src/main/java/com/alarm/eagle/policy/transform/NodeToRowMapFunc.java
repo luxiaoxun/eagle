@@ -1,6 +1,6 @@
 package com.alarm.eagle.policy.transform;
 
-import com.alarm.eagle.bean.Field;
+import com.alarm.eagle.model.Field;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.types.Row;

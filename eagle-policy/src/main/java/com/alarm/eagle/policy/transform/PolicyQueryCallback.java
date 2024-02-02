@@ -1,6 +1,6 @@
 package com.alarm.eagle.policy.transform;
 
-import com.alarm.eagle.bean.DataSink;
+import com.alarm.eagle.model.DataSink;
 import com.alarm.eagle.util.DateUtil;
 import com.alarm.eagle.util.JsonUtil;
 import org.apache.flink.streaming.runtime.streamrecord.StreamRecord;

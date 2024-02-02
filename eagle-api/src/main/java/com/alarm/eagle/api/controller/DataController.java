@@ -1,9 +1,9 @@
 package com.alarm.eagle.api.controller;
 
-import com.alarm.eagle.api.domain.DataSinkDo;
-import com.alarm.eagle.api.domain.repository.DataSinkRepository;
+import com.alarm.eagle.api.dao.DataSinkDo;
+import com.alarm.eagle.api.dao.repository.DataSinkRepository;
 import com.alarm.eagle.api.service.NotifyService;
-import com.alarm.eagle.bean.DataSink;
+import com.alarm.eagle.model.DataSink;
 import com.alarm.eagle.response.Response;
 import com.alarm.eagle.response.ResponseUtil;
 import io.swagger.annotations.Api;

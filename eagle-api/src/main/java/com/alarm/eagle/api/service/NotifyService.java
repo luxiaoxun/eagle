@@ -2,8 +2,8 @@ package com.alarm.eagle.api.service;
 
 import com.alarm.eagle.api.service.notify.Notify;
 import com.alarm.eagle.api.service.notify.NotifyFactory;
-import com.alarm.eagle.bean.AlertPolicy;
-import com.alarm.eagle.bean.DataSink;
+import com.alarm.eagle.model.AlertPolicy;
+import com.alarm.eagle.model.DataSink;
 import com.alarm.eagle.util.DateUtil;
 import org.apache.tomcat.util.threads.ThreadPoolExecutor;
 import org.slf4j.Logger;

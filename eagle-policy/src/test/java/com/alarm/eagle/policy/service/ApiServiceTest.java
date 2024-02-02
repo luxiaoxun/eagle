@@ -1,7 +1,7 @@
 package com.alarm.eagle.policy.service;
 
-import com.alarm.eagle.bean.DataSink;
-import com.alarm.eagle.bean.Task;
+import com.alarm.eagle.model.DataSink;
+import com.alarm.eagle.model.Task;
 import org.junit.*;
 import org.junit.Test;
 

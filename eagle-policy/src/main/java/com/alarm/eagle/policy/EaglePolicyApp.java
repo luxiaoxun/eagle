@@ -1,7 +1,7 @@
 package com.alarm.eagle.policy;
 
-import com.alarm.eagle.bean.DataSink;
-import com.alarm.eagle.bean.Task;
+import com.alarm.eagle.model.DataSink;
+import com.alarm.eagle.model.Task;
 import com.alarm.eagle.policy.config.EagleProperties;
 import com.alarm.eagle.policy.transform.SiddhiOperator;
 import com.alarm.eagle.policy.transform.SiddhiUnionStream;

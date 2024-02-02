@@ -1,9 +1,9 @@
 package com.alarm.eagle.policy.siddihistrem;
 
-import com.alarm.eagle.bean.Field;
-import com.alarm.eagle.bean.StreamApp;
-import com.alarm.eagle.bean.StreamDefine;
-import com.alarm.eagle.bean.Task;
+import com.alarm.eagle.model.Field;
+import com.alarm.eagle.model.StreamApp;
+import com.alarm.eagle.model.StreamDefine;
+import com.alarm.eagle.model.Task;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.alarm.eagle.util.JsonUtil;
 import org.apache.flink.api.java.tuple.Tuple2;

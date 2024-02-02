@@ -1,8 +1,8 @@
 package com.alarm.eagle.api.service;
 
-import com.alarm.eagle.api.domain.*;
-import com.alarm.eagle.api.domain.repository.*;
-import com.alarm.eagle.bean.*;
+import com.alarm.eagle.api.dao.*;
+import com.alarm.eagle.api.dao.repository.*;
+import com.alarm.eagle.model.*;
 import com.alarm.eagle.constants.AlertConstant;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;

@@ -1,7 +1,7 @@
 package com.alarm.eagle.policy.sink;
 
-import com.alarm.eagle.bean.DataSink;
-import com.alarm.eagle.bean.Task;
+import com.alarm.eagle.model.DataSink;
+import com.alarm.eagle.model.Task;
 import com.alarm.eagle.policy.service.ApiService;
 import org.apache.flink.streaming.api.functions.sink.SinkFunction;
 import org.slf4j.Logger;
