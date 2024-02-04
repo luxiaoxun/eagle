@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS `log_rule` (
+CREATE TABLE IF NOT EXISTS `eagle_log_rule` (
   `id`          bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'ID',
   `name`        varchar(256) NOT NULL COMMENT '规则名',
   `app_id`      varchar(128) NOT NULL COMMENT 'app id',
@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS `log_rule` (
   UNIQUE KEY `app_id` (`app_id`,`version`,`type`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='日志解析规则表';
 
-INSERT INTO `log_rule` (`id`, `name`, `app_id`, `version`, `type`, `script`, `state`, `update_time`) VALUES (
+INSERT INTO `eagle_log_rule` (`id`, `name`, `app_id`, `version`, `type`, `script`, `state`, `update_time`) VALUES (
 '1', 'log_app_1', '123', '20200101', 'log-rules', 'package logrules
 import com.alarm.eagle.util.DateUtil;
 import com.alarm.eagle.log.LogEntry;
@@ -45,7 +45,7 @@ rule "log_app_1"
         LOG.debug("out -----log_app_1------");
 end', '1', '2020-01-01 16:33:31.452');
 
-INSERT INTO `log_rule` (`id`, `name`, `app_id`, `version`, `type`, `script`, `state`, `update_time`) VALUES (
+INSERT INTO `eagle_log_rule` (`id`, `name`, `app_id`, `version`, `type`, `script`, `state`, `update_time`) VALUES (
 '2', 'log_app_2', '456', '20200102', 'log-rules', 'package logrules
 import com.alarm.eagle.util.DateUtil;
 import com.alarm.eagle.log.LogEntry;

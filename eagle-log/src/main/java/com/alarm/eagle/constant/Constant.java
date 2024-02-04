@@ -1,18 +1,15 @@
-package com.alarm.eagle.api.constants;
+package com.alarm.eagle.constant;
 
 /**
  * Created by luxiaoxun on 18/1/17.
  */
 public final class Constant {
-    public static final String ALERT_SYSTEM_NAME = "预警系统";
+    public final static String PATTERN_DAY = "yyyy-MM-dd";  //天
+    public final static String PATTERN_WEEK = "YYYY-ww";    //周
+    public final static String PATTERN_MONTH = "yyyy-MM";   //月
+    public final static String PATTERN_YEAR = "yyyy";       //年
 
-    public static final String ALERT_LEVEL_NAME = "告警级别";
-
-    public static final String ALERT_TASK_NAME = "任务名";
-
-    public static final String MailFrom = "****@****.com";
-
-    public static final String MailFromName = "******";
+    public static final String WRONG_LOG_INDEX = "eagle_error_log";
 
     public static final String TIMESTAMP = "timestamp";
 

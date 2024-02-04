@@ -1,4 +1,4 @@
-package com.alarm.eagle.es;
+package com.alarm.eagle.sink.es;
 
 import org.apache.flink.streaming.connectors.elasticsearch.ActionRequestFailureHandler;
 import org.apache.flink.streaming.connectors.elasticsearch.RequestIndexer;

@@ -8,7 +8,7 @@ import java.util.Date;
 /**
  * Created by luxiaoxun on 2020/01/29.
  */
-@Table(name = "log_rule")
+@Table(name = "eagle_log_rule")
 @Entity
 public class LogRuleDo {
     private static final long serialVersionUID = 1L;

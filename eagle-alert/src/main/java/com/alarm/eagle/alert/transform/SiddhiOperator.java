@@ -71,7 +71,7 @@ public class SiddhiOperator extends AbstractStreamOperator<DataSink> implements 
 
     @Override
     public void processWatermark(Watermark mark) throws Exception {
-        logger.info("metric=eagle-processWatermark||watermark={}||watermarkStr={}", mark.getTimestamp(), DateUtil.fromUnixtime(mark.getTimestamp()));
+        logger.info("metric=eagle-processWatermark||watermark={}||watermarkStr={}", mark.getTimestamp(), DateUtil.toUnixTimeString(mark.getTimestamp()));
         while (!priorityQueue.isEmpty() && priorityQueue.peek().getTimestamp() <= mark.getTimestamp()) {
             StreamRecord<Tuple2<String, ObjectNode>> streamRecord = priorityQueue.poll();
             siddhiTaskManager.send(streamRecord.getTimestamp(), streamRecord.getValue().f0, streamRecord.getValue().f1);

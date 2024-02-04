@@ -1,5 +1,6 @@
 package com.alarm.eagle.log;
 
+import com.alarm.eagle.constant.Constant;
 import com.alarm.eagle.util.DateUtil;
 import com.alarm.eagle.util.Md5Util;
 
@@ -30,11 +31,6 @@ public class LogEntry implements Serializable {
     private String esIndexPrefix = "";
     private String esIndexPostfix = "yyyy-MM-dd";
 
-    private final static String PATTERN_DAY = "yyyy-MM-dd";  //天
-    private final static String PATTERN_WEEK = "YYYY-ww";    //周
-    private final static String PATTERN_MONTH = "yyyy-MM";   //月
-    private final static String PATTERN_YEAR = "yyyy";       //年
-
     //每条日志必须要有的字段
     private Date timestamp;
     private Date atTimestamp;
@@ -42,7 +38,6 @@ public class LogEntry implements Serializable {
     private String message;
     private String path;
     private long offset = -1;
-
     private boolean wrongLog = true;
     private boolean jsonLog = false;
     private String jsonStr = null;
@@ -75,7 +70,7 @@ public class LogEntry implements Serializable {
             path = json.get("source").getAsString();
         }
         if (json.has("timestamp")) {
-            timestamp = DateUtil.toAtTimestampWithZone(json.get("timestamp").getAsString());
+            timestamp = DateUtil.toTimestamp(json.get("timestamp").getAsString());
         }
 
         if (json.has("offset")) {
@@ -315,7 +310,7 @@ public class LogEntry implements Serializable {
             date = DateUtil.convertToLocalString(esIndexPostfix, new Date().getTime());
         }
 
-        if (PATTERN_WEEK.equals(esIndexPostfix)) {
+        if (Constant.PATTERN_WEEK.equals(esIndexPostfix)) {
             return String.format("%s%s-v%s", index, esIndexPrefix, date);
         }
 
@@ -331,7 +326,7 @@ public class LogEntry implements Serializable {
             this.id = Md5Util.getMd5(this.getJson().toString());
         }
         this.addField("index", this.getIndex());
-        this.setIndex("error_log");
+        this.setIndex(Constant.WRONG_LOG_INDEX);
         this.setTimestamp(this.getAtTimestamp() != null ? this.getAtTimestamp() : this.getTimestamp());
         this.setMessage(this.getJson().toString());
         this.setWrongLog(false);

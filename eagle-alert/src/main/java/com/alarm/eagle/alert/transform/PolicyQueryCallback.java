@@ -35,7 +35,7 @@ public class PolicyQueryCallback extends QueryCallback {
                 result.put(attribute.getName(), event.getData(i));
                 i++;
             }
-            String siddhiTime = DateUtil.fromUnixtime(timestamp);
+            String siddhiTime = DateUtil.toUnixTimeString(timestamp);
             result.put("siddhiReceiveTime", siddhiTime);
             ctx.getDataSink().setData(JsonUtil.encode(result));
 

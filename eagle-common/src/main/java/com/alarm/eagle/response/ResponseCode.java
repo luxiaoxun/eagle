@@ -1,22 +1,24 @@
 package com.alarm.eagle.response;
 
 public enum ResponseCode {
-    SUCCESS(0, "success"),
-    SERVER_ERROR(-1, "server_error");
+    SUCCESS("200", "success"),
+    SYSTEM_ERROR("500", "server_error"),
 
-    private int code;
+    RULE_NOT_FOUND("10010001", "rule_not_found");
+
+    private String code;
     private String msg;
 
-    private ResponseCode(int code, String msg) {
+    private ResponseCode(String code, String msg) {
         this.code = code;
         this.msg = msg;
     }
 
-    public int getCode() {
+    public String getCode() {
         return this.code;
     }
 
-    public void setCode(int code) {
+    public void setCode(String code) {
         this.code = code;
     }
 

@@ -1,4 +1,4 @@
-package com.alarm.eagle.redis;
+package com.alarm.eagle.sink.redis;
 
 import org.apache.flink.streaming.api.functions.windowing.ProcessWindowFunction;
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow;

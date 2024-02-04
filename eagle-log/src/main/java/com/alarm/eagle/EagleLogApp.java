@@ -2,13 +2,17 @@ package com.alarm.eagle;
 
 import com.alarm.eagle.config.ConfigConstant;
 import com.alarm.eagle.config.EagleProperties;
-import com.alarm.eagle.es.ElasticsearchUtil;
-import com.alarm.eagle.es.EsActionRequestFailureHandler;
-import com.alarm.eagle.es.EsSinkFunction;
+import com.alarm.eagle.rule.RuleUtil;
+import com.alarm.eagle.sink.es.ElasticsearchUtil;
+import com.alarm.eagle.sink.es.EsActionRequestFailureHandler;
+import com.alarm.eagle.sink.es.EsSinkFunction;
 import com.alarm.eagle.log.*;
-import com.alarm.eagle.redis.*;
 import com.alarm.eagle.rule.RuleBase;
-import com.alarm.eagle.rule.RuleSourceFunction;
+import com.alarm.eagle.sink.redis.LogStatAggregateFunction;
+import com.alarm.eagle.sink.redis.LogStatWindowFunction;
+import com.alarm.eagle.sink.redis.LogStatWindowResult;
+import com.alarm.eagle.sink.redis.RedisAggSinkFunction;
+import com.alarm.eagle.source.RuleSourceFunction;
 import com.alarm.eagle.util.HttpUtil;
 import com.alarm.eagle.util.StringUtil;
 import com.google.gson.JsonArray;
@@ -142,20 +146,7 @@ public class EagleLogApp {
 
     private static RuleBase getInitRuleBase(ParameterTool parameter) {
         String ruleUrl = parameter.get(ConfigConstant.STREAM_RULE_URL);
-//        String content = HttpUtil.doGet(ruleUrl);
-        String content = HttpUtil.doGetMock(ruleUrl);
-        if (content == null) {
-            logger.error("Failed to get rules from url {}", ruleUrl);
-            return null;
-        }
-
-        JsonArray resJson = JsonParser.parseString(content).getAsJsonArray();
-        if (resJson == null) {
-            logger.error("Failed to parse json:{}", content);
-            return null;
-        }
-
-        RuleBase ruleBase = RuleBase.createRuleBase(resJson);
+        RuleBase ruleBase = RuleUtil.getRules(ruleUrl);
         return ruleBase;
     }
 

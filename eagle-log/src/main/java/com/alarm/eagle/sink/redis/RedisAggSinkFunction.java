@@ -1,4 +1,4 @@
-package com.alarm.eagle.redis;
+package com.alarm.eagle.sink.redis;
 
 import com.alarm.eagle.config.ConfigConstant;
 import com.alarm.eagle.util.DateUtil;

@@ -67,7 +67,7 @@ public class EagleProperties {
             map.put(ConfigConstant.FLINK_ENABLE_CHECKPOINT, "true");
 
             map.put(ConfigConstant.STREAM_PROCESS_PARALLELISM, "2");
-            map.put(ConfigConstant.STREAM_RULE_URL, "http://localhost:9080/eagle-api/log/rules");
+            map.put(ConfigConstant.STREAM_RULE_URL, "http://localhost:8080/eagle-api/log/rules");
 
             map.put(ConfigConstant.REDIS_WINDOW_TIME_SECONDS, "60");
             map.put(ConfigConstant.REDIS_WINDOW_TRIGGER_COUNT, "10000");

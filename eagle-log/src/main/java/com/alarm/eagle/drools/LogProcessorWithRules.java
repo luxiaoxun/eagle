@@ -41,7 +41,7 @@ public class LogProcessorWithRules implements LogProcessor {
     public LogProcessorWithRules(String pkg, RuleBase ruleBase) {
         rulePackage = pkg;
         KieHelper kieHelper = new KieHelper();
-        if (ruleBase != null && ruleBase.getRules().size() > 0) {
+        if (ruleBase != null && !ruleBase.getRules().isEmpty()) {
             for (Rule rule : ruleBase.getRules()) {
                 kieHelper.addResource(ResourceFactory.newByteArrayResource(rule.getScript().getBytes(StandardCharsets.UTF_8)), ResourceType.DRL);
             }
@@ -91,14 +91,14 @@ public class LogProcessorWithRules implements LogProcessor {
     @Override
     public boolean addRule(Rule rule) {
         if (kieBase != null) {
-            org.kie.api.definition.rule.Rule ruleCache = kieBase.getRule(rulePackage, rule.getName());
-            if (ruleCache != null && ruleCache.getName().equals(rule.getName())) {
+            org.kie.api.definition.rule.Rule kieBaseRule = kieBase.getRule(rulePackage, rule.getName());
+            if (kieBaseRule != null && kieBaseRule.getName().equals(rule.getName())) {
                 logger.info("Rule {} already exist", rule.getName());
             } else {
                 KnowledgeBuilder kb = KnowledgeBuilderFactory.newKnowledgeBuilder();
                 kb.add(ResourceFactory.newByteArrayResource(rule.getScript().getBytes(StandardCharsets.UTF_8)), ResourceType.DRL);
                 KnowledgeBaseImpl kieBaseImpl = (KnowledgeBaseImpl) kieBase;
-                kieBaseImpl.addKnowledgePackages(kb.getKnowledgePackages());
+                kieBaseImpl.addPackages(kb.getKnowledgePackages());
                 kieSession = kieBase.newKieSession();
             }
             logger.info("Add rule {} successfully", rule.getName());

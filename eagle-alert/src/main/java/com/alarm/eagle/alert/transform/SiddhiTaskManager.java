@@ -57,7 +57,7 @@ public class SiddhiTaskManager {
      * @param objectNode 接受的数据
      */
     public void send(long timestamp, String streamId, ObjectNode objectNode) {
-        logger.info("metric=eagle-siddhiSend||streamId={}||timestamp={}||objectNode={}", streamId, DateUtil.fromUnixtime(timestamp), objectNode);
+        logger.info("metric=eagle-siddhiSend||streamId={}||timestamp={}||objectNode={}", streamId, DateUtil.toUnixTimeString(timestamp), objectNode);
         synchronized (updateLock) {
             for (StreamApp streamApp : task.getStreamAppList()) {
                 for (StreamDefine streamDefine : streamApp.getStreamDefineList()) {

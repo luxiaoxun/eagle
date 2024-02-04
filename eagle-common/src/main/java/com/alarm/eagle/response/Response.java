@@ -1,24 +1,24 @@
 package com.alarm.eagle.response;
 
 public class Response<T> {
-    private int code;
+    private String code;
     private String message;
     private T data;
 
     public Response() {
     }
 
-    public Response(int code, String message, T data) {
+    public Response(String code, String message, T data) {
         this.code = code;
         this.message = message;
         this.data = data;
     }
 
-    public int getCode() {
+    public String getCode() {
         return this.code;
     }
 
-    public void setCode(int code) {
+    public void setCode(String code) {
         this.code = code;
     }
 

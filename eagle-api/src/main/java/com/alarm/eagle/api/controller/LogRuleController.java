@@ -4,6 +4,7 @@ import com.alarm.eagle.model.LogRule;
 import com.alarm.eagle.api.dao.LogRuleDo;
 import com.alarm.eagle.api.service.LogRuleService;
 import com.alarm.eagle.response.Response;
+import com.alarm.eagle.response.ResponseCode;
 import com.alarm.eagle.response.ResponseUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -41,7 +42,7 @@ public class LogRuleController {
         if (logRule != null) {
             return ResponseUtil.success(logRule);
         } else {
-            return ResponseUtil.fail(404, "没找到对应的规则");
+            return ResponseUtil.fail(ResponseCode.RULE_NOT_FOUND, "没找到对应的规则");
         }
     }
 
@@ -62,7 +63,7 @@ public class LogRuleController {
         if (ret) {
             return ResponseUtil.success(id);
         } else {
-            return ResponseUtil.fail(500, "删除规则失败");
+            return ResponseUtil.fail("删除规则失败");
         }
     }
 

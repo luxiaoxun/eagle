@@ -15,6 +15,7 @@ public class DateUtil {
     private static final Logger logger = LoggerFactory.getLogger(DateUtil.class);
 
     private static final DateTimeFormatter YMD_HMS = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss");
+    private static final DateTimeFormatter YMD_HMS_SSS = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSS");
     private static final DateTimeFormatter zFORMAT = DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
     private static final DateTimeFormatter FORMAT = DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ss.SSS");
 
@@ -27,7 +28,7 @@ public class DateUtil {
         return dateTime.getMillis();
     }
 
-    public static String fromUnixtime(long timestamp) {
+    public static String toUnixTimeString(long timestamp) {
         return YMD_HMS.print(timestamp);
     }
 
@@ -57,12 +58,16 @@ public class DateUtil {
         return d.toDate();
     }
 
+    public static String getUtcTimestamp(long timestamp) {
+        return YMD_HMS_SSS.withZoneUTC().print(timestamp);
+    }
+
     public static Date toAtTimestampWithZone(String dataStr) {
         return zFORMAT.parseDateTime(dataStr).toDate();
     }
 
-    public static Date toAtTimestamp(String dataStr) {
-        return FORMAT.parseDateTime(dataStr).toDate();
+    public static Date toTimestamp(String dataStr) {
+        return YMD_HMS_SSS.parseDateTime(dataStr).toDate();
     }
 
     public static String convertToUTCString(String format, long timestamp) {

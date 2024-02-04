@@ -1,6 +1,5 @@
 package com.alarm.eagle.util;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.ArrayList;

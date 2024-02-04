@@ -1,4 +1,4 @@
-package com.alarm.eagle.redis;
+package com.alarm.eagle.sink.redis;
 
 import org.apache.flink.api.java.tuple.Tuple5;
 

@@ -1,4 +1,4 @@
-package com.alarm.eagle.redis;
+package com.alarm.eagle.sink.redis;
 
 import com.alarm.eagle.log.LogEntry;
 import org.apache.flink.api.common.functions.AggregateFunction;

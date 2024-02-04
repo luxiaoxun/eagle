@@ -1,5 +1,6 @@
 package com.alarm.eagle.rule;
 
+import com.alarm.eagle.util.JsonUtil;
 import com.alarm.eagle.util.Md5Util;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -67,10 +68,6 @@ public class RuleBase implements Serializable {
 
     @Override
     public String toString() {
-        return "RuleBase{" +
-                "rules=" + rules +
-                ", name='" + name + '\'' +
-                ", hash='" + hash + '\'' +
-                '}';
+        return JsonUtil.encode(this);
     }
 }

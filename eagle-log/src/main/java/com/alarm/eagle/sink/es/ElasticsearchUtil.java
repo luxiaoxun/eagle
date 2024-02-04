@@ -1,4 +1,4 @@
-package com.alarm.eagle.es;
+package com.alarm.eagle.sink.es;
 
 import org.apache.http.HttpHost;
 

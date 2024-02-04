@@ -1,0 +1,57 @@
+{
+  "xdr-event-template" : {
+    "order" : 1,
+    "index_patterns" : [
+      "xdr_event-*"
+    ],
+    "settings" : {
+      "index" : {
+        "analysis" : {
+          "analyzer" : {
+            "analyzer_keyword" : {
+              "filter" : "lowercase",
+              "tokenizer" : "keyword"
+            }
+          }
+        },
+        "number_of_shards" : "4",
+        "number_of_replicas" : "0"
+      }
+    },
+    "mappings" : {
+      "dynamic_templates" : [
+        {
+          "strings_not_analyzed" : {
+            "mapping" : {
+              "type" : "keyword"
+            },
+            "match_mapping_type" : "string"
+          }
+        }
+      ],
+      "properties" : {
+        "message" : {
+          "type" : "text",
+          "fielddata" : false,
+          "analyzer" : "standard"
+        },
+        "ip" : {
+          "type" : "ip"
+        },
+        "deviceIp" : {
+          "type" : "ip"
+        },
+        "srcIp" : {
+          "type" : "ip"
+        },
+        "dstIp" : {
+          "type" : "ip"
+        },
+        "timestamp" : {
+          "format" : "yyyy-MM-dd HH:mm:ss.SSS",
+          "type" : "date"
+        }
+      }
+    }
+  }
+}

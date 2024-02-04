@@ -1,4 +1,4 @@
-package com.alarm.eagle.es;
+package com.alarm.eagle.sink.es;
 
 import com.alarm.eagle.log.LogEntry;
 import org.apache.flink.api.common.functions.RuntimeContext;

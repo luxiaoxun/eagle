@@ -39,11 +39,12 @@
         <commons.httpclient.version>3.1</commons.httpclient.version>
         <guava.version>32.1.2-jre</guava.version>
         <spring-boot.version>2.5.12</spring-boot.version>
+        <spring-kafka.version>2.7.14</spring-kafka.version>
         <mysql.version>8.0.28</mysql.version>
         <jodatime.version>2.9.6</jodatime.version>
         <lombok.version>1.18.30</lombok.version>
         <groovy.version>2.4.6</groovy.version>
-        <drools.version>6.5.0.Final</drools.version>
+        <drools.version>7.74.1.Final</drools.version>
         <siddhi.version>4.0.0</siddhi.version>
     </properties>
 
@@ -180,6 +181,11 @@
                 <artifactId>drools-compiler</artifactId>
                 <version>${drools.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.drools</groupId>
+                <artifactId>drools-mvel</artifactId>
+                <version>${drools.version}</version>
+            </dependency>
 
             <!-- siddhi -->
             <dependency>
@@ -259,6 +265,12 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter-freemarker</artifactId>
                 <version>${spring-boot.version}</version>
+            </dependency>
+            <!-- spring boot kafka https://spring.io/projects/spring-kafka -->
+            <dependency>
+                <groupId>org.springframework.kafka</groupId>
+                <artifactId>spring-kafka</artifactId>
+                <version>${spring-kafka.version}</version>
             </dependency>
 
             <!-- elasticsearch -->

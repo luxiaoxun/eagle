@@ -12,12 +12,13 @@ import javax.sql.DataSource;
  * Created by luxiaoxun on 18/1/2.
  */
 @Configuration
-@EnableJpaRepositories("com.alarm.eagle.api.domain.repository")
+@EnableJpaRepositories("com.alarm.eagle.api.dao.repository")
 public class DatasourceConfig {
 
     @Bean
     @ConfigurationProperties(prefix = "spring.datasource")
-    public DataSource getDataSouce() {
+    public DataSource getDataSource() {
         return DataSourceBuilder.create().build();
     }
+
 }
