@@ -14,7 +14,7 @@
         <module>eagle-common</module>
         <module>eagle-log</module>
         <module>eagle-fraud-detection</module>
-        <module>eagle-policy</module>
+        <module>eagle-alert</module>
     </modules>
 
     <properties>

@@ -7,10 +7,10 @@ Real time data processing system based on flink and CEP(drools/siddhi)
 ![design](https://github.com/luxiaoxun/eagle/blob/master/picture/eagle-design.png)
 
 ### Modules:
-* eagle-api：基于springboot，提供drools规则引擎的读写服务。
+* eagle-api：基于springboot，提供策略规则的读写服务。
 * eagle-common：通用类模块。
+* eagle-alert：基于flink和[siddhi](https://github.com/siddhi-io/siddhi)的数据告警服务。
 * eagle-log：基于flink和[drools](https://github.com/kiegroup/drools)的日志处理服务。
-* eagle-policy：基于flink和[siddhi](https://github.com/siddhi-io/siddhi)的数据处理服务。
 * eagle-fraud-detection：基于flink的交易欺诈检测系统(fraud detection based on dynamic rules)。 
     1. [Flink 高级应用模式第一辑：欺诈检测系统案例研究](https://www.infoq.cn/article/dR1m9FfB1gEtvggKvlVX)
     2. [Flink 高级应用模式第二辑：应用模式的动态更新](https://www.infoq.cn/article/KFT2f79afVkNfIy6MRGg)
