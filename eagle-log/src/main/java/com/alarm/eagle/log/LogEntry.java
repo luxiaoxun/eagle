@@ -28,8 +28,8 @@ public class LogEntry implements Serializable {
     private String type = null;
     private String index;
     private String indexTarget = "";
-    private String esIndexPrefix = "";
-    private String esIndexPostfix = "yyyy-MM-dd";
+    private String indexPostfix = "";
+    private String indexTimeFormat = "yyyy-MM-dd";
 
     //每条日志必须要有的字段
     private Date timestamp;
@@ -39,7 +39,6 @@ public class LogEntry implements Serializable {
     private String path;
     private long offset = -1;
     private boolean wrongLog = true;
-    private boolean jsonLog = false;
     private String jsonStr = null;
 
     private Map<String, Object> fields = new HashMap<>();
@@ -80,7 +79,7 @@ public class LogEntry implements Serializable {
         if (message != null) {
             id = generateId();
         } else {
-            id = Md5Util.getMd5(json.toString());
+            id = Md5Util.MD5(json.toString());
         }
 
         if (json.has("indexTarget")) {
@@ -90,7 +89,7 @@ public class LogEntry implements Serializable {
     }
 
     private String generateId() {
-        String id = Md5Util.getMd5(message + ip + index + path + offset);
+        String id = Md5Util.MD5(message + ip + index + path + offset);
         return id;
     }
 
@@ -186,14 +185,6 @@ public class LogEntry implements Serializable {
         }
     }
 
-    public boolean isJsonLog() {
-        return jsonLog;
-    }
-
-    public void setJsonLog(boolean jsonLog) {
-        this.jsonLog = jsonLog;
-    }
-
     public String getJsonStr() {
         return jsonStr;
     }
@@ -222,12 +213,6 @@ public class LogEntry implements Serializable {
     }
 
     public JsonObject toJSON() {
-        if (jsonLog) {
-            this.setJson("index", index);
-            JsonObject jsonObj = (JsonObject) JsonParser.parseString(this.jsonStr);
-            return jsonObj;
-        }
-
         JsonObject json = new JsonObject();
         json.addProperty("ip", ip);
         json.addProperty("index", index);
@@ -283,47 +268,46 @@ public class LogEntry implements Serializable {
         this.id = id;
     }
 
-    public String getEsIndexPostfix() {
-        return esIndexPostfix;
+    public String getIndexTimeFormat() {
+        return indexTimeFormat;
     }
 
-    public void setEsIndexPostfix(String esIndexPostfix) {
-        this.esIndexPostfix = esIndexPostfix;
+    public void setIndexTimeFormat(String indexTimeFormat) {
+        this.indexTimeFormat = indexTimeFormat;
     }
 
-    public String getEsIndexPrefix() {
-        return esIndexPrefix;
+    public String getIndexPostfix() {
+        return indexPostfix;
     }
 
-    public void setEsIndexPrefix(String esIndexPrefix) {
-        this.esIndexPrefix = esIndexPrefix;
+    public void setIndexPostfix(String indexPostfix) {
+        this.indexPostfix = indexPostfix;
     }
 
     public String generateIndexName() {
         String date;
         if (getTimestamp() != null) {
-            date = DateUtil.convertToLocalString(esIndexPostfix, getTimestamp().getTime());
+            date = DateUtil.convertToLocalString(indexTimeFormat, getTimestamp().getTime());
         } else if (getAtTimestamp() != null) {
-            date = DateUtil.convertToLocalString(esIndexPostfix, getAtTimestamp().getTime());
+            date = DateUtil.convertToLocalString(indexTimeFormat, getAtTimestamp().getTime());
         } else {
             logger.error("Invalid log was inserted: {}", getMessage());
-            date = DateUtil.convertToLocalString(esIndexPostfix, new Date().getTime());
+            date = DateUtil.convertToLocalString(indexTimeFormat, new Date().getTime());
         }
 
-        if (Constant.PATTERN_WEEK.equals(esIndexPostfix)) {
-            return String.format("%s%s-v%s", index, esIndexPrefix, date);
+        if (Constant.PATTERN_WEEK.equals(indexTimeFormat)) {
+            return String.format("%s%s-v%s", index, indexPostfix, date);
         }
 
-        return String.format("%s%s-%s", index, esIndexPrefix, date);
+        return String.format("%s%s-%s", index, indexPostfix, date);
     }
 
     public void handleError() {
-        this.jsonLog = false;
         if (this.ip == null) {
             this.ip = "0.0.0.0";
         }
         if (this.id == null) {
-            this.id = Md5Util.getMd5(this.getJson().toString());
+            this.id = Md5Util.MD5(this.getJson().toString());
         }
         this.addField("index", this.getIndex());
         this.setIndex(Constant.WRONG_LOG_INDEX);
@@ -341,7 +325,7 @@ public class LogEntry implements Serializable {
         if (timestamp == null || atTimestamp == null) {
             return;
         }
-        addField("delaytime", atTimestamp.getTime() - timestamp.getTime());
+        addField("delay_time", atTimestamp.getTime() - timestamp.getTime());
     }
 
     @Override

@@ -58,7 +58,7 @@ public class LogProcessFunction extends BroadcastProcessFunction<LogEntry, RuleB
                 }
             }
         } catch (Exception ex) {
-            logger.error("Log process error: " + ex.toString());
+            logger.error("Log process error: " + ex);
         }
     }
 

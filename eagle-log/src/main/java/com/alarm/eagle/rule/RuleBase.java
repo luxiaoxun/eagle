@@ -19,27 +19,10 @@ public class RuleBase implements Serializable {
     private String name = "Empty-Name";
     private String hash = "";
 
-    public static RuleBase createRuleBase(JsonArray jsonArray) {
-        RuleBase ruleBase = new RuleBase();
-        for (JsonElement obj : jsonArray) {
-            JsonObject job = (JsonObject) obj;
-            Rule rule = new Rule();
-            rule.setId(job.get("id").getAsString());
-            rule.setType(job.get("type").getAsString());
-            rule.setScript(job.get("script").getAsString());
-            rule.setState(job.get("state").getAsString());
-            ruleBase.rules.add(rule);
-        }
-        String str = ruleBase.toString();
-        ruleBase.hash = Md5Util.getMd5(str);
-        ruleBase.name = "rules-" + ruleBase.hash;
-        return ruleBase;
-    }
-
-    public static RuleBase createRuleBase(JsonArray jsonArray, String name) {
-        RuleBase ruleBase = createRuleBase(jsonArray);
-        ruleBase.name = name;
-        return ruleBase;
+    public RuleBase(List<Rule> ruleList) {
+        rules = ruleList;
+        hash = Md5Util.MD5(JsonUtil.encode(ruleList));
+        name = "rules-" + hash;
     }
 
     public List<Rule> getRules() {

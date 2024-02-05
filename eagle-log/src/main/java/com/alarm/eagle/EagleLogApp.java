@@ -64,8 +64,8 @@ public class EagleLogApp {
             sinkToRedis(parameter, processedStream);
             sinkToElasticsearch(parameter, processedStream);
 
-            DataStream<LogEntry> kafkaOutputStream = processedStream.getSideOutput(Descriptors.kafkaOutputTag);
-            sinkLogToKafka(parameter, kafkaOutputStream);
+//            DataStream<LogEntry> kafkaOutputStream = processedStream.getSideOutput(Descriptors.kafkaOutputTag);
+//            sinkLogToKafka(parameter, kafkaOutputStream);
 
             env.getConfig().setGlobalJobParameters(parameter);
             env.execute("eagle-log");

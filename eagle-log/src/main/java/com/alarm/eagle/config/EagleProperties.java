@@ -63,10 +63,10 @@ public class EagleProperties {
                     map.put(ConfigConstant.KAFKA_SINK_TOPIC_PARALLELISM, "6");
                     break;
             }
-            map.put(ConfigConstant.FLINK_PARALLELISM, "2");
+            map.put(ConfigConstant.FLINK_PARALLELISM, "1");
             map.put(ConfigConstant.FLINK_ENABLE_CHECKPOINT, "true");
 
-            map.put(ConfigConstant.STREAM_PROCESS_PARALLELISM, "2");
+            map.put(ConfigConstant.STREAM_PROCESS_PARALLELISM, "1");
             map.put(ConfigConstant.STREAM_RULE_URL, "http://localhost:8080/eagle-api/log/rules");
 
             map.put(ConfigConstant.REDIS_WINDOW_TIME_SECONDS, "60");
@@ -74,14 +74,14 @@ public class EagleProperties {
             map.put(ConfigConstant.REDIS_HOSTS, "127.0.0.1:6379");
             map.put(ConfigConstant.REDIS_PASSWORD, "redis-admin");
             map.put(ConfigConstant.REDIS_CLUSTER_ENABLED, "false");
-            map.put(ConfigConstant.REDIS_SINK_PARALLELISM, "2");
+            map.put(ConfigConstant.REDIS_SINK_PARALLELISM, "1");
 
             map.put(ConfigConstant.ELASTICSEARCH_HOSTS, "127.0.0.1:9200");
             map.put(ConfigConstant.ELASTICSEARCH_BULK_FLUSH_MAX_ACTIONS, "5000");
             map.put(ConfigConstant.ELASTICSEARCH_BULK_FLUSH_MAX_SIZE_MB, "50");
             map.put(ConfigConstant.ELASTICSEARCH_BULK_FLUSH_INTERVAL_MS, "1000");
-            map.put(ConfigConstant.ELASTICSEARCH_SINK_PARALLELISM, "2");
-            map.put(ConfigConstant.ELASTICSEARCH_INDEX_POSTFIX, "_log-test");
+            map.put(ConfigConstant.ELASTICSEARCH_SINK_PARALLELISM, "1");
+            map.put(ConfigConstant.ELASTICSEARCH_INDEX_POSTFIX, "");
 
             Map<String, String> paramsMap = params.toMap();
             map.putAll(paramsMap);

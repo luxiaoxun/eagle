@@ -12,8 +12,9 @@ CREATE TABLE IF NOT EXISTS `eagle_log_rule` (
   UNIQUE KEY `app_id` (`app_id`,`version`,`type`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='日志解析规则表';
 
-INSERT INTO `eagle_log_rule` (`id`, `name`, `app_id`, `version`, `type`, `script`, `state`, `update_time`) VALUES (
-'1', 'log_app_1', '123', '20200101', 'log-rules', 'package logrules
+INSERT INTO eagle_db.eagle_log_rule
+(id, name, app_id, version, `type`, script, state, update_time)
+VALUES(1, 'log_app_1', '123', '20200101', 'log-rules', 'package logrules
 import com.alarm.eagle.util.DateUtil;
 import com.alarm.eagle.log.LogEntry;
 import org.slf4j.Logger;
@@ -28,12 +29,12 @@ rule "log_app_1"
         $log : LogEntry( index == "log_app_1", $msg : message)
     then
         LOG.debug("receive log_app_1 log, id:[{}]", $log.getId());
-        String logTime = RegexUtil.extractString("(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}.\\d{3})", $msg);
+        String logTime = RegexUtil.extractString("(\\\\d{4}-\\\\d{2}-\\\\d{2} \\\\d{2}:\\\\d{2}:\\\\d{2})", $msg);
         if (logTime == null) {
             LOG.warn("invalid date or time, log: {}", $msg);
             return;
         }
-        Date date = DateUtil.convertFromString("yyyy-MM-dd HH:mm:ss.SSS", logTime);
+        Date date = DateUtil.convertFromString("yyyy-MM-dd HH:mm:ss", logTime);
         $log.setTimestamp(date != null ? date : $log.getAtTimestamp());
 
         long delayTime = (System.currentTimeMillis() - $log.getTimestamp().getTime())/1000;
@@ -43,10 +44,10 @@ rule "log_app_1"
         }
         $log.dealDone();
         LOG.debug("out -----log_app_1------");
-end', '1', '2020-01-01 16:33:31.452');
-
-INSERT INTO `eagle_log_rule` (`id`, `name`, `app_id`, `version`, `type`, `script`, `state`, `update_time`) VALUES (
-'2', 'log_app_2', '456', '20200102', 'log-rules', 'package logrules
+end', 1, '2024-02-05 10:09:30.393');
+INSERT INTO eagle_db.eagle_log_rule
+(id, name, app_id, version, `type`, script, state, update_time)
+VALUES(2, 'log_app_2', '456', '20200102', 'log-rules', 'package logrules
 import com.alarm.eagle.util.DateUtil;
 import com.alarm.eagle.log.LogEntry;
 import org.slf4j.Logger;
@@ -61,7 +62,7 @@ rule "log_app_2"
         $log : LogEntry( index == "log_app_2", $msg : message)
     then
         LOG.debug("receive log_app_2 log, id:[{}]", $log.getId());
-        String logTime = RegexUtil.extractString("(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2})", $msg);
+        String logTime = RegexUtil.extractString("(\\\\d{4}-\\\\d{2}-\\\\d{2} \\\\d{2}:\\\\d{2}:\\\\d{2})", $msg);
         if (logTime == null) {
             LOG.warn("invalid date or time, log: {}", $msg);
             return;
@@ -71,4 +72,5 @@ rule "log_app_2"
 
         $log.dealDone();
         LOG.debug("out -----log_app_2------");
-end', '1', '2020-01-02 19:39:17.521');
+end', 1, '2024-02-05 10:02:41.947');
+

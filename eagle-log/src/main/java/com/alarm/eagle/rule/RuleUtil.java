@@ -3,10 +3,12 @@ package com.alarm.eagle.rule;
 import com.alarm.eagle.response.Response;
 import com.alarm.eagle.util.HttpUtil;
 import com.alarm.eagle.util.JsonUtil;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonParser;
+import com.fasterxml.jackson.core.type.TypeReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class RuleUtil {
     private static final Logger logger = LoggerFactory.getLogger(RuleUtil.class);
@@ -21,19 +23,15 @@ public class RuleUtil {
                 return ruleBase;
             }
 
-            Response response = JsonUtil.decode(content, Response.class);
+            Response<List<Rule>> response = JsonUtil.decode(content, new TypeReference<Response<List<Rule>>>() {
+            });
             if (response == null || response.getData() == null || !response.getCode().equals("200")) {
-                logger.error("Failed to get rules from url {}", ruleUrl);
+                logger.error("Failed to get rules content: {}", content);
                 return ruleBase;
             }
 
-            JsonArray resJson = JsonParser.parseString(JsonUtil.encode(response.getData())).getAsJsonArray();
-            if (resJson == null) {
-                logger.error("Failed to parse json:{}", content);
-                return ruleBase;
-            }
-
-            ruleBase = RuleBase.createRuleBase(resJson);
+            List<Rule> ruleList = response.getData();
+            ruleBase = new RuleBase(ruleList);
 
         } catch (Exception e) {
             logger.error("Exception occurs:", e);

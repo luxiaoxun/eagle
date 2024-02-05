@@ -24,10 +24,10 @@
         <slf4j.version>1.7.31</slf4j.version>
         <log4j2.version>2.18.0</log4j2.version>
         <scala.binary.version>2.12</scala.binary.version>
-        <flink.version>1.18.1</flink.version>
-        <flink-kafka.version>3.0.1-1.18</flink-kafka.version>
+        <flink.version>1.16.3</flink.version>
+        <flink-kafka.version>1.16.3</flink-kafka.version>
         <!-- 注意flink和ES的版本依赖 -->
-        <flink-elasticsearch.version>3.0.1-1.16</flink-elasticsearch.version>
+        <flink-elasticsearch.version>1.16.3</flink-elasticsearch.version>
         <es.version>7.10.2</es.version>
         <jedis.version>2.9.0</jedis.version>
         <jackson.version>2.14.0</jackson.version>
@@ -97,15 +97,17 @@
                 <artifactId>flink-clients</artifactId>
                 <version>${flink.version}</version>
             </dependency>
+            <!-- https://mvnrepository.com/artifact/org.apache.flink/flink-connector-kafka -->
             <dependency>
                 <groupId>org.apache.flink</groupId>
                 <artifactId>flink-connector-kafka</artifactId>
                 <version>${flink-kafka.version}</version>
             </dependency>
+            <!-- https://mvnrepository.com/artifact/org.apache.flink/flink-connector-elasticsearch7 -->
             <dependency>
                 <groupId>org.apache.flink</groupId>
                 <artifactId>flink-connector-elasticsearch7</artifactId>
-                <version>3.0.1-1.16</version>
+                <version>${flink-elasticsearch.version}</version>
             </dependency>
 
             <!-- redis -->
