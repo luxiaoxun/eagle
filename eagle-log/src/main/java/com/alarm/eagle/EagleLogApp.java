@@ -4,8 +4,6 @@ import com.alarm.eagle.config.ConfigConstant;
 import com.alarm.eagle.config.EagleProperties;
 import com.alarm.eagle.rule.RuleUtil;
 import com.alarm.eagle.sink.es.ElasticsearchUtil;
-import com.alarm.eagle.sink.es.EsActionRequestFailureHandler;
-import com.alarm.eagle.sink.es.EsSinkFunction;
 import com.alarm.eagle.log.*;
 import com.alarm.eagle.rule.RuleBase;
 import com.alarm.eagle.sink.redis.LogStatAggregateFunction;
@@ -13,15 +11,15 @@ import com.alarm.eagle.sink.redis.LogStatWindowFunction;
 import com.alarm.eagle.sink.redis.LogStatWindowResult;
 import com.alarm.eagle.sink.redis.RedisAggSinkFunction;
 import com.alarm.eagle.source.RuleSourceFunction;
-import com.alarm.eagle.util.HttpUtil;
 import com.alarm.eagle.util.StringUtil;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonParser;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
+import org.apache.flink.api.connector.sink2.Sink;
 import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.api.java.utils.ParameterTool;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.connector.base.DeliveryGuarantee;
+import org.apache.flink.connector.elasticsearch.sink.Elasticsearch7SinkBuilder;
+import org.apache.flink.connector.elasticsearch.sink.FlushBackoffType;
 import org.apache.flink.connector.kafka.sink.KafkaRecordSerializationSchema;
 import org.apache.flink.connector.kafka.sink.KafkaSink;
 import org.apache.flink.connector.kafka.source.KafkaSource;
@@ -31,8 +29,6 @@ import org.apache.flink.streaming.api.datastream.*;
 import org.apache.flink.streaming.api.environment.CheckpointConfig;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.windowing.time.Time;
-import org.apache.flink.streaming.connectors.elasticsearch.ElasticsearchSinkBase;
-import org.apache.flink.streaming.connectors.elasticsearch7.ElasticsearchSink;
 import org.apache.http.HttpHost;
 import org.apache.kafka.clients.CommonClientConfigs;
 import org.apache.kafka.clients.consumer.OffsetResetStrategy;
@@ -40,9 +36,7 @@ import org.apache.kafka.common.config.SaslConfigs;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 
 /**
  * Created by luxiaoxun on 2020/01/27.
@@ -58,9 +52,9 @@ public class EagleLogApp {
 
             // Build stream DAG
             StreamExecutionEnvironment env = getStreamExecutionEnvironment(parameter);
-            DataStream<LogEntry> dataSource = getKafkaDataSource(parameter, env);
+            DataStream<LogEvent> dataSource = getKafkaDataSource(parameter, env);
             BroadcastStream<RuleBase> ruleSource = getRuleDataSource(parameter, env);
-            SingleOutputStreamOperator<LogEntry> processedStream = processLogStream(parameter, dataSource, ruleSource);
+            SingleOutputStreamOperator<LogEvent> processedStream = processLogStream(parameter, dataSource, ruleSource);
             sinkToRedis(parameter, processedStream);
             sinkToElasticsearch(parameter, processedStream);
 
@@ -106,7 +100,7 @@ public class EagleLogApp {
                 .broadcast(Descriptors.ruleStateDescriptor);
     }
 
-    private static DataStream<LogEntry> getKafkaDataSource(ParameterTool parameter, StreamExecutionEnvironment env) {
+    private static DataStream<LogEvent> getKafkaDataSource(ParameterTool parameter, StreamExecutionEnvironment env) {
         String kafkaBootstrapServers = parameter.get(ConfigConstant.KAFKA_BOOTSTRAP_SERVERS);
         String kafkaGroupId = parameter.get(ConfigConstant.KAFKA_GROUP_ID);
         String kafkaTopic = parameter.get(ConfigConstant.KAFKA_TOPIC);
@@ -114,7 +108,7 @@ public class EagleLogApp {
         String kafkaUsername = parameter.get(ConfigConstant.KAFKA_SASL_USERNAME);
         String kafkaPassword = parameter.get(ConfigConstant.KAFKA_SASL_PASSWORD);
         Properties properties = getProperties(kafkaUsername, kafkaPassword);
-        KafkaSource<LogEntry> source = KafkaSource.<LogEntry>builder()
+        KafkaSource<LogEvent> source = KafkaSource.<LogEvent>builder()
                 .setBootstrapServers(kafkaBootstrapServers)
                 .setTopics(kafkaTopic)
                 .setGroupId(kafkaGroupId)
@@ -128,9 +122,9 @@ public class EagleLogApp {
                 .name(kafkaTopic).uid(kafkaTopic).setParallelism(kafkaParallelism);
     }
 
-    private static SingleOutputStreamOperator<LogEntry> processLogStream(ParameterTool parameter, DataStream<LogEntry> dataSource,
+    private static SingleOutputStreamOperator<LogEvent> processLogStream(ParameterTool parameter, DataStream<LogEvent> dataSource,
                                                                          BroadcastStream<RuleBase> ruleSource) throws Exception {
-        BroadcastConnectedStream<LogEntry, RuleBase> connectedStreams = dataSource.connect(ruleSource);
+        BroadcastConnectedStream<LogEvent, RuleBase> connectedStreams = dataSource.connect(ruleSource);
         int processParallelism = parameter.getInt(ConfigConstant.STREAM_PROCESS_PARALLELISM);
         String kafkaIndex = parameter.get(ConfigConstant.KAFKA_SINK_INDEX);
         RuleBase ruleBase = getInitRuleBase(parameter);
@@ -150,7 +144,7 @@ public class EagleLogApp {
         return ruleBase;
     }
 
-    private static void sinkLogToKafka(ParameterTool parameter, DataStream<LogEntry> stream) {
+    private static void sinkLogToKafka(ParameterTool parameter, DataStream<LogEvent> stream) {
         String kafkaBootstrapServers = parameter.get(ConfigConstant.KAFKA_SINK_BOOTSTRAP_SERVERS);
         String kafkaTopic = parameter.get(ConfigConstant.KAFKA_SINK_TOPIC);
         int kafkaParallelism = parameter.getInt(ConfigConstant.KAFKA_SINK_TOPIC_PARALLELISM);
@@ -158,9 +152,9 @@ public class EagleLogApp {
         String kafkaPassword = parameter.get(ConfigConstant.KAFKA_SASL_PASSWORD);
         Properties properties = getProperties(kafkaUsername, kafkaPassword);
         String name = "kafka-sink";
-        KafkaRecordSerializationSchema<LogEntry> recordSerializationSchema = KafkaRecordSerializationSchema.builder()
+        KafkaRecordSerializationSchema<LogEvent> recordSerializationSchema = KafkaRecordSerializationSchema.builder()
                 .setTopic(kafkaTopic).setValueSerializationSchema(new LogSchema()).build();
-        KafkaSink<LogEntry> kafkaSink = KafkaSink.<LogEntry>builder()
+        KafkaSink<LogEvent> kafkaSink = KafkaSink.<LogEvent>builder()
                 .setBootstrapServers(kafkaBootstrapServers)
                 .setRecordSerializer(recordSerializationSchema)
                 .setKafkaProducerConfig(properties)
@@ -169,7 +163,7 @@ public class EagleLogApp {
         stream.sinkTo(kafkaSink).setParallelism(kafkaParallelism).name(name).uid(name);
     }
 
-    private static void sinkToElasticsearch(ParameterTool parameter, DataStream<LogEntry> dataSource) {
+    private static void sinkToElasticsearch(ParameterTool parameter, DataStream<LogEvent> dataSource) {
         List<HttpHost> esHttpHosts = ElasticsearchUtil.getEsAddresses(parameter.get(ConfigConstant.ELASTICSEARCH_HOSTS));
         int bulkMaxActions = parameter.getInt(ConfigConstant.ELASTICSEARCH_BULK_FLUSH_MAX_ACTIONS, 5000);
         int bulkMaxSize = parameter.getInt(ConfigConstant.ELASTICSEARCH_BULK_FLUSH_MAX_SIZE_MB, 5);
@@ -178,25 +172,37 @@ public class EagleLogApp {
         String indexPostfix = parameter.get(ConfigConstant.ELASTICSEARCH_INDEX_POSTFIX, "");
 
         String name = "ES-sink";
-        ElasticsearchSink.Builder<LogEntry> esSinkBuilder = new ElasticsearchSink.Builder<>(esHttpHosts, new EsSinkFunction(indexPostfix));
-        esSinkBuilder.setBulkFlushMaxActions(bulkMaxActions);
-        esSinkBuilder.setBulkFlushMaxSizeMb(bulkMaxSize);
-        esSinkBuilder.setBulkFlushInterval(intervalMillis);
-        esSinkBuilder.setBulkFlushBackoff(true);
-        esSinkBuilder.setBulkFlushBackoffRetries(3);
-        esSinkBuilder.setBulkFlushBackoffType(ElasticsearchSinkBase.FlushBackoffType.EXPONENTIAL);
-        esSinkBuilder.setBulkFlushBackoffDelay(1000);
-        esSinkBuilder.setFailureHandler(new EsActionRequestFailureHandler());
-        dataSource.addSink(esSinkBuilder.build()).setParallelism(esSinkParallelism).name(name).uid(name);
+//        ElasticsearchSink.Builder<LogEntry> esSinkBuilder = new ElasticsearchSink.Builder<>(esHttpHosts, new EsSinkFunction(indexPostfix));
+//        esSinkBuilder.setBulkFlushMaxActions(bulkMaxActions);
+//        esSinkBuilder.setBulkFlushMaxSizeMb(bulkMaxSize);
+//        esSinkBuilder.setBulkFlushInterval(intervalMillis);
+//        esSinkBuilder.setBulkFlushBackoff(true);
+//        esSinkBuilder.setBulkFlushBackoffRetries(3);
+//        esSinkBuilder.setBulkFlushBackoffType(ElasticsearchSinkBase.FlushBackoffType.EXPONENTIAL);
+//        esSinkBuilder.setBulkFlushBackoffDelay(1000);
+//        esSinkBuilder.setFailureHandler(new EsActionRequestFailureHandler());
+//        dataSource.addSink(esSinkBuilder.build()).setParallelism(esSinkParallelism).name(name).uid(name);
+
+        Sink<LogEvent> esSink = new Elasticsearch7SinkBuilder<LogEvent>()
+                .setHosts(esHttpHosts.toArray(new HttpHost[0]))
+                .setBulkFlushMaxActions(bulkMaxActions) // Instructs the sink to emit after every element, otherwise they would be buffered
+                .setBulkFlushMaxSizeMb(bulkMaxSize)
+                .setBulkFlushInterval(intervalMillis)
+                .setBulkFlushBackoffStrategy(FlushBackoffType.EXPONENTIAL, 3, 1000)
+                .setEmitter(
+                        (element, context, indexer) ->
+                                indexer.add(ElasticsearchUtil.createIndexRequest(element, indexPostfix)))
+                .build();
+        dataSource.sinkTo(esSink).setParallelism(esSinkParallelism).name(name).uid(name);
     }
 
-    private static void sinkToRedis(ParameterTool parameter, DataStream<LogEntry> dataSource) {
+    private static void sinkToRedis(ParameterTool parameter, DataStream<LogEvent> dataSource) {
         // save statistic information in redis
         int windowTime = parameter.getInt(ConfigConstant.REDIS_WINDOW_TIME_SECONDS);
         int windowCount = parameter.getInt(ConfigConstant.REDIS_WINDOW_TRIGGER_COUNT);
         int redisSinkParallelism = parameter.getInt(ConfigConstant.REDIS_SINK_PARALLELISM);
         String name = "redis-agg-log";
-        DataStream<LogStatWindowResult> keyedStream = dataSource.keyBy((KeySelector<LogEntry, String>) log -> log.getIndex())
+        DataStream<LogStatWindowResult> keyedStream = dataSource.keyBy((KeySelector<LogEvent, String>) log -> log.getIndex())
                 .timeWindow(Time.seconds(windowTime))
                 .trigger(new CountTriggerWithTimeout<>(windowCount, TimeCharacteristic.ProcessingTime))
                 .aggregate(new LogStatAggregateFunction(), new LogStatWindowFunction())

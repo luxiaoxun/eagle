@@ -13,7 +13,7 @@ public class Descriptors {
             "rules-state", BasicTypeInfo.STRING_TYPE_INFO, TypeInformation.of(new TypeHint<RuleBase>() {
     }));
 
-    public static final OutputTag<LogEntry> kafkaOutputTag = new OutputTag<LogEntry>("log-kafka-output",
-            TypeInformation.of(LogEntry.class)) {
+    public static final OutputTag<LogEvent> kafkaOutputTag = new OutputTag<LogEvent>("log-kafka-output",
+            TypeInformation.of(LogEvent.class)) {
     };
 }

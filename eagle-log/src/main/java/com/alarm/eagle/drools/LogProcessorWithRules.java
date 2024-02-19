@@ -1,9 +1,10 @@
 package com.alarm.eagle.drools;
 
-import com.alarm.eagle.log.LogEntry;
+import com.alarm.eagle.log.LogEvent;
 import com.alarm.eagle.rule.Rule;
 import com.alarm.eagle.rule.RuleBase;
 
+import com.alarm.eagle.util.JsonUtil;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.drools.core.impl.KnowledgeBaseImpl;
@@ -23,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import java.nio.charset.StandardCharsets;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by luxiaoxun on 2020/01/29.
@@ -53,21 +55,22 @@ public class LogProcessorWithRules implements LogProcessor {
     }
 
     @Override
-    public List<LogEntry> execute(String msg) {
-        LogEntry entry = new LogEntry((JsonObject) JsonParser.parseString(msg));
+    public List<LogEvent> execute(String msg) {
+        Map<String, Object> data = JsonUtil.jsonToObjectHashMap(msg, String.class, Object.class);
+        LogEvent entry = new LogEvent(data);
         return execute(entry);
     }
 
     @Override
-    public List<LogEntry> execute(LogEntry entry) {
-        List<LogEntry> result = new LinkedList<>();
+    public List<LogEvent> execute(LogEvent entry) {
+        List<LogEvent> result = new LinkedList<>();
         try {
             if (kieSession != null) {
                 kieSession.setGlobal("LOG", logger);
                 kieSession.insert(entry);
                 kieSession.fireAllRules();
                 for (Object obj : kieSession.getObjects()) {
-                    result.add((LogEntry) obj);
+                    result.add((LogEvent) obj);
                 }
             }
         } catch (Exception ex) {

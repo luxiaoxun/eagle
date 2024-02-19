@@ -1,12 +1,12 @@
 package com.alarm.eagle.sink.redis;
 
-import com.alarm.eagle.log.LogEntry;
+import com.alarm.eagle.log.LogEvent;
 import org.apache.flink.api.common.functions.AggregateFunction;
 
 /**
  * Created by luxiaoxun on 2020/06/15.
  */
-public class LogStatAggregateFunction implements AggregateFunction<LogEntry, LogStatAccumulator, LogStatAccumulator> {
+public class LogStatAggregateFunction implements AggregateFunction<LogEvent, LogStatAccumulator, LogStatAccumulator> {
     private static final long serialVersionUID = 1L;
 
     @Override
@@ -15,12 +15,12 @@ public class LogStatAggregateFunction implements AggregateFunction<LogEntry, Log
     }
 
     @Override
-    public LogStatAccumulator add(LogEntry logEntry, LogStatAccumulator logStatAccumulator) {
+    public LogStatAccumulator add(LogEvent logEvent, LogStatAccumulator logStatAccumulator) {
         if (logStatAccumulator.getKey().isEmpty()) {
-            logStatAccumulator.setKey(logEntry.getIndex());
+            logStatAccumulator.setKey(logEvent.getIndex());
         }
         logStatAccumulator.addCount(1);
-        String ip = logEntry.getIp();
+        String ip = logEvent.getIp();
         if (ip == null) {
             ip = "127.0.0.1";
         }

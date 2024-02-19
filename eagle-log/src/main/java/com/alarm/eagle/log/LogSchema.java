@@ -1,7 +1,6 @@
 package com.alarm.eagle.log;
 
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import com.alarm.eagle.util.JsonUtil;
 import org.apache.flink.api.common.serialization.DeserializationSchema;
 import org.apache.flink.api.common.serialization.SerializationSchema;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
@@ -13,11 +12,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.Map;
 
 /**
  * Created by luxiaoxun on 2020/01/27.
  */
-public class LogSchema implements DeserializationSchema<LogEntry>, SerializationSchema<LogEntry>, KafkaRecordDeserializationSchema<LogEntry> {
+public class LogSchema implements DeserializationSchema<LogEvent>, SerializationSchema<LogEvent>, KafkaRecordDeserializationSchema<LogEvent> {
     private static final Logger logger = LoggerFactory.getLogger(LogSchema.class);
 
     private String logIndex = null;
@@ -35,14 +35,15 @@ public class LogSchema implements DeserializationSchema<LogEntry>, Serialization
     }
 
     @Override
-    public LogEntry deserialize(byte[] bytes) {
+    public LogEvent deserialize(byte[] bytes) {
         String msg = new String(bytes);
         try {
-            LogEntry entry = new LogEntry((JsonObject) JsonParser.parseString(msg));
+            Map<String, Object> data = JsonUtil.jsonToObjectHashMap(msg, String.class, Object.class);
+            LogEvent logEvent = new LogEvent(data);
             if (logIndex != null) {
-                entry.setIndex(logIndex);
+                logEvent.setIndex(logIndex);
             }
-            return entry;
+            return logEvent;
         } catch (Exception e) {
             logger.error("Cannot parse log:{}, exception:{}", msg, e);
         }
@@ -50,25 +51,26 @@ public class LogSchema implements DeserializationSchema<LogEntry>, Serialization
     }
 
     @Override
-    public byte[] serialize(LogEntry logEntry) {
-        return logEntry.toJSON().toString().getBytes();
+    public byte[] serialize(LogEvent logEvent) {
+        return JsonUtil.encode(logEvent).getBytes();
     }
 
     @Override
-    public boolean isEndOfStream(LogEntry logEntry) {
+    public boolean isEndOfStream(LogEvent logEvent) {
         return false;
     }
 
     @Override
-    public TypeInformation<LogEntry> getProducedType() {
-        return TypeExtractor.getForClass(LogEntry.class);
+    public TypeInformation<LogEvent> getProducedType() {
+        return TypeExtractor.getForClass(LogEvent.class);
     }
 
     @Override
-    public void deserialize(ConsumerRecord<byte[], byte[]> consumerRecord, Collector<LogEntry> collector) throws IOException {
-        LogEntry logEntry = deserialize(consumerRecord.value());
-        if (logEntry != null) {
-            collector.collect(logEntry);
+    public void deserialize(ConsumerRecord<byte[], byte[]> consumerRecord, Collector<LogEvent> collector) throws IOException {
+        LogEvent logEvent = deserialize(consumerRecord.value());
+        if (logEvent != null) {
+            logger.info("Received log:{}", logEvent);
+            collector.collect(logEvent);
         }
     }
 }

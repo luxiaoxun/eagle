@@ -16,7 +16,7 @@ import java.util.List;
 /**
  * Created by luxiaoxun on 2020/01/27.
  */
-public class LogProcessFunction extends BroadcastProcessFunction<LogEntry, RuleBase, LogEntry> {
+public class LogProcessFunction extends BroadcastProcessFunction<LogEvent, RuleBase, LogEvent> {
     private static final Logger logger = LoggerFactory.getLogger(LogProcessFunction.class);
 
     private RuleBase latestRuleBase = null;
@@ -40,11 +40,11 @@ public class LogProcessFunction extends BroadcastProcessFunction<LogEntry, RuleB
     }
 
     @Override
-    public void processElement(LogEntry logEntry, ReadOnlyContext readOnlyContext, Collector<LogEntry> collector) throws Exception {
+    public void processElement(LogEvent logEvent, ReadOnlyContext readOnlyContext, Collector<LogEvent> collector) throws Exception {
         try {
-            List<LogEntry> result = logProcessor.execute(logEntry);
-            for (LogEntry item : result) {
-                if (item.isWrongLog()) {
+            List<LogEvent> result = logProcessor.execute(logEvent);
+            for (LogEvent item : result) {
+                if (item.isErrorLog()) {
                     logger.warn("Error log, index:{}", item.getIndex());
                     item.handleError();
                     collector.collect(item);
@@ -58,12 +58,12 @@ public class LogProcessFunction extends BroadcastProcessFunction<LogEntry, RuleB
                 }
             }
         } catch (Exception ex) {
-            logger.error("Log process error: " + ex);
+            logger.error("Log process error: {}", ex);
         }
     }
 
     @Override
-    public void processBroadcastElement(RuleBase ruleBase, Context context, Collector<LogEntry> collector) throws Exception {
+    public void processBroadcastElement(RuleBase ruleBase, Context context, Collector<LogEvent> collector) throws Exception {
         BroadcastState<String, RuleBase> ruleState = context.getBroadcastState(Descriptors.ruleStateDescriptor);
         ruleState.put(ruleKeyName, ruleBase);
         if (latestRuleBase != null && StringUtils.equals(latestRuleBase.getHash(), ruleBase.getHash())) {

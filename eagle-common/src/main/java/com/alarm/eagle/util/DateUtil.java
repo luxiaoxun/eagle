@@ -58,7 +58,7 @@ public class DateUtil {
         return d.toDate();
     }
 
-    public static String getUtcTimestamp(long timestamp) {
+    public static String toUtcTimestamp(long timestamp) {
         return YMD_HMS_SSS.withZoneUTC().print(timestamp);
     }
 

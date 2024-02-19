@@ -42,7 +42,7 @@ public class EsIndexManager {
         log.info("Start to set index template for eagle log");
         boolean result = false;
         PutIndexTemplateRequest request = new PutIndexTemplateRequest("eagle-log-template");
-        request.patterns(Arrays.asList("eagle_log-*"));
+        request.patterns(Arrays.asList("eagle_log_*", "eagle_error_log*"));
         request.settings(Settings.builder()
                         .put("index.refresh_interval", "1s")
                         .put("index.number_of_shards", 4)

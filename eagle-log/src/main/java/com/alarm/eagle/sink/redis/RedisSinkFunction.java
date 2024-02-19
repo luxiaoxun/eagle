@@ -1,7 +1,7 @@
 package com.alarm.eagle.sink.redis;
 
 import com.alarm.eagle.config.ConfigConstant;
-import com.alarm.eagle.log.LogEntry;
+import com.alarm.eagle.log.LogEvent;
 import com.alarm.eagle.util.DateUtil;
 import com.alarm.eagle.util.StringUtil;
 import org.apache.commons.lang3.StringUtils;
@@ -18,7 +18,7 @@ import java.util.*;
 /**
  * Created by luxiaoxun on 2020/01/29.
  */
-public class RedisSinkFunction extends RichSinkFunction<Tuple2<String, List<LogEntry>>> {
+public class RedisSinkFunction extends RichSinkFunction<Tuple2<String, List<LogEvent>>> {
     private static final Logger logger = LoggerFactory.getLogger(RedisSinkFunction.class);
 
     private transient JedisCluster jedisCluster = null;
@@ -51,13 +51,13 @@ public class RedisSinkFunction extends RichSinkFunction<Tuple2<String, List<LogE
     }
 
     @Override
-    public void invoke(Tuple2<String, List<LogEntry>> value, Context context) {
+    public void invoke(Tuple2<String, List<LogEvent>> value, Context context) {
         String keyName = value.getField(0);
         logger.debug("Redis sink, key name: " + keyName);
-        List<LogEntry> logs = value.getField(1);
+        List<LogEvent> logs = value.getField(1);
         if (logs != null && logs.size() > 0) {
             Map<String, Long> statMap = new HashMap<>();
-            for (LogEntry entry : logs) {
+            for (LogEvent entry : logs) {
                 String ip = entry.getIp();
                 String index = entry.getIndex();
                 logger.debug("receive ip:{}, index:{}", ip, index);

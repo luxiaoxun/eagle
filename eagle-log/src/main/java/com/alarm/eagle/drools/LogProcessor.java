@@ -1,6 +1,6 @@
 package com.alarm.eagle.drools;
 
-import com.alarm.eagle.log.LogEntry;
+import com.alarm.eagle.log.LogEvent;
 import com.alarm.eagle.rule.Rule;
 import com.alarm.eagle.rule.RuleBase;
 
@@ -12,9 +12,9 @@ import java.util.List;
 public interface LogProcessor {
     String LOG_PKG = "logrules";
 
-    List<LogEntry> execute(String msg);
+    List<LogEvent> execute(String msg);
 
-    List<LogEntry> execute(LogEntry entry);
+    List<LogEvent> execute(LogEvent entry);
 
     boolean loadRules(RuleBase ruleBase);
 

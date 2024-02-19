@@ -11,7 +11,6 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
 import java.util.HashMap;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -63,7 +62,7 @@ public class DataMockService {
         long now = System.currentTimeMillis();
         JsonObject dataLog = new JsonObject();
         dataLog.addProperty(Constant.EVENT_TIME, now);
-        dataLog.addProperty(Constant.TIMESTAMP, DateUtil.getUtcTimestamp(now));
+        dataLog.addProperty(Constant.TIMESTAMP, DateUtil.toUtcTimestamp(now));
         dataLog.addProperty(Constant.INDEX, "log_app_1");
         dataLog.addProperty(Constant.IP, "10.17.1.56");
         dataLog.addProperty(Constant.TENANT_ID, "root");

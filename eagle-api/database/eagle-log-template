@@ -1,8 +1,8 @@
 {
-  "xdr-event-template" : {
+  "eagle-log-template" : {
     "order" : 1,
     "index_patterns" : [
-      "xdr_event-*"
+      "eagle_log_*"
     ],
     "settings" : {
       "index" : {
@@ -38,13 +38,13 @@
         "ip" : {
           "type" : "ip"
         },
-        "deviceIp" : {
+        "device_ip" : {
           "type" : "ip"
         },
-        "srcIp" : {
+        "src_ip" : {
           "type" : "ip"
         },
-        "dstIp" : {
+        "dst_ip" : {
           "type" : "ip"
         },
         "timestamp" : {
