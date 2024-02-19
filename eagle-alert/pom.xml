@@ -10,8 +10,11 @@
     <artifactId>eagle-alert</artifactId>
     <packaging>jar</packaging>
 
-    <name>eagle-policy</name>
-    <url>http://maven.apache.org</url>
+    <name>eagle-alert</name>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
 
     <dependencies>
         <dependency>
@@ -195,19 +198,19 @@
                 </executions>
             </plugin>
         </plugins>
-<!--        <filters>-->
-<!--            <filter>application-${profile.env}.properties</filter>-->
-<!--        </filters>-->
-<!--        <resources>-->
-<!--            <resource>-->
-<!--                <directory>src/main/resources</directory>-->
-<!--                <includes>-->
-<!--                    <include>**/*.xml</include>-->
-<!--                    <include>**/*.properties</include>-->
-<!--                    <include>**/*.conf</include>-->
-<!--                </includes>-->
-<!--                <filtering>true</filtering>-->
-<!--            </resource>-->
-<!--        </resources>-->
+        <!--        <filters>-->
+        <!--            <filter>application-${profile.env}.properties</filter>-->
+        <!--        </filters>-->
+        <!--        <resources>-->
+        <!--            <resource>-->
+        <!--                <directory>src/main/resources</directory>-->
+        <!--                <includes>-->
+        <!--                    <include>**/*.xml</include>-->
+        <!--                    <include>**/*.properties</include>-->
+        <!--                    <include>**/*.conf</include>-->
+        <!--                </includes>-->
+        <!--                <filtering>true</filtering>-->
+        <!--            </resource>-->
+        <!--        </resources>-->
     </build>
 </project>
