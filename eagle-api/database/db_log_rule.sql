@@ -16,7 +16,7 @@ INSERT INTO eagle_db.eagle_log_rule
 (id, name, app_id, version, `type`, script, state, update_time)
 VALUES(1, 'log_app_1', '123', '20200101', 'log-rules', 'package logrules
 import com.alarm.eagle.util.DateUtil;
-import com.alarm.eagle.log.LogEntry;
+import com.alarm.eagle.log.LogEvent;
 import org.slf4j.Logger;
 import com.alarm.eagle.util.Md5Util;
 import com.alarm.eagle.util.RegexUtil
@@ -26,7 +26,7 @@ rule "log_app_1"
     no-loop true
     salience 100
     when
-        $log : LogEntry( index == "log_app_1", $msg : message)
+        $log : LogEvent( index == "log_app_1", $msg : message)
     then
         LOG.debug("receive log_app_1 log, id:[{}]", $log.getId());
         String logTime = RegexUtil.extractString("(\\\\d{4}-\\\\d{2}-\\\\d{2} \\\\d{2}:\\\\d{2}:\\\\d{2})", $msg);
@@ -44,12 +44,12 @@ rule "log_app_1"
         }
         $log.dealDone();
         LOG.debug("out -----log_app_1------");
-end', 1, '2024-02-05 10:09:30.393');
+end', 1, '2024-02-19 13:50:09.222');
 INSERT INTO eagle_db.eagle_log_rule
 (id, name, app_id, version, `type`, script, state, update_time)
 VALUES(2, 'log_app_2', '456', '20200102', 'log-rules', 'package logrules
 import com.alarm.eagle.util.DateUtil;
-import com.alarm.eagle.log.LogEntry;
+import com.alarm.eagle.log.LogEvent;
 import org.slf4j.Logger;
 import com.alarm.eagle.util.Md5Util;
 import com.alarm.eagle.util.RegexUtil
@@ -59,7 +59,7 @@ rule "log_app_2"
     no-loop true
     salience 100
     when
-        $log : LogEntry( index == "log_app_2", $msg : message)
+        $log : LogEvent( index == "log_app_2", $msg : message)
     then
         LOG.debug("receive log_app_2 log, id:[{}]", $log.getId());
         String logTime = RegexUtil.extractString("(\\\\d{4}-\\\\d{2}-\\\\d{2} \\\\d{2}:\\\\d{2}:\\\\d{2})", $msg);
@@ -72,5 +72,5 @@ rule "log_app_2"
 
         $log.dealDone();
         LOG.debug("out -----log_app_2------");
-end', 1, '2024-02-05 10:02:41.947');
+end', 1, '2024-02-19 13:50:09.234');
 
