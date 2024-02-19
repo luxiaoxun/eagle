@@ -10,7 +10,7 @@ import java.util.List;
  * Created by luxiaoxun on 2020/01/29.
  */
 public interface LogProcessor {
-    String LOG_PKG = "logrules";
+    String LOG_PKG = "log-rules";
 
     List<LogEvent> execute(String msg);
 

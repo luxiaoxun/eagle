@@ -31,7 +31,7 @@ public class RuleSourceFunction extends RichSourceFunction<RuleBase> {
     public void run(SourceContext sourceContext) throws Exception {
         while (isRunning) {
             logger.info("Http to get rules from " + ruleUrl);
-            RuleBase ruleBase = RuleUtil.getRules(ruleUrl);
+            RuleBase ruleBase = RuleUtil.getMockRules(ruleUrl);
             if (ruleBase != null) {
                 sourceContext.collect(ruleBase);
             }

@@ -58,7 +58,7 @@ public class EagleLogApp {
             sinkToRedis(parameter, processedStream);
             sinkToElasticsearch(parameter, processedStream);
 
-//            DataStream<LogEntry> kafkaOutputStream = processedStream.getSideOutput(Descriptors.kafkaOutputTag);
+//            DataStream<> kafkaOutputStream = processedStream.getSideOutput(Descriptors.kafkaOutputTag);
 //            sinkLogToKafka(parameter, kafkaOutputStream);
 
             env.getConfig().setGlobalJobParameters(parameter);
@@ -140,7 +140,7 @@ public class EagleLogApp {
 
     private static RuleBase getInitRuleBase(ParameterTool parameter) {
         String ruleUrl = parameter.get(ConfigConstant.STREAM_RULE_URL);
-        RuleBase ruleBase = RuleUtil.getRules(ruleUrl);
+        RuleBase ruleBase = RuleUtil.getMockRules(ruleUrl);
         return ruleBase;
     }
 
@@ -172,17 +172,6 @@ public class EagleLogApp {
         String indexPostfix = parameter.get(ConfigConstant.ELASTICSEARCH_INDEX_POSTFIX, "");
 
         String name = "ES-sink";
-//        ElasticsearchSink.Builder<LogEntry> esSinkBuilder = new ElasticsearchSink.Builder<>(esHttpHosts, new EsSinkFunction(indexPostfix));
-//        esSinkBuilder.setBulkFlushMaxActions(bulkMaxActions);
-//        esSinkBuilder.setBulkFlushMaxSizeMb(bulkMaxSize);
-//        esSinkBuilder.setBulkFlushInterval(intervalMillis);
-//        esSinkBuilder.setBulkFlushBackoff(true);
-//        esSinkBuilder.setBulkFlushBackoffRetries(3);
-//        esSinkBuilder.setBulkFlushBackoffType(ElasticsearchSinkBase.FlushBackoffType.EXPONENTIAL);
-//        esSinkBuilder.setBulkFlushBackoffDelay(1000);
-//        esSinkBuilder.setFailureHandler(new EsActionRequestFailureHandler());
-//        dataSource.addSink(esSinkBuilder.build()).setParallelism(esSinkParallelism).name(name).uid(name);
-
         Sink<LogEvent> esSink = new Elasticsearch7SinkBuilder<LogEvent>()
                 .setHosts(esHttpHosts.toArray(new HttpHost[0]))
                 .setBulkFlushMaxActions(bulkMaxActions) // Instructs the sink to emit after every element, otherwise they would be buffered

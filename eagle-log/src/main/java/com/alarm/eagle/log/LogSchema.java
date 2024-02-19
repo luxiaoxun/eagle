@@ -69,7 +69,7 @@ public class LogSchema implements DeserializationSchema<LogEvent>, Serialization
     public void deserialize(ConsumerRecord<byte[], byte[]> consumerRecord, Collector<LogEvent> collector) throws IOException {
         LogEvent logEvent = deserialize(consumerRecord.value());
         if (logEvent != null) {
-            logger.info("Received log:{}", logEvent);
+            logger.debug("Received log:{}", logEvent);
             collector.collect(logEvent);
         }
     }

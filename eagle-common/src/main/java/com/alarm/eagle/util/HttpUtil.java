@@ -42,30 +42,6 @@ public class HttpUtil {
     public HttpUtil() {
     }
 
-    private static String mockRules = "[{\n" +
-            "\t\"id\": 123,\n" +
-            "\t\"name\": \"eagle_log_rule_1\",\n" +
-            "\t\"appId\": \"059b0847-4fda-487a-ab85-7a5e625a8bd1\",\n" +
-            "\t\"type\": \"logrules\",\n" +
-            "\t\"script\": \"package logrules\\n\\nimport com.alarm.eagle.util.DateUtil;\\nimport com.alarm.eagle.log.LogEntry;\\nimport org.slf4j.Logger;\\nimport com.alarm.eagle.util.Md5Util;\\nimport com.alarm.eagle.util.RegexUtil\\nimport java.util.Date;\\n\\nglobal Logger LOG;\\n\\nrule \\\"eagle_log_rule_1\\\"\\nno-loop true\\nsalience 100\\nwhen\\n    $log : LogEntry( index == \\\"log_app_1\\\", $msg : message)\\nthen\\n    LOG.debug(\\\"receive eagle_log_1 log, id:[{}]\\\", $log.getId());\\n    String type = $log.getType();\\n    if (\\\"opm\\\".equals(type)){\\n        String logTime = RegexUtil.extractString(\\\"(\\\\\\\\d{4}-\\\\\\\\d{2}-\\\\\\\\d{2} \\\\\\\\d{2}:\\\\\\\\d{2}:\\\\\\\\d{2}.\\\\\\\\d{3})\\\", $msg);\\n        if(logTime == null){\\n            LOG.warn(\\\"invalid date or time, log: {}\\\", $msg);\\n            return;\\n        }\\n        Date date = DateUtil.convertFromString(\\\"yyyy-MM-dd HH:mm:ss.SSS\\\", logTime);\\n        $log.setTimestamp(date != null ? date : $log.getAtTimestamp());\\n        if ($msg.contains(\\\"EventTracking\\\")){\\n            String tracking = RegexUtil.extractString(\\\"(EventTracking.+)\\\", $msg);\\n            if (tracking != null){\\n                String[]  tracks = tracking.split(\\\"\\\\\\\\|\\\");\\n                $log.addField(\\\"EventType\\\",tracks[0]);\\n                $log.addField(\\\"LogType\\\",tracks[1]);\\n                $log.addField(\\\"LogId\\\",tracks[2]);\\n                $log.addField(\\\"UserId\\\",tracks[3]);\\n                $log.addField(\\\"LogTime\\\",tracks[4]);\\n            }\\n        }\\n    } else if (\\\"offermanager\\\".equals(type)){\\n            String logTime = RegexUtil.extractString(\\\"(\\\\\\\\d{4}-\\\\\\\\d{2}-\\\\\\\\d{2} \\\\\\\\d{2}:\\\\\\\\d{2}:\\\\\\\\d{2},\\\\\\\\d{3})\\\", $msg);\\n            if(logTime == null){\\n                LOG.warn(\\\"invalid date or time, log: {}\\\", $msg);\\n                return;\\n            }\\n            Date date = DateUtil.convertFromString(\\\"yyyy-MM-dd HH:mm:ss,SSS\\\", logTime);\\n            $log.setTimestamp(date != null ? date : $log.getAtTimestamp());\\n        } else {\\n            return;\\n        }\\n\\n    long delayTime = (System.currentTimeMillis() - $log.getTimestamp().getTime())/1000;\\n    if (delayTime > 5*24*3600 || delayTime < -5*24*3600) {\\n        LOG.warn(\\\"Too early or too late log, ignore it, delay:{}, log:{}\\\", delayTime, $log.getTimestamp().getTime());\\n        return;\\n    }\\n    $log.dealDone();\\n    LOG.debug(\\\"out -----eagle_log_1------\\\");\\nend\",\n" +
-            "\t\"version\": \"20190729\",\n" +
-            "\t\"state\": 1,\n" +
-            "\t\"updateTime\": 1564475611452\n" +
-            "}, {\n" +
-            "\t\"id\": 456,\n" +
-            "\t\"name\": \"eagle_log_rule_2\",\n" +
-            "\t\"appId\": \"2a2df323-d2ea-45ca-bf7e-6d2afa125688\",\n" +
-            "\t\"type\": \"logrules\",\n" +
-            "\t\"script\": \"package logrules\\n\\nimport org.slf4j.Logger;\\nimport java.util.Date;\\nimport java.util.Locale;\\nimport com.alarm.eagle.log.LogEntry;\\nimport com.alarm.eagle.util.RegexUtil;\\nimport com.alarm.eagle.util.DateUtil\\nimport java.time.LocalDateTime;\\n\\nglobal Logger LOG;\\n\\nrule \\\"eagle_log_rule_2\\\"\\n\\tno-loop true\\n\\tsalience 100\\n    when\\n        $log : LogEntry(index == \\\"log_app_2\\\", $msg : message)\\n    then\\n        LOG.debug(\\\"receive eagle_log_2 log, id:[{}]\\\", $log.getId());\\n        String logTime = RegexUtil.extractString(\\\"(\\\\\\\\d{4}-\\\\\\\\d{2}-\\\\\\\\d{2} \\\\\\\\d{2}:\\\\\\\\d{2}:\\\\\\\\d{2}.\\\\\\\\d{3})\\\", $msg);\\n        if(logTime == null){\\n            LOG.warn(\\\"invalid date or time, log: {}\\\", $msg);\\n            return;\\n        }\\n        Date date = DateUtil.convertFromString(\\\"yyyy-MM-dd HH:mm:ss,SSS\\\", logTime);\\n        $log.setTimestamp(date!=null? date:$log.getAtTimestamp());\\n\\n        $log.dealDone();\\n        LOG.debug(\\\"out ----- eagle_log_2 log-----\\\");\\nend\",\n" +
-            "\t\"version\": \"20190826\",\n" +
-            "\t\"state\": 1,\n" +
-            "\t\"updateTime\": 1567078969483\n" +
-            "}]";
-
-    public static String doGetMock(String urlPath) {
-        return mockRules;
-    }
-
     public static String doGet(String urlPath) {
         return doGet(urlPath, Charsets.UTF_8, (Map) null, (Map) null);
     }
