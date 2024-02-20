@@ -42,20 +42,20 @@ public class RedisAggSinkFunction extends RichSinkFunction<LogStatWindowResult> 
         try {
             long totalCount = 0;
             String preKey = "log:";
-            String postKey = DateUtil.convertToUTCString("yyyyMMdd:HHmm", value.getEndTime());
+            String postKey = DateUtil.convertToLocalString("yyyyMMdd_HHmm", value.getEndTime());
             String redisKey = preKey + keyName + ":" + postKey;
-            logger.info("Redis key:{}", redisKey);
+            logger.info("Redis key: {}", redisKey);
             try (StatefulRedisConnection<String, String> connection = redisClient.connect()) {
                 RedisCommands<String, String> syncCommands = connection.sync();
                 for (String keyIp : statMap.keySet()) {
                     Long count = statMap.get(keyIp);
                     syncCommands.hincrby(redisKey, keyIp, count);
-                    logger.debug("Redis item.key:{}, item.value:{}", keyIp, count);
+                    logger.debug("Redis item.key: {}, item.value: {}", keyIp, count);
                     totalCount += count;
                 }
                 syncCommands.expire(redisKey, 2 * 24 * 3600);  // 48 hours
                 String redisTotalKey = preKey + keyName + ":total:" + postKey;
-                logger.info("Redis total.key:{}, total.value:{}", redisTotalKey, totalCount);
+                logger.info("Redis total.key: {}, total.value: {}", redisTotalKey, totalCount);
                 syncCommands.set(redisTotalKey, Long.toString(totalCount));
                 syncCommands.expire(redisTotalKey, 2 * 24 * 3600);  // 48 hours
             }

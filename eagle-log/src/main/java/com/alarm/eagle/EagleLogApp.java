@@ -28,6 +28,7 @@ import org.apache.flink.streaming.api.TimeCharacteristic;
 import org.apache.flink.streaming.api.datastream.*;
 import org.apache.flink.streaming.api.environment.CheckpointConfig;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
+import org.apache.flink.streaming.api.windowing.assigners.TumblingProcessingTimeWindows;
 import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.http.HttpHost;
 import org.apache.kafka.clients.CommonClientConfigs;
@@ -187,7 +188,7 @@ public class EagleLogApp {
         int redisSinkParallelism = parameter.getInt(ConfigConstant.REDIS_SINK_PARALLELISM);
         String name = "redis-agg-log";
         DataStream<LogStatWindowResult> keyedStream = dataSource.keyBy((KeySelector<LogEvent, String>) LogEvent::getIndex)
-                .timeWindow(Time.seconds(windowTime))
+                .window(TumblingProcessingTimeWindows.of(Time.seconds(windowTime)))
                 .trigger(new CountTriggerWithTimeout<>(windowCount, TimeCharacteristic.ProcessingTime))
                 .aggregate(new LogStatAggregateFunction(), new LogStatWindowFunction())
                 .setParallelism(redisSinkParallelism).name(name).uid(name);

@@ -62,7 +62,7 @@ public class RedisSinkFunction extends RichSinkFunction<Tuple2<String, List<LogE
                 Date now = DateUtil.getNowDateMinute();
                 long totalCount = 0;
                 String preKey = "log:";
-                String postKey = DateUtil.convertToUTCString("yyyyMMdd:HHmm", now.getTime());
+                String postKey = DateUtil.convertToLocalString("yyyyMMdd_HHmm", now.getTime());
                 String redisKey = preKey + keyName + ":" + postKey;
                 logger.info("redis key:{}", redisKey);
 
