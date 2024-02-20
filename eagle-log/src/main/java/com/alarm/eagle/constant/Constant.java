@@ -36,6 +36,8 @@ public final class Constant {
 
     public static final String PATH = "path";
 
+    public static final String INDEX_SOURCE = "index_source";
+
     public static final String INDEX_TARGET = "index_target";
 
     public static final String INDEX_POSTFIX = "index_postfix";

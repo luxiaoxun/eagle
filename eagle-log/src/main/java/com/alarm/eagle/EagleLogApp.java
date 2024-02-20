@@ -127,21 +127,16 @@ public class EagleLogApp {
         BroadcastConnectedStream<LogEvent, RuleBase> connectedStreams = dataSource.connect(ruleSource);
         int processParallelism = parameter.getInt(ConfigConstant.STREAM_PROCESS_PARALLELISM);
         String kafkaIndex = parameter.get(ConfigConstant.KAFKA_SINK_INDEX);
-        RuleBase ruleBase = getInitRuleBase(parameter);
+        String ruleUrl = parameter.get(ConfigConstant.STREAM_RULE_URL);
+        RuleBase ruleBase = RuleUtil.getMockRules(ruleUrl);
         if (ruleBase == null) {
             throw new Exception("Can not get initial rules");
         } else {
             String name = "process-log";
-            logger.debug("Initial rules: " + ruleBase.toString());
+            logger.debug("Initial rules: " + ruleBase);
             return connectedStreams.process(new LogProcessFunction(ruleBase, kafkaIndex))
                     .setParallelism(processParallelism).name(name).uid(name);
         }
-    }
-
-    private static RuleBase getInitRuleBase(ParameterTool parameter) {
-        String ruleUrl = parameter.get(ConfigConstant.STREAM_RULE_URL);
-        RuleBase ruleBase = RuleUtil.getMockRules(ruleUrl);
-        return ruleBase;
     }
 
     private static void sinkLogToKafka(ParameterTool parameter, DataStream<LogEvent> stream) {
@@ -191,7 +186,7 @@ public class EagleLogApp {
         int windowCount = parameter.getInt(ConfigConstant.REDIS_WINDOW_TRIGGER_COUNT);
         int redisSinkParallelism = parameter.getInt(ConfigConstant.REDIS_SINK_PARALLELISM);
         String name = "redis-agg-log";
-        DataStream<LogStatWindowResult> keyedStream = dataSource.keyBy((KeySelector<LogEvent, String>) log -> log.getIndex())
+        DataStream<LogStatWindowResult> keyedStream = dataSource.keyBy((KeySelector<LogEvent, String>) LogEvent::getIndex)
                 .timeWindow(Time.seconds(windowTime))
                 .trigger(new CountTriggerWithTimeout<>(windowCount, TimeCharacteristic.ProcessingTime))
                 .aggregate(new LogStatAggregateFunction(), new LogStatWindowFunction())

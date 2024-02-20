@@ -178,7 +178,7 @@ public class LogEvent extends HashMap<String, Object> {
     }
 
     public void handleError() {
-        this.addField("index_source", getIndex());
+        this.addField(Constant.INDEX_SOURCE, getIndex());
         this.setIndex(Constant.WRONG_LOG_INDEX);
         this.setTimestamp(this.getAtTimestamp() != null ? this.getAtTimestamp() : this.getTimestamp());
         this.setErrorLog(false);

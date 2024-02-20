@@ -100,8 +100,4 @@ public class DateUtil {
         return now - (now + timeZone * 3600000L) % 86400000 + 86400000;
     }
 
-    public static void main(String[] args) {
-        System.out.println(getEsString(tomorrowZeroTimestampMs(System.currentTimeMillis(), 8)));
-    }
-
 }

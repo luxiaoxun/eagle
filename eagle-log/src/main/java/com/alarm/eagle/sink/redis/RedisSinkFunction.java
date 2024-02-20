@@ -1,17 +1,16 @@
 package com.alarm.eagle.sink.redis;
 
-import com.alarm.eagle.config.ConfigConstant;
 import com.alarm.eagle.log.LogEvent;
 import com.alarm.eagle.util.DateUtil;
-import com.alarm.eagle.util.StringUtil;
-import org.apache.commons.lang3.StringUtils;
+import io.lettuce.core.RedisClient;
+import io.lettuce.core.api.StatefulRedisConnection;
+import io.lettuce.core.api.sync.RedisCommands;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.utils.ParameterTool;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.functions.sink.RichSinkFunction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import redis.clients.jedis.*;
 
 import java.util.*;
 
@@ -21,32 +20,19 @@ import java.util.*;
 public class RedisSinkFunction extends RichSinkFunction<Tuple2<String, List<LogEvent>>> {
     private static final Logger logger = LoggerFactory.getLogger(RedisSinkFunction.class);
 
-    private transient JedisCluster jedisCluster = null;
-
-    private transient JedisPool jedisPool = null;
-
-    private boolean isRedisCluster = false;
+    private transient RedisClient redisClient = null;
 
     @Override
     public void open(Configuration parameters) throws Exception {
-        ParameterTool parameterTool = (ParameterTool)
-                getRuntimeContext().getExecutionConfig().getGlobalJobParameters();
-        isRedisCluster = parameterTool.getBoolean(ConfigConstant.REDIS_CLUSTER_ENABLED, false);
-        if (isRedisCluster) {
-            jedisCluster = getJedisCluster(parameterTool);
-        } else {
-            jedisPool = getJedisPool(parameterTool);
-        }
+        ParameterTool parameterTool = (ParameterTool) getRuntimeContext().getExecutionConfig().getGlobalJobParameters();
+        redisClient = RedisUtil.getRedisClient(parameterTool);
     }
 
     @Override
     public void close() throws Exception {
         super.close();
-        if (jedisCluster != null) {
-            jedisCluster.close();
-        }
-        if (jedisPool != null) {
-            jedisPool.close();
+        if (redisClient != null) {
+            redisClient.shutdown();
         }
     }
 
@@ -79,84 +65,24 @@ public class RedisSinkFunction extends RichSinkFunction<Tuple2<String, List<LogE
                 String postKey = DateUtil.convertToUTCString("yyyyMMdd:HHmm", now.getTime());
                 String redisKey = preKey + keyName + ":" + postKey;
                 logger.info("redis key:{}", redisKey);
-                if (isRedisCluster) {
+
+                try (StatefulRedisConnection<String, String> connection = redisClient.connect()) {
+                    RedisCommands<String, String> syncCommands = connection.sync();
                     for (String key : statMap.keySet()) {
                         Long count = statMap.get(key);
-                        jedisCluster.hincrBy(redisKey, key, count);
+                        syncCommands.hincrby(redisKey, key, count);
                         logger.debug("item.key:{},item.value:{}", key, count);
                         totalCount += count;
                     }
-                    jedisCluster.expire(redisKey, 2 * 24 * 3600);  // 48 hours
+                    syncCommands.expire(redisKey, 2 * 24 * 3600);  // 48 hours
                     String redisTotalKey = preKey + keyName + ":total:" + postKey;
                     logger.info("Redis total.key:{}, total.value:{}", redisTotalKey, totalCount);
-                    jedisCluster.set(redisTotalKey, Long.toString(totalCount));
-                    jedisCluster.expire(redisTotalKey, 2 * 24 * 3600);  // 48 hours
-                } else {
-                    try (Jedis jedis = jedisPool.getResource()) {
-                        for (String key : statMap.keySet()) {
-                            Long count = statMap.get(key);
-                            jedis.hincrBy(redisKey, key, count);
-                            logger.debug("item.key:{},item.value:{}", key, count);
-                            totalCount += count;
-                        }
-                        jedis.expire(redisKey, 2 * 24 * 3600);  // 48 hours
-                        String redisTotalKey = preKey + keyName + ":total:" + postKey;
-                        logger.info("Redis total.key:{}, total.value:{}", redisTotalKey, totalCount);
-                        jedis.set(redisTotalKey, Long.toString(totalCount));
-                        jedis.expire(redisTotalKey, 2 * 24 * 3600);  // 48 hours
-                    }
+                    syncCommands.set(redisTotalKey, Long.toString(totalCount));
+                    syncCommands.expire(redisTotalKey, 2 * 24 * 3600);  // 48 hours
                 }
             } catch (Exception ex) {
                 logger.error("Redis sink, key name:{}, exception:{}", keyName, ex.toString());
             }
         }
     }
-
-    private JedisCluster getJedisCluster(ParameterTool parameter) {
-        JedisCluster jedis = null;
-        String redisHosts = parameter.get(ConfigConstant.REDIS_HOSTS, "");
-        String redisPassword = parameter.get(ConfigConstant.REDIS_PASSWORD, "");
-        if (!StringUtils.isEmpty(redisHosts)) {
-            Set<HostAndPort> nodes = new HashSet<>();
-            for (String server : redisHosts.split(",")) {
-                String[] hostPort = server.split(":");
-                nodes.add(new HostAndPort(hostPort[0], hostPort.length >= 2 ? Integer.parseInt(hostPort[1]) : 6379));
-            }
-            JedisPoolConfig jpc = new JedisPoolConfig();
-            jpc.setMaxTotal(8);
-            jpc.setMaxIdle(8);
-            jpc.setMaxWaitMillis(1000L);
-            int timeout = 3000;
-            int maxAttempts = 10;
-            if (!StringUtil.isEmpty(redisPassword)) {
-                jedis = new JedisCluster(nodes, timeout, timeout, maxAttempts, redisPassword, jpc);
-            } else {
-                jedis = new JedisCluster(nodes, timeout, maxAttempts, jpc);
-            }
-        }
-        return jedis;
-    }
-
-    private JedisPool getJedisPool(ParameterTool parameter) {
-        JedisPool jedis = null;
-        String redisHosts = parameter.get(ConfigConstant.REDIS_HOSTS, "");
-        String redisPassword = parameter.get(ConfigConstant.REDIS_PASSWORD, "");
-        if (!StringUtils.isEmpty(redisHosts)) {
-            String[] hostPort = redisHosts.split(":");
-            if (hostPort.length == 2) {
-                JedisPoolConfig jpc = new JedisPoolConfig();
-                jpc.setMaxTotal(8);
-                jpc.setMaxIdle(8);
-                jpc.setMaxWaitMillis(1000L);
-                int timeout = 3000;
-                if (!StringUtil.isEmpty(redisPassword)) {
-                    jedis = new JedisPool(jpc, hostPort[0], Integer.parseInt(hostPort[1]), timeout, redisPassword);
-                } else {
-                    jedis = new JedisPool(jpc, hostPort[0], Integer.parseInt(hostPort[1]), timeout);
-                }
-            }
-        }
-        return jedis;
-    }
-
 }

@@ -1,6 +1,7 @@
 package com.alarm.eagle;
 
 import com.alarm.eagle.util.DateUtil;
+import com.alarm.eagle.util.Md5Util;
 import com.alarm.eagle.util.RegexUtil;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.Assert;
@@ -34,6 +35,12 @@ public class UtilTest {
         if (pairs != null && pairs.size() > 0) {
             pairs.stream().forEach(System.out::println);
         }
+    }
+
+    @Test
+    public void testMd5() {
+        System.out.println(Md5Util.MD5("aaaa"));
+        System.out.println(Md5Util.MD5("1234"));
     }
 
 }
