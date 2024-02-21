@@ -1,7 +1,7 @@
 package com.alarm.eagle;
 
-import com.alarm.eagle.config.AlarmConfigConstant;
-import com.alarm.eagle.config.EagleAlarmProperties;
+import com.alarm.eagle.config.Constant;
+import com.alarm.eagle.config.DetectionProperties;
 import com.alarm.eagle.functions.AverageAggregate;
 import com.alarm.eagle.functions.DynamicAlertFunction;
 import com.alarm.eagle.functions.DynamicKeyFunction;
@@ -31,13 +31,13 @@ import org.slf4j.LoggerFactory;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-public class FraudDetectionApp {
-    private static final Logger logger = LoggerFactory.getLogger(FraudDetectionApp.class);
+public class DetectionApp {
+    private static final Logger logger = LoggerFactory.getLogger(DetectionApp.class);
 
     public static void main(String[] args) {
         try {
             ParameterTool params = ParameterTool.fromArgs(args);
-            ParameterTool parameter = EagleAlarmProperties.getInstance(params).getParameter();
+            ParameterTool parameter = DetectionProperties.getInstance(params).getParameter();
             showConf(parameter);
 
             // Build stream DAG
@@ -88,8 +88,8 @@ public class FraudDetectionApp {
     private static DataStream<Transaction> getTransactionsStream(StreamExecutionEnvironment env, ParameterTool parameter) {
         // Data stream setup
         SourceFunction<String> transactionSource = TransactionsSource.createTransactionsSource(parameter);
-        int sourceParallelism = parameter.getInt(AlarmConfigConstant.KAFKA_TOPIC_PARALLELISM);
-        int orderness = parameter.getInt(AlarmConfigConstant.TRANSACTIONS_OUT_OF_ORDERNESS);
+        int sourceParallelism = parameter.getInt(Constant.KAFKA_TOPIC_PARALLELISM);
+        int orderness = parameter.getInt(Constant.TRANSACTIONS_OUT_OF_ORDERNESS);
         DataStream<String> transactionsStringsStream = env.addSource(transactionSource).name("Transactions Source")
                 .setParallelism(sourceParallelism);
         DataStream<Transaction> transactionsStream =
@@ -121,8 +121,8 @@ public class FraudDetectionApp {
 
     private static StreamExecutionEnvironment getStreamExecutionEnvironment(ParameterTool parameter) {
         StreamExecutionEnvironment env = null;
-        int globalParallelism = parameter.getInt(AlarmConfigConstant.FLINK_PARALLELISM);
-        if (parameter.get(AlarmConfigConstant.FLINK_MODE).equals(AlarmConfigConstant.MODE_DEV)) {
+        int globalParallelism = parameter.getInt(Constant.FLINK_PARALLELISM);
+        if (parameter.get(Constant.FLINK_MODE).equals(Constant.MODE_DEV)) {
             env = StreamExecutionEnvironment.createLocalEnvironment();
             globalParallelism = 1;
         } else {
@@ -132,7 +132,7 @@ public class FraudDetectionApp {
         env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime);
 
         //checkpoint
-        boolean enableCheckpoint = parameter.getBoolean(AlarmConfigConstant.FLINK_ENABLE_CHECKPOINT, false);
+        boolean enableCheckpoint = parameter.getBoolean(Constant.FLINK_ENABLE_CHECKPOINT, false);
         if (enableCheckpoint) {
             env.enableCheckpointing(60000L);
             CheckpointConfig config = env.getCheckpointConfig();

@@ -1,6 +1,6 @@
 package com.alarm.eagle.sink;
 
-import com.alarm.eagle.config.AlarmConfigConstant;
+import com.alarm.eagle.config.Constant;
 import com.alarm.eagle.functions.JsonSerializer;
 import com.alarm.eagle.rule.Rule;
 
@@ -15,12 +15,12 @@ public class CurrentRulesSink {
 
     public static SinkFunction<String> createRulesSink(ParameterTool parameter) {
 
-        String sinkType = parameter.get(AlarmConfigConstant.RULE_EXPORT_TYPE);
+        String sinkType = parameter.get(Constant.RULE_EXPORT_TYPE);
         Type currentRulesSinkType = Type.valueOf(sinkType.toUpperCase());
         switch (currentRulesSinkType) {
             case KAFKA:
-                String kafkaBootstrapServers = parameter.get(AlarmConfigConstant.KAFKA_RULE_EXPORT_BOOTSTRAP_SERVERS);
-                String ruleExportTopic = parameter.get(AlarmConfigConstant.KAFKA_RULE_EXPORT_TOPIC);
+                String kafkaBootstrapServers = parameter.get(Constant.KAFKA_RULE_EXPORT_BOOTSTRAP_SERVERS);
+                String ruleExportTopic = parameter.get(Constant.KAFKA_RULE_EXPORT_TOPIC);
                 return new FlinkKafkaProducer<>(kafkaBootstrapServers, ruleExportTopic, new SimpleStringSchema());
             case STDOUT:
                 return new PrintSinkFunction<>(true);

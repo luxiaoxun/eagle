@@ -18,7 +18,7 @@ public class RuleParser {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     public Rule fromString(String line) throws IOException {
-        if (line.length() > 0 && '{' == line.charAt(0)) {
+        if (!line.isEmpty() && '{' == line.charAt(0)) {
             return parseJson(line);
         } else {
             return parsePlain(line);

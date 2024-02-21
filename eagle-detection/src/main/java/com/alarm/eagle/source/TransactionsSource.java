@@ -1,6 +1,6 @@
 package com.alarm.eagle.source;
 
-import com.alarm.eagle.config.AlarmConfigConstant;
+import com.alarm.eagle.config.Constant;
 import com.alarm.eagle.functions.JsonDeserializer;
 import com.alarm.eagle.functions.JsonGeneratorWrapper;
 import com.alarm.eagle.functions.TimeStamper;
@@ -17,14 +17,14 @@ import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
 public class TransactionsSource {
 
     public static SourceFunction<String> createTransactionsSource(ParameterTool parameter) {
-        String sourceType = parameter.get(AlarmConfigConstant.TRANSACTIONS_SOURCE_TYPE);
+        String sourceType = parameter.get(Constant.TRANSACTIONS_SOURCE_TYPE);
         Type transactionsSourceType = Type.valueOf(sourceType.toUpperCase());
-        int transactionsPerSecond = parameter.getInt(AlarmConfigConstant.TRANSACTIONS_PER_SECOND);
+        int transactionsPerSecond = parameter.getInt(Constant.TRANSACTIONS_PER_SECOND);
         switch (transactionsSourceType) {
             case KAFKA:
-                String kafkaBootstrapServers = parameter.get(AlarmConfigConstant.KAFKA_BOOTSTRAP_SERVERS);
-                String kafkaGroupId = parameter.get(AlarmConfigConstant.KAFKA_GROUP_ID);
-                String transactionsTopic = parameter.get(AlarmConfigConstant.KAFKA_TOPIC);
+                String kafkaBootstrapServers = parameter.get(Constant.KAFKA_BOOTSTRAP_SERVERS);
+                String kafkaGroupId = parameter.get(Constant.KAFKA_GROUP_ID);
+                String transactionsTopic = parameter.get(Constant.KAFKA_TOPIC);
 
                 Properties properties = new Properties();
                 properties.setProperty("bootstrap.servers", kafkaBootstrapServers);

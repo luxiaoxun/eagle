@@ -2,7 +2,7 @@ package com.alarm.eagle.source;
 
 import java.util.concurrent.TimeUnit;
 
-import com.alarm.eagle.config.AlarmConfigConstant;
+import com.alarm.eagle.config.Constant;
 import com.alarm.eagle.functions.RuleDeserializer;
 import com.alarm.eagle.rule.Rule;
 import org.apache.flink.api.java.utils.ParameterTool;
@@ -15,7 +15,7 @@ public class RulesSource {
     private static final int RULES_STREAM_PARALLELISM = 1;
 
     public static SourceFunction<String> createRulesSource(ParameterTool parameter) {
-        String ruleUrl = parameter.get(AlarmConfigConstant.STREAM_RULE_URL);
+        String ruleUrl = parameter.get(Constant.STREAM_RULE_URL);
         RuleSourceFunction ruleSourceFunction = new RuleSourceFunction(ruleUrl);
         return ruleSourceFunction;
     }

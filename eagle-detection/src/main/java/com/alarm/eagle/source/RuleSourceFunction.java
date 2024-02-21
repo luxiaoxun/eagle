@@ -1,5 +1,6 @@
 package com.alarm.eagle.source;
 
+import com.alarm.eagle.rule.RuleHelper;
 import com.alarm.eagle.util.HttpUtil;
 import org.apache.flink.streaming.api.functions.source.RichSourceFunction;
 import org.slf4j.Logger;
@@ -20,8 +21,7 @@ public class RuleSourceFunction extends RichSourceFunction<String> {
         while (isRunning) {
             try {
                 logger.info("Http to get alarm rules from " + ruleUrl);
-//            String content = HttpUtil.doGet(ruleUrl);
-                String content = HttpUtil.doGetMock(ruleUrl);
+                String content = RuleHelper.getMockRules(ruleUrl);
                 if (content == null) {
                     logger.error("Failed to get alarm rules from url {}", ruleUrl);
                     return;

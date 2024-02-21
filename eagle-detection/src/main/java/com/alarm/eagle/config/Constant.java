@@ -1,6 +1,6 @@
 package com.alarm.eagle.config;
 
-public interface AlarmConfigConstant {
+public interface Constant {
 
     String FLINK_MODE = "mode";
     String MODE_DEV = "dev";

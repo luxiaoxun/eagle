@@ -1,6 +1,6 @@
 package com.alarm.eagle.sink;
 
-import com.alarm.eagle.config.AlarmConfigConstant;
+import com.alarm.eagle.config.Constant;
 import com.alarm.eagle.functions.JsonSerializer;
 import com.alarm.eagle.message.Alert;
 import org.apache.flink.api.common.serialization.SimpleStringSchema;
@@ -13,12 +13,12 @@ import org.apache.flink.streaming.connectors.kafka.FlinkKafkaProducer;
 public class AlertsSink {
 
     public static SinkFunction<String> createAlertsSink(ParameterTool parameter) {
-        String sinkType = parameter.get(AlarmConfigConstant.ALERT_SINK_TYPE);
+        String sinkType = parameter.get(Constant.ALERT_SINK_TYPE);
         Type alertsSinkType = Type.valueOf(sinkType.toUpperCase());
         switch (alertsSinkType) {
             case KAFKA:
-                String kafkaBootstrapServers = parameter.get(AlarmConfigConstant.KAFKA_ALERT_BOOTSTRAP_SERVERS);
-                String alertTopic = parameter.get(AlarmConfigConstant.KAFKA_ALERT_TOPIC);
+                String kafkaBootstrapServers = parameter.get(Constant.KAFKA_ALERT_BOOTSTRAP_SERVERS);
+                String alertTopic = parameter.get(Constant.KAFKA_ALERT_TOPIC);
                 return new FlinkKafkaProducer<>(kafkaBootstrapServers, alertTopic, new SimpleStringSchema());
             case STDOUT:
                 return new PrintSinkFunction<>(true);
