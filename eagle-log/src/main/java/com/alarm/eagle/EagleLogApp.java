@@ -30,6 +30,7 @@ import org.apache.flink.streaming.api.environment.CheckpointConfig;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.windowing.assigners.TumblingProcessingTimeWindows;
 import org.apache.flink.streaming.api.windowing.time.Time;
+import org.apache.flink.util.CollectionUtil;
 import org.apache.http.HttpHost;
 import org.apache.kafka.clients.CommonClientConfigs;
 import org.apache.kafka.clients.consumer.OffsetResetStrategy;
@@ -55,7 +56,8 @@ public class EagleLogApp {
             StreamExecutionEnvironment env = getStreamExecutionEnvironment(parameter);
             DataStream<LogEvent> dataSource = getKafkaDataSource(parameter, env);
             BroadcastStream<RuleBase> ruleSource = getRuleDataSource(parameter, env);
-            SingleOutputStreamOperator<LogEvent> processedStream = processLogStream(parameter, dataSource, ruleSource);
+            BroadcastConnectedStream<LogEvent, RuleBase> connectedStreams = dataSource.connect(ruleSource);
+            SingleOutputStreamOperator<LogEvent> processedStream = processLogStream(parameter, connectedStreams);
             sinkToRedis(parameter, processedStream);
             sinkToElasticsearch(parameter, processedStream);
 
@@ -67,31 +69,6 @@ public class EagleLogApp {
         } catch (Exception e) {
             logger.error(e.toString());
         }
-    }
-
-    private static StreamExecutionEnvironment getStreamExecutionEnvironment(ParameterTool parameter) {
-        StreamExecutionEnvironment env = null;
-        int globalParallelism = parameter.getInt(ConfigConstant.FLINK_PARALLELISM);
-        if (parameter.get(ConfigConstant.FLINK_MODE).equals(ConfigConstant.MODE_DEV)) {
-            env = StreamExecutionEnvironment.createLocalEnvironment();
-            globalParallelism = 1;
-        } else {
-            env = StreamExecutionEnvironment.getExecutionEnvironment();
-        }
-        env.setParallelism(globalParallelism);
-
-        //checkpoint
-        boolean enableCheckpoint = parameter.getBoolean(ConfigConstant.FLINK_ENABLE_CHECKPOINT, false);
-        if (enableCheckpoint) {
-            env.enableCheckpointing(60000L);
-            CheckpointConfig config = env.getCheckpointConfig();
-            config.setMinPauseBetweenCheckpoints(30000L);
-            config.setCheckpointTimeout(10000L);
-            //RETAIN_ON_CANCELLATION则在job cancel的时候会保留externalized checkpoint state
-            config.setExternalizedCheckpointCleanup(CheckpointConfig.ExternalizedCheckpointCleanup.DELETE_ON_CANCELLATION);
-        }
-
-        return env;
     }
 
     private static BroadcastStream<RuleBase> getRuleDataSource(ParameterTool parameter, StreamExecutionEnvironment env) {
@@ -123,14 +100,13 @@ public class EagleLogApp {
                 .name(kafkaTopic).uid(kafkaTopic).setParallelism(kafkaParallelism);
     }
 
-    private static SingleOutputStreamOperator<LogEvent> processLogStream(ParameterTool parameter, DataStream<LogEvent> dataSource,
-                                                                         BroadcastStream<RuleBase> ruleSource) throws Exception {
-        BroadcastConnectedStream<LogEvent, RuleBase> connectedStreams = dataSource.connect(ruleSource);
+    private static SingleOutputStreamOperator<LogEvent> processLogStream(ParameterTool parameter,
+                                                                         BroadcastConnectedStream<LogEvent, RuleBase> connectedStreams) throws Exception {
         int processParallelism = parameter.getInt(ConfigConstant.STREAM_PROCESS_PARALLELISM);
         String kafkaIndex = parameter.get(ConfigConstant.KAFKA_SINK_INDEX);
         String ruleUrl = parameter.get(ConfigConstant.STREAM_RULE_URL);
         RuleBase ruleBase = RuleUtil.getMockRules(ruleUrl);
-        if (ruleBase == null) {
+        if (CollectionUtil.isNullOrEmpty(ruleBase.getRules())) {
             throw new Exception("Can not get initial rules");
         } else {
             String name = "process-log";
@@ -206,6 +182,31 @@ public class EagleLogApp {
             properties.put(SaslConfigs.SASL_JAAS_CONFIG, jaasCfg);
         }
         return properties;
+    }
+
+    private static StreamExecutionEnvironment getStreamExecutionEnvironment(ParameterTool parameter) {
+        StreamExecutionEnvironment env = null;
+        int globalParallelism = parameter.getInt(ConfigConstant.FLINK_PARALLELISM);
+        if (parameter.get(ConfigConstant.FLINK_MODE).equals(ConfigConstant.MODE_DEV)) {
+            env = StreamExecutionEnvironment.createLocalEnvironment();
+            globalParallelism = 1;
+        } else {
+            env = StreamExecutionEnvironment.getExecutionEnvironment();
+        }
+        env.setParallelism(globalParallelism);
+
+        //checkpoint
+        boolean enableCheckpoint = parameter.getBoolean(ConfigConstant.FLINK_ENABLE_CHECKPOINT, false);
+        if (enableCheckpoint) {
+            env.enableCheckpointing(60000L);
+            CheckpointConfig config = env.getCheckpointConfig();
+            config.setMinPauseBetweenCheckpoints(30000L);
+            config.setCheckpointTimeout(10000L);
+            //RETAIN_ON_CANCELLATION则在job cancel的时候会保留externalized checkpoint state
+            config.setExternalizedCheckpointCleanup(CheckpointConfig.ExternalizedCheckpointCleanup.DELETE_ON_CANCELLATION);
+        }
+
+        return env;
     }
 
     private static void showConf(ParameterTool parameter) {
