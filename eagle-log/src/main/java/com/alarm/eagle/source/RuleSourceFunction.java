@@ -1,18 +1,10 @@
 package com.alarm.eagle.source;
 
-import com.alarm.eagle.response.Response;
-import com.alarm.eagle.rule.Rule;
 import com.alarm.eagle.rule.RuleBase;
 import com.alarm.eagle.rule.RuleUtil;
-import com.alarm.eagle.util.HttpUtil;
-import com.alarm.eagle.util.JsonUtil;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonParser;
 import org.apache.flink.streaming.api.functions.source.RichSourceFunction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.List;
 
 /**
  * Created by luxiaoxun on 2020/01/27.
