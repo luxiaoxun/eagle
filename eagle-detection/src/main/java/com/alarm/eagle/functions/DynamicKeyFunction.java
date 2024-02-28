@@ -17,8 +17,6 @@ import org.apache.flink.metrics.Gauge;
 import org.apache.flink.streaming.api.functions.co.BroadcastProcessFunction;
 import org.apache.flink.util.Collector;
 
-import static com.alarm.eagle.functions.ProcessingUtils.handleRuleBroadcast;
-
 /**
  * Implements dynamic data partitioning based on a set of broadcasted rules.
  */
@@ -42,8 +40,8 @@ public class DynamicKeyFunction
         for (Entry<Integer, Rule> entry : rulesState.immutableEntries()) {
             final Rule rule = entry.getValue();
             try {
-                out.collect(new Keyed<>(event, KeysExtractor.getKey(rule.getGroupingKeyNames(), event),
-                        rule.getRuleId()));
+                String key = KeysExtractor.getKey(rule.getGroupingKeyNames(), event);
+                out.collect(new Keyed<>(event, key, rule.getRuleId()));
                 ruleCounter++;
             } catch (Exception ex) {
                 log.error("Invalid rule: {}", rule);
@@ -56,7 +54,7 @@ public class DynamicKeyFunction
     public void processBroadcastElement(Rule rule, Context ctx, Collector<Keyed<Transaction, String, Integer>> out) throws Exception {
         log.info("New rule: {}", rule);
         BroadcastState<Integer, Rule> broadcastState = ctx.getBroadcastState(Descriptors.rulesDescriptor);
-        handleRuleBroadcast(rule, broadcastState);
+        ProcessingUtils.handleRuleBroadcast(rule, broadcastState);
         if (rule.getRuleState() == Rule.RuleState.CONTROL) {
             handleControlCommand(rule.getControlType(), broadcastState);
         }

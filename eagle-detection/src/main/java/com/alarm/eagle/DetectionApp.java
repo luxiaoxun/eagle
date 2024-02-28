@@ -7,6 +7,7 @@ import com.alarm.eagle.functions.DynamicAlertFunction;
 import com.alarm.eagle.functions.DynamicKeyFunction;
 import com.alarm.eagle.message.Alert;
 import com.alarm.eagle.message.Descriptors;
+import com.alarm.eagle.message.Keyed;
 import com.alarm.eagle.message.Transaction;
 import com.alarm.eagle.rule.Rule;
 import com.alarm.eagle.sink.AlertsSink;
@@ -24,6 +25,7 @@ import org.apache.flink.streaming.api.environment.CheckpointConfig;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.functions.source.SourceFunction;
 import org.apache.flink.streaming.api.functions.timestamps.BoundedOutOfOrdernessTimestampExtractor;
+import org.apache.flink.streaming.api.windowing.assigners.TumblingProcessingTimeWindows;
 import org.apache.flink.streaming.api.windowing.time.Time;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,7 +54,7 @@ public class DetectionApp {
                     .process(new DynamicKeyFunction())
                     .uid("DynamicKeyFunction")
                     .name("Dynamic Partitioning Function")
-                    .keyBy((keyed) -> keyed.getKey())
+                    .keyBy(Keyed::getKey)
                     .connect(rulesStream)
                     .process(new DynamicAlertFunction())
                     .uid("DynamicAlertFunction")
@@ -73,7 +75,7 @@ public class DetectionApp {
             alertsJson.addSink(AlertsSink.createAlertsSink(parameter)).setParallelism(1).name("Alerts JSON Sink");
             currentRulesJson.addSink(CurrentRulesSink.createRulesSink(parameter)).setParallelism(1);
 
-            DataStream<String> latencies = latency.timeWindowAll(Time.seconds(10))
+            DataStream<String> latencies = latency.windowAll(TumblingProcessingTimeWindows.of(Time.seconds(10)))
                     .aggregate(new AverageAggregate()).map(String::valueOf);
             latencies.addSink(LatencySink.createLatencySink(parameter));
 
@@ -139,7 +141,7 @@ public class DetectionApp {
             config.setMinPauseBetweenCheckpoints(30000L);
             config.setCheckpointTimeout(10000L);
             //RETAIN_ON_CANCELLATION则在job cancel的时候会保留externalized checkpoint state
-            config.enableExternalizedCheckpoints(CheckpointConfig.ExternalizedCheckpointCleanup.DELETE_ON_CANCELLATION);
+            config.setExternalizedCheckpointCleanup(CheckpointConfig.ExternalizedCheckpointCleanup.DELETE_ON_CANCELLATION);
         }
 
         return env;

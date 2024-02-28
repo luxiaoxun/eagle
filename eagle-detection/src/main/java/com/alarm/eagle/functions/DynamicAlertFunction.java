@@ -1,8 +1,5 @@
 package com.alarm.eagle.functions;
 
-import static com.alarm.eagle.functions.ProcessingUtils.addToStateValuesSet;
-import static com.alarm.eagle.functions.ProcessingUtils.handleRuleBroadcast;
-
 import com.alarm.eagle.message.*;
 import com.alarm.eagle.rule.Rule;
 import com.alarm.eagle.rule.RuleHelper;
@@ -29,14 +26,14 @@ import org.apache.flink.util.Collector;
  * Implements main rule evaluation and alerting logic.
  */
 @Slf4j
-public class DynamicAlertFunction extends KeyedBroadcastProcessFunction<
-        String, Keyed<Transaction, String, Integer>, Rule, Alert> {
+public class DynamicAlertFunction extends
+        KeyedBroadcastProcessFunction<String, Keyed<Transaction, String, Integer>, Rule, Alert> {
 
     private static final String COUNT = "COUNT_FLINK";
     private static final String COUNT_WITH_RESET = "COUNT_WITH_RESET_FLINK";
 
-    private static int WIDEST_RULE_KEY = Integer.MIN_VALUE;
-    private static int CLEAR_STATE_COMMAND_KEY = Integer.MIN_VALUE + 1;
+    private static final int WIDEST_RULE_KEY = Integer.MIN_VALUE;
+    private static final int CLEAR_STATE_COMMAND_KEY = Integer.MIN_VALUE + 1;
 
     private transient MapState<Long, Set<Transaction>> windowState;
     private Meter alertMeter;
@@ -54,11 +51,10 @@ public class DynamicAlertFunction extends KeyedBroadcastProcessFunction<
     }
 
     @Override
-    public void processElement(Keyed<Transaction, String, Integer> value, ReadOnlyContext ctx, Collector<Alert> out)
-            throws Exception {
+    public void processElement(Keyed<Transaction, String, Integer> value, ReadOnlyContext ctx, Collector<Alert> out) throws Exception {
         long currentEventTime = value.getWrapped().getEventTime();
 
-        addToStateValuesSet(windowState, currentEventTime, value.getWrapped());
+        ProcessingUtils.addToStateValuesSet(windowState, currentEventTime, value.getWrapped());
 
         long ingestionTime = value.getWrapped().getIngestionTimestamp();
         ctx.output(Descriptors.latencySinkTag, System.currentTimeMillis() - ingestionTime);
@@ -101,7 +97,7 @@ public class DynamicAlertFunction extends KeyedBroadcastProcessFunction<
     public void processBroadcastElement(Rule rule, Context ctx, Collector<Alert> out) throws Exception {
         log.info("Rule: {}", rule);
         BroadcastState<Integer, Rule> broadcastState = ctx.getBroadcastState(Descriptors.rulesDescriptor);
-        handleRuleBroadcast(rule, broadcastState);
+        ProcessingUtils.handleRuleBroadcast(rule, broadcastState);
         updateWidestWindowRule(rule, broadcastState);
         if (rule.getRuleState() == Rule.RuleState.CONTROL) {
             handleControlCommand(rule, broadcastState, ctx);
