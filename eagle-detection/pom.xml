@@ -131,7 +131,7 @@
                                 </filter>
                             </filters>
                             <finalName>
-                                ${project.artifactId}-${project.version}-${git.branch}-${git.commit.id.describe-short}
+                                ${project.artifactId}-${project.version}
                             </finalName>
                         </configuration>
                     </execution>
