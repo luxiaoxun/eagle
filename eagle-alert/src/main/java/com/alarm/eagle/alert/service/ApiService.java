@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Created by skycrab on 18/1/5.
@@ -46,7 +47,7 @@ public class ApiService {
         try {
             Response<Task> taskResponse = JsonUtil.decode(result, new TypeReference<Response<Task>>() {
             });
-            if (taskResponse != null && taskResponse.getCode() == 0) {
+            if (taskResponse != null && Objects.equals(taskResponse.getCode(), "200")) {
                 return taskResponse.getData();
             }
         } catch (Exception e) {

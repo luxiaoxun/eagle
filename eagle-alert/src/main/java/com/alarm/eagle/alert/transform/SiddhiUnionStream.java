@@ -8,6 +8,7 @@ import com.alarm.eagle.alert.config.EagleProperties;
 import com.alarm.eagle.alert.source.EventJsonStringSource;
 import com.alarm.eagle.util.DateUtil;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.common.serialization.SimpleStringSchema;
 import org.apache.flink.api.java.functions.KeySelector;
@@ -15,12 +16,11 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.functions.source.SourceFunction;
-import org.apache.flink.streaming.api.functions.timestamps.BoundedOutOfOrdernessTimestampExtractor;
-import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -112,13 +112,9 @@ public class SiddhiUnionStream {
                 return objectNode;
             }
         });
-        return dataStream.assignTimestampsAndWatermarks(new BoundedOutOfOrdernessTimestampExtractor<ObjectNode>(Time.minutes(1L)) {
-            @Override
-            public long extractTimestamp(ObjectNode jsonNodes) {
-                long time = toUnixTimestamp(jsonNodes, timestampField);
-                return time;
-            }
-        });
+        return dataStream.assignTimestampsAndWatermarks(
+                WatermarkStrategy.<ObjectNode>forBoundedOutOfOrderness(Duration.ofMinutes(1))
+                        .withTimestampAssigner((jsonNodes, timestamp) -> toUnixTimestamp(jsonNodes, timestampField)));
     }
 
     /**

@@ -15,23 +15,22 @@ import com.alarm.eagle.sink.CurrentRulesSink;
 import com.alarm.eagle.sink.LatencySink;
 import com.alarm.eagle.source.RulesSource;
 import com.alarm.eagle.source.TransactionsSource;
+import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.api.java.utils.ParameterTool;
 import org.apache.flink.configuration.Configuration;
-import org.apache.flink.streaming.api.TimeCharacteristic;
 import org.apache.flink.streaming.api.datastream.BroadcastStream;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.streaming.api.environment.CheckpointConfig;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.functions.source.SourceFunction;
-import org.apache.flink.streaming.api.functions.timestamps.BoundedOutOfOrdernessTimestampExtractor;
 import org.apache.flink.streaming.api.windowing.assigners.TumblingProcessingTimeWindows;
 import org.apache.flink.streaming.api.windowing.time.Time;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.Duration;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 public class DetectionApp {
     private static final Logger logger = LoggerFactory.getLogger(DetectionApp.class);
@@ -97,20 +96,8 @@ public class DetectionApp {
         DataStream<Transaction> transactionsStream =
                 TransactionsSource.stringsStreamToTransactions(transactionsStringsStream);
         return transactionsStream.assignTimestampsAndWatermarks(
-                new SimpleBoundedOutOfOrdernessTimestampExtractor<>(orderness));
-    }
-
-    private static class SimpleBoundedOutOfOrdernessTimestampExtractor<T extends Transaction>
-            extends BoundedOutOfOrdernessTimestampExtractor<T> {
-
-        public SimpleBoundedOutOfOrdernessTimestampExtractor(int maxOutOfOrderness) {
-            super(Time.of(maxOutOfOrderness, TimeUnit.MILLISECONDS));
-        }
-
-        @Override
-        public long extractTimestamp(T element) {
-            return element.getEventTime();
-        }
+                WatermarkStrategy.<Transaction>forBoundedOutOfOrderness(Duration.ofMillis(orderness))
+                        .withTimestampAssigner((element, timestamp) -> element.getEventTime()));
     }
 
     private static DataStream<Rule> getRulesUpdateStream(StreamExecutionEnvironment env, ParameterTool parameter) {
@@ -131,7 +118,8 @@ public class DetectionApp {
             env = StreamExecutionEnvironment.getExecutionEnvironment();
         }
         env.setParallelism(globalParallelism);
-        env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime);
+
+        // EventTime is the default in Flink 1.17+; watermark strategy is set on the stream
 
         //checkpoint
         boolean enableCheckpoint = parameter.getBoolean(Constant.FLINK_ENABLE_CHECKPOINT, false);

@@ -24,7 +24,6 @@ import org.apache.flink.connector.kafka.sink.KafkaRecordSerializationSchema;
 import org.apache.flink.connector.kafka.sink.KafkaSink;
 import org.apache.flink.connector.kafka.source.KafkaSource;
 import org.apache.flink.connector.kafka.source.enumerator.initializer.OffsetsInitializer;
-import org.apache.flink.streaming.api.TimeCharacteristic;
 import org.apache.flink.streaming.api.datastream.*;
 import org.apache.flink.streaming.api.environment.CheckpointConfig;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
@@ -165,7 +164,7 @@ public class EagleLogApp {
         String name = "redis-agg-log";
         DataStream<LogStatWindowResult> keyedStream = dataSource.keyBy((KeySelector<LogEvent, String>) LogEvent::getIndex)
                 .window(TumblingProcessingTimeWindows.of(Time.seconds(windowTime)))
-                .trigger(new CountTriggerWithTimeout<>(windowCount, TimeCharacteristic.ProcessingTime))
+                .trigger(new CountTriggerWithTimeout<>(windowCount, true))
                 .aggregate(new LogStatAggregateFunction(), new LogStatWindowFunction())
                 .setParallelism(redisSinkParallelism).name(name).uid(name);
         String sinkName = "redis-sink";

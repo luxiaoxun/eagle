@@ -4,7 +4,6 @@ import org.apache.flink.api.common.functions.ReduceFunction;
 import org.apache.flink.api.common.state.ReducingState;
 import org.apache.flink.api.common.state.ReducingStateDescriptor;
 import org.apache.flink.api.common.typeutils.base.LongSerializer;
-import org.apache.flink.streaming.api.TimeCharacteristic;
 import org.apache.flink.streaming.api.windowing.triggers.Trigger;
 import org.apache.flink.streaming.api.windowing.triggers.TriggerResult;
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
@@ -22,15 +21,15 @@ public class CountTriggerWithTimeout<T> extends Trigger<T, TimeWindow> {
     private int maxCount;
 
     //event time / process time
-    private TimeCharacteristic timeType;
+    private boolean isProcessingTime;
 
     //count state
     private ReducingStateDescriptor<Long> countStateDescriptor =
             new ReducingStateDescriptor("counter", new Sum(), LongSerializer.INSTANCE);
 
-    public CountTriggerWithTimeout(int maxCount, TimeCharacteristic timeType) {
+    public CountTriggerWithTimeout(int maxCount, boolean isProcessingTime) {
         this.maxCount = maxCount;
-        this.timeType = timeType;
+        this.isProcessingTime = isProcessingTime;
     }
 
     @Override
@@ -52,7 +51,7 @@ public class CountTriggerWithTimeout<T> extends Trigger<T, TimeWindow> {
 
     @Override
     public TriggerResult onProcessingTime(long time, TimeWindow window, TriggerContext ctx) throws Exception {
-        if (timeType != TimeCharacteristic.ProcessingTime) {
+        if (!isProcessingTime) {
             return TriggerResult.CONTINUE;
         }
 
@@ -66,7 +65,7 @@ public class CountTriggerWithTimeout<T> extends Trigger<T, TimeWindow> {
 
     @Override
     public TriggerResult onEventTime(long time, TimeWindow window, TriggerContext ctx) throws Exception {
-        if (timeType != TimeCharacteristic.EventTime) {
+        if (isProcessingTime) {
             return TriggerResult.CONTINUE;
         }
 

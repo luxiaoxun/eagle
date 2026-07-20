@@ -2,7 +2,7 @@
 <Configuration monitorInterval="10" status="off">
     <properties>
         <property name="LOG_HOME">./logs/</property>
-        <property name="FILE_NAME">eagle-fraud-detection</property>
+        <property name="FILE_NAME">eagle-detection</property>
     </properties>
     <Appenders>
         <Console name="console" target="SYSTEM_OUT">

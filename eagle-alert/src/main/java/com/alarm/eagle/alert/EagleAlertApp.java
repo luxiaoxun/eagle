@@ -11,7 +11,6 @@ import com.alarm.eagle.alert.sink.ApiSink;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
-import org.apache.flink.streaming.api.TimeCharacteristic;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.CheckpointConfig;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
@@ -54,13 +53,14 @@ public class EagleAlertApp {
             env.setParallelism(optParallelism);
         }
 
+        // In Flink 1.17+, time characteristic is determined by WatermarkStrategy on the stream,
+        // not by a global env setting. EventTime is the default.
         switch (task.getTimeCharacteristic()) {
             case ProcessingTime:
-                env.setStreamTimeCharacteristic(TimeCharacteristic.ProcessingTime);
             case IngestionTime:
-                env.setStreamTimeCharacteristic(TimeCharacteristic.IngestionTime);
             case EventTime:
-                env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime);
+                // time characteristic handled per-stream via WatermarkStrategy in SiddhiUnionStream
+                break;
         }
 
         //checkpoint
