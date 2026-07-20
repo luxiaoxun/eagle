@@ -84,12 +84,12 @@ public class JDBCPeriodicPatternProcessorDiscoverer<T>
         try {
             this.connection = DriverManager.getConnection(jdbcUrl);
             this.statement = connection.createStatement();
-            System.out.println("[DISCOVER] JDBC connection successful: " + jdbcUrl);
+            LOG.info("[DISCOVER] JDBC connection successful: " + jdbcUrl);
         } catch (SQLException e) {
             // ★ Connection failure does not block Discoverer creation (allows initialProcessors mode)
             this.connection = null;
             this.statement = null;
-            System.out.println("[DISCOVER] JDBC connection failed (will use initialProcessors mode): "
+            LOG.info("[DISCOVER] JDBC connection failed (will use initialProcessors mode): "
                     + e.getMessage());
         }
     }
@@ -102,18 +102,18 @@ public class JDBCPeriodicPatternProcessorDiscoverer<T>
         if (latestData == null
                 && initialProcessors != null
                 && !initialProcessors.isEmpty()) {
-            System.out.println("[DISCOVER] Using initial rules (total: "
+            LOG.info("[DISCOVER] Using initial rules (total: "
                     + initialProcessors.size() + ")");
             return true;
         }
 
         if (statement == null) {
-            System.out.println("[DISCOVER] ⚠ statement is null, skipping check");
+            LOG.info("[DISCOVER] ⚠ statement is null, skipping check");
             return false;
         }
 
         try {
-            System.out.println("[DISCOVER] Querying MySQL: SELECT * FROM " + tableName + " ...");
+            LOG.info("[DISCOVER] Querying MySQL: SELECT * FROM " + tableName + " ...");
             ResultSet rs = statement.executeQuery(
                     "SELECT * FROM " + tableName);
             Map<String, RowData> current = new HashMap<>();
@@ -134,16 +134,16 @@ public class JDBCPeriodicPatternProcessorDiscoverer<T>
             }
 
             if (latestData == null || isChanged(current)) {
-                System.out.println("[DISCOVER] ✅ Rule change detected (" + current.size() + ")");
+                LOG.info("[DISCOVER] ✅ Rule change detected (" + current.size() + ")");
                 latestData = current;
                 return true;
             }
-            System.out.println("[DISCOVER] No changes (" + current.size() + " rules)");
+            LOG.info("[DISCOVER] No changes (" + current.size() + " rules)");
             return false;
 
         } catch (SQLException e) {
             LOG.warn("Failed to check rule changes, reconnecting...", e);
-            System.out.println("[DISCOVER] ⚠ MySQL query failed: " + e.getMessage() + ", attempting reconnect...");
+            LOG.info("[DISCOVER] ⚠ MySQL query failed: " + e.getMessage() + ", attempting reconnect...");
             reconnect();
             return false;
         }
@@ -160,7 +160,7 @@ public class JDBCPeriodicPatternProcessorDiscoverer<T>
                 && !initialProcessors.isEmpty()) {
             // Set latestData to empty Map to avoid repeated triggers in subsequent polls
             latestData = new HashMap<>();
-            System.out.println("[DISCOVER] Returning initial rules (total: "
+            LOG.info("[DISCOVER] Returning initial rules (total: "
                     + initialProcessors.size() + ")");
             return new ArrayList<>(initialProcessors);
         }

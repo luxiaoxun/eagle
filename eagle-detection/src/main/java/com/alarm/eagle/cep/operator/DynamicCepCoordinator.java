@@ -70,18 +70,18 @@ public class DynamicCepCoordinator<IN>
         synchronized (this) {
             LOG.info("Pattern processors updated for {}. Count: {}",
                     operatorName, processors != null ? processors.size() : 0);
-            System.out.println("[COORD] Rule changes detected, total: "
+            LOG.info("[COORD] Rule changes detected, total: "
                     + (processors != null ? processors.size() : 0)
                     + "");
 
             PatternProcessorChangeEvent<IN> changeEvent = computeDelta(processors);
 
             if (changeEvent.isEmpty()) {
-                System.out.println("[COORD] No incremental changes, skipping distribution");
+                LOG.info("[COORD] No incremental changes, skipping distribution");
                 return;
             }
 
-            System.out.println("[COORD] Incremental changes: +" + changeEvent.getAdded().size()
+            LOG.info("[COORD] Incremental changes: +" + changeEvent.getAdded().size()
                     + " added, ~" + changeEvent.getRemoved().size()
                     + " removed, ↑" + changeEvent.getUpdated().size()
                     + " updated");
@@ -158,7 +158,7 @@ public class DynamicCepCoordinator<IN>
             gateway.sendEvent(event);
             count++;
         }
-        System.out.println("[COORD] " + event.getClass().getSimpleName()
+        LOG.info("[COORD] " + event.getClass().getSimpleName()
                 + " sent to " + count + " SubtaskGateway(s)"
                 + (count == 0 ? " (TM not ready yet, will resend when ready)" : ""));
     }
@@ -169,13 +169,13 @@ public class DynamicCepCoordinator<IN>
     public void start() throws Exception {
         started = true;
         LOG.info("Starting DynamicCepCoordinator for operator {}.", operatorName);
-        System.out.println("[COORD] Coordinator started, creating Discoverer...");
+        LOG.info("[COORD] Coordinator started, creating Discoverer...");
 
         discoverer = discovererFactory.createPatternProcessorDiscoverer(
                 Thread.currentThread().getContextClassLoader());
         // ★ this passed as PatternProcessorManager
         discoverer.discoverPatternProcessorUpdates(this);
-        System.out.println("[COORD] Discoverer started, first poll will be triggered in Timer thread");
+        LOG.info("[COORD] Discoverer started, first poll will be triggered in Timer thread");
     }
 
     @Override
@@ -186,7 +186,7 @@ public class DynamicCepCoordinator<IN>
             discoverer.close();
         }
         LOG.info("DynamicCepCoordinator closed for operator {}.", operatorName);
-        System.out.println("[COORD] Coordinator closed");
+        LOG.info("[COORD] Coordinator closed");
     }
 
     @Override
@@ -267,7 +267,7 @@ public class DynamicCepCoordinator<IN>
             int subtask, int attemptNumber, SubtaskGateway gateway) {
         LOG.debug("Subtask {} attempt {} ready for operator {}.",
                 subtask, attemptNumber, operatorName);
-        System.out.println("[COORD] Subtask #" + subtask
+        LOG.info("[COORD] Subtask #" + subtask
                 + " (attempt " + attemptNumber + ") ready");
         gateways.put(subtask, gateway);
         resendToSubtask(subtask);
@@ -282,7 +282,7 @@ public class DynamicCepCoordinator<IN>
             UpdatePatternProcessorEvent<IN> event =
                     new UpdatePatternProcessorEvent<>(currentProcessors);
             gateway.sendEvent(event);
-            System.out.println("[COORD] Subtask #" + subtask
+            LOG.info("[COORD] Subtask #" + subtask
                     + " restored, sending full rule set (" + currentProcessors.size() + ")");
         }
     }

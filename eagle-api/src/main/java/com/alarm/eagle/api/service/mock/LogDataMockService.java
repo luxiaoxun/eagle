@@ -18,7 +18,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Service
 @Slf4j
 @Profile("dev")
-public class DataMockService {
+public class LogDataMockService {
     @Autowired
     private KafKaProducer kafKaProducer;
 

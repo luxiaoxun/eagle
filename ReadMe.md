@@ -18,9 +18,10 @@ build
 mvn clean package
 ```
 
-debug mode:
+IDE dev mode:
 ```
 "Run/Debug" => "Edit Configurations...",
+"Program Arguments" => "--mode dev"
 "Build and run" section select "Modify options" => Java => Add dependencies with "Provided" scope to classpath.
 ```
 cluster mode:

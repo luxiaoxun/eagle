@@ -148,9 +148,9 @@ public class DynamicCepOperator<IN, KEY, OUT>
     @Override
     public void initializeState(StateInitializationContext context)
             throws Exception {
-        System.out.println("[CEP] initializeState() started...");
+        LOG.info("[CEP] initializeState() started...");
         super.initializeState(context);
-        System.out.println("[CEP] super.initializeState() completed");
+        LOG.info("[CEP] super.initializeState() completed");
         this.initContext = context;
 
         // ★ SharedBuffer: shared by all rules (current limitation)
@@ -161,20 +161,20 @@ public class DynamicCepOperator<IN, KEY, OUT>
                         getOperatorConfig().getConfiguration()));
 
         this.ruleContexts = new HashMap<>();
-        System.out.println("[CEP] initializeState() completed");
+        LOG.info("[CEP] initializeState() completed");
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public void open() throws Exception {
-        System.out.println("[CEP] open() started...");
+        LOG.info("[CEP] open() started...");
         super.open();
-        System.out.println("[CEP] super.open() completed");
+        LOG.info("[CEP] super.open() completed");
 
         collector = new TimestampedCollector<>(output);
         context = new ContextFunctionImpl();
 
-        System.out.println("[CEP] open() completed (rules will be dynamically loaded upon receiving OperatorEvent)");
+        LOG.info("[CEP] open() completed (rules will be dynamically loaded upon receiving OperatorEvent)");
     }
 
     @Override
@@ -208,7 +208,7 @@ public class DynamicCepOperator<IN, KEY, OUT>
         }
 
         if (ruleContexts.isEmpty()) {
-            System.out.println("[CEP] ⚠ Event arrived but no active rules, dropping and waiting...");
+            LOG.info("[CEP] ⚠ Event arrived but no active rules, dropping and waiting...");
             return;
         }
 
@@ -454,7 +454,7 @@ public class DynamicCepOperator<IN, KEY, OUT>
         try {
             if (event instanceof UpdatePatternProcessorEvent) {
                 // ★ TM restart recovery: full replacement
-                System.out.println("[CEP] Received full rule set event, total: "
+                LOG.info("[CEP] Received full rule set event, total: "
                         + ((UpdatePatternProcessorEvent<IN>) event)
                             .getProcessors().size()
                         + "");
@@ -463,7 +463,7 @@ public class DynamicCepOperator<IN, KEY, OUT>
                 // ★ incremental change: added / removed / updated
                 PatternProcessorChangeEvent<IN> change =
                         (PatternProcessorChangeEvent<IN>) event;
-                System.out.println("[CEP] Received incremental change event: +"
+                LOG.info("[CEP] Received incremental change event: +"
                         + change.getAdded().size() + " added, ~"
                         + change.getRemoved().size() + " removed, ↑"
                         + change.getUpdated().size() + " updated");
@@ -474,10 +474,10 @@ public class DynamicCepOperator<IN, KEY, OUT>
             } else {
                 LOG.warn("Received unexpected operator event: {}", event);
             }
-            System.out.println("[CEP] Event handling completed, current: " + ruleContexts.size()
+            LOG.info("[CEP] Event handling completed, current: " + ruleContexts.size()
                     + " rules active");
         } catch (Exception e) {
-            System.err.println("[CEP] ★★★ handleOperatorEvent Exception!★★★");
+            LOG.error("[CEP] ★★★ handleOperatorEvent Exception!★★★");
             e.printStackTrace(System.err);
             throw new RuntimeException(
                     "Failed to update pattern processors.", e);
@@ -501,7 +501,7 @@ public class DynamicCepOperator<IN, KEY, OUT>
                 pendingStateClear.add(key);
                 closeRuleContext(oldRc);
                 ruleContexts.remove(key);
-                System.out.println("[CEP] Rule offline: " + key);
+                LOG.info("[CEP] Rule offline: " + key);
             }
         }
 
@@ -520,7 +520,7 @@ public class DynamicCepOperator<IN, KEY, OUT>
             RuleKey newKey = new RuleKey(processor.getId(), processor.getVersion());
             RuleContext<IN, OUT> rc = createRuleContext(processor, newKey);
             ruleContexts.put(newKey, rc);
-            System.out.println("[CEP] Rule update: id=" + newKey.id
+            LOG.info("[CEP] Rule update: id=" + newKey.id
                     + (oldKey != null ? ", v" + oldKey.version + " → v" : "")
                     + newKey.version);
         }
@@ -530,7 +530,7 @@ public class DynamicCepOperator<IN, KEY, OUT>
             RuleKey newKey = new RuleKey(processor.getId(), processor.getVersion());
             RuleContext<IN, OUT> rc = createRuleContext(processor, newKey);
             ruleContexts.put(newKey, rc);
-            System.out.println("[CEP] New rule online: " + newKey);
+            LOG.info("[CEP] New rule online: " + newKey);
         }
     }
 
@@ -543,7 +543,7 @@ public class DynamicCepOperator<IN, KEY, OUT>
         List<PatternProcessor<IN>> processors = event.getProcessors();
 
         if (processors == null || processors.isEmpty()) {
-            System.out.println("[CEP] Received empty rule list, clearing all NFAs");
+            LOG.info("[CEP] Received empty rule list, clearing all NFAs");
             for (Map.Entry<RuleKey, RuleContext<IN, OUT>> entry :
                     ruleContexts.entrySet()) {
                 pendingStateClear.add(entry.getKey());
@@ -575,7 +575,7 @@ public class DynamicCepOperator<IN, KEY, OUT>
 
         // Case A: empty rule list → clear all rules
         if (processors == null || processors.isEmpty()) {
-            System.out.println("[CEP] Received empty rule list, clearing all NFAs");
+            LOG.info("[CEP] Received empty rule list, clearing all NFAs");
             for (RuleContext<IN, OUT> rc : ruleContexts.values()) {
                 pendingStateClear.add(new RuleKey(
                         rc.processor.getId(), rc.processor.getVersion()));
@@ -599,7 +599,7 @@ public class DynamicCepOperator<IN, KEY, OUT>
             if (existing != null) {
                 // Same id+version: reuse (no need to rebuild)
                 newContexts.put(ruleKey, existing);
-                System.out.println("[CEP] Rule kept: id=" + ruleKey.id
+                LOG.info("[CEP] Rule kept: id=" + ruleKey.id
                         + ", version=" + ruleKey.version + " (unchanged)");
                 continue;
             }
@@ -610,10 +610,10 @@ public class DynamicCepOperator<IN, KEY, OUT>
                 RuleContext<IN, OUT> oldRc = ruleContexts.get(oldKey);
                 pendingStateClear.add(oldKey);
                 closeRuleContext(oldRc);
-                System.out.println("[CEP] Rule version update: id=" + ruleKey.id
+                LOG.info("[CEP] Rule version update: id=" + ruleKey.id
                         + ", v" + oldKey.version + " → v" + ruleKey.version);
             } else {
-                System.out.println("[CEP] New rule online: id=" + ruleKey.id
+                LOG.info("[CEP] New rule online: id=" + ruleKey.id
                         + ", version=" + ruleKey.version);
             }
 
@@ -626,7 +626,7 @@ public class DynamicCepOperator<IN, KEY, OUT>
         for (Map.Entry<RuleKey, RuleContext<IN, OUT>> entry :
                 ruleContexts.entrySet()) {
             if (!newContexts.containsKey(entry.getKey())) {
-                System.out.println("[CEP] Rule offline: id=" + entry.getKey().id
+                LOG.info("[CEP] Rule offline: id=" + entry.getKey().id
                         + ", version=" + entry.getKey().version);
                 pendingStateClear.add(entry.getKey());
                 closeRuleContext(entry.getValue());
@@ -636,10 +636,10 @@ public class DynamicCepOperator<IN, KEY, OUT>
         // ⑤ ★ Atomic replacement
         this.ruleContexts = newContexts;
 
-        System.out.println("[CEP] ★ Rules loaded, currently active: "
+        LOG.info("[CEP] ★ Rules loaded, currently active: "
                 + ruleContexts.size() + "");
         for (RuleKey key : ruleContexts.keySet()) {
-            System.out.println("[CEP]   - [" + key.id + "] v" + key.version);
+            LOG.info("[CEP]   - [" + key.id + "] v" + key.version);
         }
     }
 
@@ -746,18 +746,18 @@ public class DynamicCepOperator<IN, KEY, OUT>
         switch (event.getAction()) {
             case PAUSE:
                 pausedRuleIds.add(ruleId);
-                System.out.println("[CEP] Rule paused: " + ruleId);
+                LOG.info("[CEP] Rule paused: " + ruleId);
                 break;
 
             case RESUME:
                 pausedRuleIds.remove(ruleId);
                 drainingRuleIds.remove(ruleId);
-                System.out.println("[CEP] Rule resumed: " + ruleId);
+                LOG.info("[CEP] Rule resumed: " + ruleId);
                 break;
 
             case DRAIN:
                 drainingRuleIds.add(ruleId);
-                System.out.println("[CEP] Rule draining: " + ruleId);
+                LOG.info("[CEP] Rule draining: " + ruleId);
                 break;
 
             case DELETE:
@@ -775,7 +775,7 @@ public class DynamicCepOperator<IN, KEY, OUT>
                 for (RuleKey key : toRemove) {
                     ruleContexts.remove(key);
                 }
-                System.out.println("[CEP] Rule cleaned up: " + ruleId
+                LOG.info("[CEP] Rule cleaned up: " + ruleId
                         + " (" + toRemove.size() + " version(s))");
                 break;
         }

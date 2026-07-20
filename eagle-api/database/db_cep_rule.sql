@@ -190,3 +190,106 @@ INSERT INTO `eagle_cep_rule` (`rule_id`, `version`, `name`, `description`, `patt
   "window": {"type": "FIRST_AND_LAST", "size": 2, "unit": "MINUTES"},
   "afterMatchStrategy": {"type": "NO_SKIP", "patternName": null}
 }', NULL, 1);
+
+-- ============================================================
+-- 金融欺诈检测规则
+-- ============================================================
+
+-- 规则 5：快速多笔大额交易
+-- 场景：同一 payer 30 分钟内 3 笔以上超过 50000 的交易（替代原聚合规则）
+INSERT INTO `eagle_cep_rule` (`rule_id`, `version`, `name`, `description`, `pattern`, `function`, `status`) VALUES
+('rule_rapid_large_amount', 1, '快速多笔大额交易', '同一payer 30分钟内3笔以上超过50000的交易',
+'{
+  "name": "rapid_large_amount",
+  "type": "COMPOSITE",
+  "version": 1,
+  "nodes": [
+    {
+      "name": "large_txn",
+      "type": "ATOMIC",
+      "quantifier": {
+        "consumingStrategy": "STRICT",
+        "properties": ["LOOPING"],
+        "times": {"from": 3, "to": 3, "windowTime": null}
+      },
+      "condition": {"type": "AVIATOR", "expression": "paymentAmount > 50000"}
+    }
+  ],
+  "edges": [],
+  "window": {"type": "FIRST_AND_LAST", "size": 30, "unit": "MINUTES"},
+  "afterMatchStrategy": {"type": "SKIP_PAST_LAST_EVENT", "patternName": null}
+}', NULL, 1);
+
+-- 规则 6：小额测试后超大额转账
+-- 场景：同一 payer 先做 <100 小额测试，5 分钟内做 >200000 超大额转账
+INSERT INTO `eagle_cep_rule` (`rule_id`, `version`, `name`, `description`, `pattern`, `function`, `status`) VALUES
+('rule_small_then_large', 1, '小额测试后大额转账', '同一payer先做<100小额交易测试，5分钟内做>200000超大额交易',
+'{
+  "name": "small_then_large",
+  "type": "COMPOSITE",
+  "version": 1,
+  "nodes": [
+    {
+      "name": "small_txn",
+      "type": "ATOMIC",
+      "quantifier": {
+        "consumingStrategy": "SKIP_TILL_NEXT",
+        "properties": ["SINGLE"],
+        "times": null
+      },
+      "condition": {"type": "AVIATOR", "expression": "paymentAmount < 100"}
+    },
+    {
+      "name": "huge_txn",
+      "type": "ATOMIC",
+      "quantifier": {
+        "consumingStrategy": "SKIP_TILL_NEXT",
+        "properties": ["SINGLE"],
+        "times": null
+      },
+      "condition": {"type": "AVIATOR", "expression": "paymentAmount > 200000"}
+    }
+  ],
+  "edges": [
+    {"source": "small_txn", "target": "huge_txn", "type": "SKIP_TILL_NEXT"}
+  ],
+  "window": {"type": "FIRST_AND_LAST", "size": 5, "unit": "MINUTES"},
+  "afterMatchStrategy": {"type": "NO_SKIP", "patternName": null}
+}', NULL, 1);
+
+-- 规则 7：分散转出检测
+-- 场景：同一 payer 10 分钟内做 2 笔以上大额转账到不同 beneficiary
+INSERT INTO `eagle_cep_rule` (`rule_id`, `version`, `name`, `description`, `pattern`, `function`, `status`) VALUES
+('rule_split_transfer', 1, '分散转出检测', '同一payer 10分钟内做2笔以上>30000转账到不同beneficiary',
+'{
+  "name": "split_transfer",
+  "type": "COMPOSITE",
+  "version": 1,
+  "nodes": [
+    {
+      "name": "first_txn",
+      "type": "ATOMIC",
+      "quantifier": {
+        "consumingStrategy": "SKIP_TILL_NEXT",
+        "properties": ["SINGLE"],
+        "times": null
+      },
+      "condition": {"type": "AVIATOR", "expression": "paymentAmount > 30000"}
+    },
+    {
+      "name": "second_txn",
+      "type": "ATOMIC",
+      "quantifier": {
+        "consumingStrategy": "SKIP_TILL_NEXT",
+        "properties": ["SINGLE"],
+        "times": null
+      },
+      "condition": {"type": "AVIATOR", "expression": "paymentAmount > 30000"}
+    }
+  ],
+  "edges": [
+    {"source": "first_txn", "target": "second_txn", "type": "SKIP_TILL_NEXT"}
+  ],
+  "window": {"type": "FIRST_AND_LAST", "size": 10, "unit": "MINUTES"},
+  "afterMatchStrategy": {"type": "NO_SKIP", "patternName": null}
+}', NULL, 1);

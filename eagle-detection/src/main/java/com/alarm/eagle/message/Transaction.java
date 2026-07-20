@@ -1,5 +1,6 @@
 package com.alarm.eagle.message;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -9,80 +10,78 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+/**
+ * 交易事件模型 — Dynamic CEP 匹配用事件类
+ */
+public class Transaction implements Serializable {
+    private static final long serialVersionUID = 1L;
 
-@Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
-public class Transaction implements TimestampAssignable<Long> {
-    public long transactionId;
-    public long eventTime;
-    public long payerId;
-    public long beneficiaryId;
-    public BigDecimal paymentAmount;
-    public PaymentType paymentType;
+    private long transactionId;
+    private long eventTime;
+    private long payerId;
+    private long beneficiaryId;
+    private BigDecimal paymentAmount;
+    private String paymentType;
     private Long ingestionTimestamp;
 
-    private static transient DateTimeFormatter timeFormatter =
-            DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").withLocale(Locale.US).withZone(ZoneOffset.UTC);
+    private static final transient DateTimeFormatter timeFormatter =
+            DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+                    .withLocale(Locale.US).withZone(ZoneOffset.UTC);
 
-    public enum PaymentType {
-        CSH("CSH"),
-        CRD("CRD");
+    public Transaction() {}
 
-        String representation;
-
-        PaymentType(String repr) {
-            this.representation = repr;
-        }
-
-        public static PaymentType fromString(String representation) {
-            for (PaymentType b : PaymentType.values()) {
-                if (b.representation.equals(representation)) {
-                    return b;
-                }
-            }
-            return null;
-        }
-    }
-
+    /** 从 CSV 行解析: transactionId,eventTime,payerId,beneficiaryId,paymentType,paymentAmount,ingestionTimestamp */
     public static Transaction fromString(String line) {
         List<String> tokens = Arrays.asList(line.split(","));
-        int numArgs = 7;
-        if (tokens.size() != numArgs) {
+        if (tokens.size() != 7) {
             throw new RuntimeException(
-                    "Invalid transaction: "
-                            + line
-                            + ". Required number of arguments: "
-                            + numArgs
-                            + " found "
-                            + tokens.size());
+                    "Invalid transaction: " + line
+                            + ". Required 7 fields, found " + tokens.size());
         }
 
         Transaction transaction = new Transaction();
-
         try {
             Iterator<String> iter = tokens.iterator();
             transaction.transactionId = Long.parseLong(iter.next());
-            transaction.eventTime = ZonedDateTime.parse(iter.next(), timeFormatter).toInstant().toEpochMilli();
+            transaction.eventTime = ZonedDateTime.parse(iter.next(), timeFormatter)
+                    .toInstant().toEpochMilli();
             transaction.payerId = Long.parseLong(iter.next());
             transaction.beneficiaryId = Long.parseLong(iter.next());
-            transaction.paymentType = PaymentType.fromString(iter.next());
+            transaction.paymentType = iter.next();
             transaction.paymentAmount = new BigDecimal(iter.next());
             transaction.ingestionTimestamp = Long.parseLong(iter.next());
         } catch (NumberFormatException nfe) {
             throw new RuntimeException("Invalid record: " + line, nfe);
         }
-
         return transaction;
     }
 
+    // ======================== Getters (Aviator 表达式通过 getter 访问) ========================
+
+    public long getTransactionId() { return transactionId; }
+    public long getEventTime() { return eventTime; }
+    public long getPayerId() { return payerId; }
+    public long getBeneficiaryId() { return beneficiaryId; }
+    public BigDecimal getPaymentAmount() { return paymentAmount; }
+    public String getPaymentType() { return paymentType; }
+    public Long getIngestionTimestamp() { return ingestionTimestamp; }
+
+    // ======================== Setters ========================
+
+    public void setTransactionId(long transactionId) { this.transactionId = transactionId; }
+    public void setEventTime(long eventTime) { this.eventTime = eventTime; }
+    public void setPayerId(long payerId) { this.payerId = payerId; }
+    public void setBeneficiaryId(long beneficiaryId) { this.beneficiaryId = beneficiaryId; }
+    public void setPaymentAmount(BigDecimal paymentAmount) { this.paymentAmount = paymentAmount; }
+    public void setPaymentType(String paymentType) { this.paymentType = paymentType; }
+    public void setIngestionTimestamp(Long ingestionTimestamp) { this.ingestionTimestamp = ingestionTimestamp; }
+
     @Override
-    public void assignIngestionTimestamp(Long timestamp) {
-        this.ingestionTimestamp = timestamp;
+    public String toString() {
+        return "Transaction{txnId=" + transactionId
+                + ", payer=" + payerId
+                + ", beneficiary=" + beneficiaryId
+                + ", amount=" + paymentAmount
+                + ", type=" + paymentType + '}';
     }
 }

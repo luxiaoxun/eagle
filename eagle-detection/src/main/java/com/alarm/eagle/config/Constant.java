@@ -10,27 +10,19 @@ public interface Constant {
     String FLINK_PARALLELISM = "flink.parallelism";
     String FLINK_ENABLE_CHECKPOINT = "flink.enable.checkpoint";
 
-    String STREAM_RULE_URL = "stream.rule.url";
+    /** eagle-api 基础 URL（用于拉取 CEP 规则） */
+    String API_BASE_URL = "api.base.url";
 
-    String TRANSACTIONS_SOURCE_TYPE = "transaction.source.type";
-    String TRANSACTIONS_PER_SECOND = "transaction.per.second";
-    String TRANSACTIONS_OUT_OF_ORDERNESS = "transaction.out.of.orderness";
+    /** CEP 规则轮询间隔（毫秒） */
+    String CEP_RULE_POLL_INTERVAL_MS = "cep.rule.poll.interval.ms";
 
     String KAFKA_BOOTSTRAP_SERVERS = "kafka.bootstrap.servers";
     String KAFKA_GROUP_ID = "kafka.group.id";
     String KAFKA_TOPIC = "kafka.topic";
     String KAFKA_TOPIC_PARALLELISM = "kafka.topic.parallelism";
+    String KAFKA_SASL_USERNAME = "kafka.sasl.username";
+    String KAFKA_SASL_PASSWORD = "kafka.sasl.password";
 
-    String ALERT_SINK_TYPE = "alert.sink.type";
-    String KAFKA_ALERT_BOOTSTRAP_SERVERS = "kafka.alert.bootstrap.servers";
-    String KAFKA_ALERT_TOPIC = "kafka.alert.topic";
-
-    String RULE_EXPORT_TYPE = "rule.export.type";
-    String KAFKA_RULE_EXPORT_BOOTSTRAP_SERVERS = "kafka.rule.export.bootstrap.servers";
-    String KAFKA_RULE_EXPORT_TOPIC = "kafka.rule.export.topic";
-
-    String LATENCY_SINK_TYPE = "latency.sink.type";
-    String KAFKA_LATENCY_BOOTSTRAP_SERVERS = "kafka.latency.bootstrap.servers";
-    String KAFKA_LATENCY_TOPIC = "kafka.latency.topic";
-
+    /** 事件乱序容忍度（毫秒） */
+    String TRANSACTIONS_OUT_OF_ORDERNESS = "transaction.out.of.orderness";
 }

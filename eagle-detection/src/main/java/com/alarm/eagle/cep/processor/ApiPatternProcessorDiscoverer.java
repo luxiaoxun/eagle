@@ -74,17 +74,17 @@ public class ApiPatternProcessorDiscoverer<T>
         if (latestProcessors == null
                 && initialProcessors != null
                 && !initialProcessors.isEmpty()) {
-            System.out.println("[API-DISCOVER] Using initial rules (total: "
+            LOG.info("[API-DISCOVER] Using initial rules (total: "
                     + initialProcessors.size() + ")");
             return true;
         }
 
         try {
             String rulesUrl = apiBaseUrl + "/cep/rules";
-            System.out.println("[API-DISCOVER] Polling: GET " + rulesUrl);
+            LOG.info("[API-DISCOVER] Polling: GET " + rulesUrl);
             String json = httpGet(rulesUrl);
             if (json == null || json.isEmpty()) {
-                System.out.println("[API-DISCOVER] ⚠ Empty response from API");
+                LOG.info("[API-DISCOVER] ⚠ Empty response from API");
                 return false;
             }
 
@@ -109,18 +109,18 @@ public class ApiPatternProcessorDiscoverer<T>
             }
 
             if (latestProcessors == null || isChanged(current)) {
-                System.out.println("[API-DISCOVER] ✅ Rule change detected (" +
+                LOG.info("[API-DISCOVER] ✅ Rule change detected (" +
                         current.size() + " rules)");
                 latestProcessors = current;
                 return true;
             }
-            System.out.println("[API-DISCOVER] No changes (" +
+            LOG.info("[API-DISCOVER] No changes (" +
                     current.size() + " rules)");
             return false;
 
         } catch (Exception e) {
             LOG.warn("Failed to check rule changes from API: {}", e.getMessage());
-            System.out.println("[API-DISCOVER] ⚠ API query failed: " + e.getMessage());
+            LOG.info("[API-DISCOVER] ⚠ API query failed: " + e.getMessage());
             return false;
         }
     }
@@ -132,7 +132,7 @@ public class ApiPatternProcessorDiscoverer<T>
         if (latestProcessors == null && initialProcessors != null
                 && !initialProcessors.isEmpty()) {
             latestProcessors = new ArrayList<>();
-            System.out.println("[API-DISCOVER] Returning initial rules (total: "
+            LOG.info("[API-DISCOVER] Returning initial rules (total: "
                     + initialProcessors.size() + ")");
             return new ArrayList<>(initialProcessors);
         }
@@ -168,7 +168,7 @@ public class ApiPatternProcessorDiscoverer<T>
 
             int code = conn.getResponseCode();
             if (code != 200) {
-                System.out.println("[API-DISCOVER] HTTP " + code + " from " + urlStr);
+                LOG.info("[API-DISCOVER] HTTP " + code + " from " + urlStr);
                 return null;
             }
 

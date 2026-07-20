@@ -1,39 +1,59 @@
 package com.alarm.eagle;
 
+import com.alarm.eagle.cep.DynamicCEP;
+import com.alarm.eagle.cep.processor.DefaultPatternProcessor;
+import com.alarm.eagle.cep.processor.PatternProcessor;
+import com.alarm.eagle.cep.processor.PatternProcessorDiscovererFactory;
+import com.alarm.eagle.cep.processor.ApiPatternProcessorDiscovererFactory;
 import com.alarm.eagle.config.Constant;
 import com.alarm.eagle.config.DetectionProperties;
-import com.alarm.eagle.functions.AverageAggregate;
-import com.alarm.eagle.functions.DynamicAlertFunction;
-import com.alarm.eagle.functions.DynamicKeyFunction;
-import com.alarm.eagle.message.Alert;
-import com.alarm.eagle.message.Descriptors;
-import com.alarm.eagle.message.Keyed;
 import com.alarm.eagle.message.Transaction;
-import com.alarm.eagle.rule.Rule;
-import com.alarm.eagle.sink.AlertsSink;
-import com.alarm.eagle.sink.CurrentRulesSink;
-import com.alarm.eagle.sink.LatencySink;
-import com.alarm.eagle.source.RulesSource;
-import com.alarm.eagle.source.TransactionsSource;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
+import org.apache.flink.api.common.serialization.SimpleStringSchema;
+import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.utils.ParameterTool;
 import org.apache.flink.configuration.Configuration;
-import org.apache.flink.streaming.api.datastream.BroadcastStream;
+import org.apache.flink.cep.functions.PatternProcessFunction;
+import org.apache.flink.connector.kafka.source.KafkaSource;
+import org.apache.flink.connector.kafka.source.enumerator.initializer.OffsetsInitializer;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.streaming.api.environment.CheckpointConfig;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
-import org.apache.flink.streaming.api.functions.source.SourceFunction;
-import org.apache.flink.streaming.api.windowing.assigners.TumblingProcessingTimeWindows;
-import org.apache.flink.streaming.api.windowing.time.Time;
+import org.apache.flink.util.Collector;
+import org.apache.kafka.clients.CommonClientConfigs;
+import org.apache.kafka.clients.consumer.OffsetResetStrategy;
+import org.apache.kafka.common.config.SaslConfigs;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
+/**
+ * Eagle Detection — Flink 实时欺诈检测作业
+ *
+ * <p>使用 Dynamic CEP 引擎，支持运行时热更新规则：
+ * <ol>
+ *   <li>从 Kafka 消费交易事件流</li>
+ *   <li>启动时从 eagle-api 同步加载 CEP 规则</li>
+ *   <li>运行时通过 ApiPatternProcessorDiscoverer 后台轮询规则更新</li>
+ *   <li>匹配结果输出到标准输出（dev）或 Kafka（prod）</li>
+ * </ol>
+ */
 public class DetectionApp {
     private static final Logger logger = LoggerFactory.getLogger(DetectionApp.class);
+    private static final ObjectMapper mapper = new ObjectMapper();
 
     public static void main(String[] args) {
         try {
@@ -41,75 +61,153 @@ public class DetectionApp {
             ParameterTool parameter = DetectionProperties.getInstance(params).getParameter();
             showConf(parameter);
 
-            // Build stream DAG
+            // ---- 1. 创建 Flink 环境 ----
             StreamExecutionEnvironment env = getStreamExecutionEnvironment(parameter);
-            DataStream<Rule> rulesUpdateStream = getRulesUpdateStream(env, parameter);
-            DataStream<Transaction> transactions = getTransactionsStream(env, parameter);
-            BroadcastStream<Rule> rulesStream = rulesUpdateStream.broadcast(Descriptors.rulesDescriptor);
 
-            // Processing pipeline setup
-            DataStream<Alert> alerts = transactions
-                    .connect(rulesStream)
-                    .process(new DynamicKeyFunction())
-                    .uid("DynamicKeyFunction")
-                    .name("Dynamic Partitioning Function")
-                    .keyBy(Keyed::getKey)
-                    .connect(rulesStream)
-                    .process(new DynamicAlertFunction())
-                    .uid("DynamicAlertFunction")
-                    .name("Dynamic Rule Evaluation Function");
+            // ---- 2. Kafka 数据源 ----
+            DataStream<Transaction> transactions = getTransactionStream(env, parameter);
 
-            SingleOutputStreamOperator<Alert> alertStream = (SingleOutputStreamOperator<Alert>) alerts;
-            DataStream<String> allRuleEvaluations = alertStream.getSideOutput(Descriptors.demoSinkTag);
-            DataStream<Long> latency = alertStream.getSideOutput(Descriptors.latencySinkTag);
-            DataStream<Rule> currentRules = alertStream.getSideOutput(Descriptors.currentRulesSinkTag);
+            // ---- 3. 启动时同步加载 CEP 规则 ----
+            String apiBaseUrl = parameter.get(Constant.API_BASE_URL);
+            List<PatternProcessor<Transaction>> initialRules =
+                    fetchRulesFromApi(apiBaseUrl);
+            logger.info("Loaded {} initial CEP rules from API", initialRules.size());
 
-            alerts.print().name("Alert STDOUT Sink");
-            allRuleEvaluations.print().setParallelism(1).name("Rule Evaluation Sink");
+            // ---- 4. 创建 DiscovererFactory ----
+            long pollIntervalMs = parameter.getLong(
+                    Constant.CEP_RULE_POLL_INTERVAL_MS, 30000L);
+            PatternProcessorDiscovererFactory<Transaction> discovererFactory =
+                    new ApiPatternProcessorDiscovererFactory<>(
+                            apiBaseUrl, initialRules, pollIntervalMs);
 
-            DataStream<String> alertsJson = AlertsSink.alertsStreamToJson(alerts);
-            DataStream<String> currentRulesJson = CurrentRulesSink.rulesStreamToJson(currentRules);
-            currentRulesJson.print();
+            // ---- 5. Dynamic CEP ----
+            SingleOutputStreamOperator<String> cepResults = DynamicCEP.dynamicPatterns(
+                    transactions,
+                    discovererFactory,
+                    false,  // EventTime
+                    TypeInformation.of(String.class));
 
-            alertsJson.addSink(AlertsSink.createAlertsSink(parameter)).setParallelism(1).name("Alerts JSON Sink");
-            currentRulesJson.addSink(CurrentRulesSink.createRulesSink(parameter)).setParallelism(1);
-
-            DataStream<String> latencies = latency.windowAll(TumblingProcessingTimeWindows.of(Time.seconds(10)))
-                    .aggregate(new AverageAggregate()).map(String::valueOf);
-            latencies.addSink(LatencySink.createLatencySink(parameter));
+            // ---- 6. 输出 ----
+            cepResults.print("CEP-ALERT").setParallelism(1).name("CEP Alert STDOUT");
 
             env.getConfig().setGlobalJobParameters(parameter);
-            env.execute("eagle-alarm");
+            env.execute("eagle-detection");
 
         } catch (Exception e) {
-            logger.error(e.toString());
+            logger.error("DetectionApp error: ", e);
         }
     }
 
-    private static DataStream<Transaction> getTransactionsStream(StreamExecutionEnvironment env, ParameterTool parameter) {
-        // Data stream setup
-        SourceFunction<String> transactionSource = TransactionsSource.createTransactionsSource(parameter);
-        int sourceParallelism = parameter.getInt(Constant.KAFKA_TOPIC_PARALLELISM);
+    // ======================== Kafka 数据源 ========================
+
+    private static DataStream<Transaction> getTransactionStream(
+            StreamExecutionEnvironment env, ParameterTool parameter) {
+        String bootstrapServers = parameter.get(Constant.KAFKA_BOOTSTRAP_SERVERS);
+        String groupId = parameter.get(Constant.KAFKA_GROUP_ID);
+        String topic = parameter.get(Constant.KAFKA_TOPIC);
+        int parallelism = parameter.getInt(Constant.KAFKA_TOPIC_PARALLELISM);
         int orderness = parameter.getInt(Constant.TRANSACTIONS_OUT_OF_ORDERNESS);
-        DataStream<String> transactionsStringsStream = env.addSource(transactionSource).name("Transactions Source")
-                .setParallelism(sourceParallelism);
-        DataStream<Transaction> transactionsStream =
-                TransactionsSource.stringsStreamToTransactions(transactionsStringsStream);
-        return transactionsStream.assignTimestampsAndWatermarks(
-                WatermarkStrategy.<Transaction>forBoundedOutOfOrderness(Duration.ofMillis(orderness))
-                        .withTimestampAssigner((element, timestamp) -> element.getEventTime()));
+        String username = parameter.get(Constant.KAFKA_SASL_USERNAME, "");
+        String password = parameter.get(Constant.KAFKA_SASL_PASSWORD, "");
+
+        Properties props = new Properties();
+        if (!username.isEmpty() && !password.isEmpty()) {
+            props.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, "SASL_PLAINTEXT");
+            props.put(SaslConfigs.SASL_MECHANISM, "PLAIN");
+            props.put(SaslConfigs.SASL_JAAS_CONFIG,
+                    String.format("org.apache.kafka.common.security.plain.PlainLoginModule " +
+                            "required username=\"%s\" password=\"%s\";", username, password));
+        }
+
+        KafkaSource<String> source = KafkaSource.<String>builder()
+                .setBootstrapServers(bootstrapServers)
+                .setTopics(topic)
+                .setGroupId(groupId)
+                .setProperties(props)
+                .setStartingOffsets(OffsetsInitializer.committedOffsets(
+                        OffsetResetStrategy.EARLIEST))
+                .setValueOnlyDeserializer(new SimpleStringSchema())
+                .build();
+
+        return env.fromSource(source, WatermarkStrategy.noWatermarks(),
+                        "Kafka-" + topic)
+                .setParallelism(parallelism)
+                .map(Transaction::fromString)
+                .name("Transaction Parser")
+                .assignTimestampsAndWatermarks(
+                        WatermarkStrategy.<Transaction>forBoundedOutOfOrderness(
+                                        Duration.ofMillis(orderness))
+                                .withTimestampAssigner(
+                                        (txn, ts) -> txn.getEventTime()));
     }
 
-    private static DataStream<Rule> getRulesUpdateStream(StreamExecutionEnvironment env, ParameterTool parameter) {
-        String name = "Rule Source";
-        SourceFunction<String> rulesSource = RulesSource.createRulesSource(parameter);
-        DataStream<String> rulesStrings =
-                env.addSource(rulesSource).name(name).setParallelism(1);
-        return RulesSource.stringsStreamToRules(rulesStrings);
+    // ======================== 从 API 同步加载规则 ========================
+
+    /**
+     * 启动时同步调用 GET /cep/rules 加载 CEP 规则。
+     * 确保规则在 Kafka 事件到达前已就绪。
+     */
+    private static List<PatternProcessor<Transaction>> fetchRulesFromApi(
+            String apiBaseUrl) {
+        List<PatternProcessor<Transaction>> rules = new ArrayList<>();
+        try {
+            String json = httpGet(apiBaseUrl + "/cep/rules");
+            if (json == null || json.isEmpty()) {
+                logger.warn("Empty response from CEP rules API, starting with no rules");
+                return rules;
+            }
+
+            JsonNode root = mapper.readTree(json);
+            JsonNode dataNode = root.has("data") ? root.get("data") : root;
+            if (!dataNode.isArray()) return rules;
+
+            for (JsonNode item : dataNode) {
+                String ruleId = item.get("ruleId").asText();
+                int version = item.get("version").asInt();
+                String patternStr = item.get("pattern").asText();
+
+                rules.add(new DefaultPatternProcessor<>(
+                        ruleId, version, patternStr,
+                        new DetectionAlertFunction(ruleId, version)));
+                logger.info("  Loaded rule: {} (v{})", ruleId, version);
+            }
+        } catch (Exception e) {
+            logger.error("Failed to fetch CEP rules from API, starting with no rules: {}",
+                    e.getMessage());
+        }
+        return rules;
     }
 
-    private static StreamExecutionEnvironment getStreamExecutionEnvironment(ParameterTool parameter) {
-        StreamExecutionEnvironment env = null;
+    private static String httpGet(String urlStr) {
+        try {
+            URL url = new URL(urlStr);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("GET");
+            conn.setConnectTimeout(5000);
+            conn.setReadTimeout(5000);
+            conn.setRequestProperty("Accept", "application/json");
+
+            if (conn.getResponseCode() != 200) return null;
+
+            StringBuilder sb = new StringBuilder();
+            try (BufferedReader reader = new BufferedReader(
+                    new InputStreamReader(conn.getInputStream(),
+                            StandardCharsets.UTF_8))) {
+                String line;
+                while ((line = reader.readLine()) != null) sb.append(line);
+            }
+            conn.disconnect();
+            return sb.toString();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    // ======================== Flink 环境配置 ========================
+
+    private static StreamExecutionEnvironment getStreamExecutionEnvironment(
+            ParameterTool parameter) {
+        StreamExecutionEnvironment env;
         int globalParallelism = parameter.getInt(Constant.FLINK_PARALLELISM);
         if (parameter.get(Constant.FLINK_MODE).equals(Constant.MODE_DEV)) {
             env = StreamExecutionEnvironment.createLocalEnvironment();
@@ -119,28 +217,64 @@ public class DetectionApp {
         }
         env.setParallelism(globalParallelism);
 
-        // EventTime is the default in Flink 1.17+; watermark strategy is set on the stream
-
-        //checkpoint
-        boolean enableCheckpoint = parameter.getBoolean(Constant.FLINK_ENABLE_CHECKPOINT, false);
+        boolean enableCheckpoint = parameter.getBoolean(
+                Constant.FLINK_ENABLE_CHECKPOINT, false);
         if (enableCheckpoint) {
             env.enableCheckpointing(60000L);
             CheckpointConfig config = env.getCheckpointConfig();
             config.setMinPauseBetweenCheckpoints(30000L);
             config.setCheckpointTimeout(10000L);
-            //RETAIN_ON_CANCELLATION则在job cancel的时候会保留externalized checkpoint state
-            config.setExternalizedCheckpointCleanup(CheckpointConfig.ExternalizedCheckpointCleanup.DELETE_ON_CANCELLATION);
+            config.setExternalizedCheckpointCleanup(
+                    CheckpointConfig.ExternalizedCheckpointCleanup.DELETE_ON_CANCELLATION);
         }
-
         return env;
     }
 
     private static void showConf(ParameterTool parameter) {
-        logger.info("Show " + parameter.getNumberOfParameters() + " config parameters");
+        logger.info("Show {} config parameters", parameter.getNumberOfParameters());
         Configuration configuration = parameter.getConfiguration();
-        Map<String, String> map = configuration.toMap();
-        for (String key : map.keySet()) {
-            logger.info(key + ":" + map.get(key));
+        for (String key : configuration.toMap().keySet()) {
+            logger.info("  {} = {}", key, configuration.getString(key, ""));
+        }
+    }
+
+    // ======================== 告警输出函数 ========================
+
+    /**
+     * 匹配结果输出函数，将 CEP 匹配到的序列格式化为告警字符串。
+     */
+    public static class DetectionAlertFunction
+            extends PatternProcessFunction<Transaction, String> {
+
+        private static final long serialVersionUID = 1L;
+        private final String ruleId;
+        private final int version;
+
+        public DetectionAlertFunction(String ruleId, int version) {
+            this.ruleId = ruleId;
+            this.version = version;
+        }
+
+        @Override
+        public void processMatch(
+                Map<String, List<Transaction>> match,
+                Context ctx, Collector<String> out) {
+            StringBuilder sb = new StringBuilder();
+            sb.append("[ALERT] rule=").append(ruleId)
+                    .append(" v").append(version).append(" | ");
+
+            for (Map.Entry<String, List<Transaction>> entry : match.entrySet()) {
+                sb.append(entry.getKey()).append("=[");
+                for (Transaction txn : entry.getValue()) {
+                    sb.append("txnId=").append(txn.getTransactionId())
+                            .append(",payer=").append(txn.getPayerId())
+                            .append(",beneficiary=").append(txn.getBeneficiaryId())
+                            .append(",amount=").append(txn.getPaymentAmount())
+                            .append("; ");
+                }
+                sb.append("] ");
+            }
+            out.collect(sb.toString());
         }
     }
 }

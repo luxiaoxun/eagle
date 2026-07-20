@@ -35,28 +35,14 @@ public class DetectionProperties {
             switch (mode) {
                 case Constant.MODE_DEV:
                     map.put(Constant.FLINK_MODE, Constant.MODE_DEV);
-                    map.put(Constant.STREAM_RULE_URL, "http://localhost:9080/eagle-api/alarm/rules");
+                    map.put(Constant.API_BASE_URL, "http://localhost:8080/eagle-api");
+                    map.put(Constant.CEP_RULE_POLL_INTERVAL_MS, "30000");
 
-                    map.put(Constant.TRANSACTIONS_SOURCE_TYPE, "GENERATOR");
-                    map.put(Constant.TRANSACTIONS_PER_SECOND, "5");
-                    map.put(Constant.TRANSACTIONS_OUT_OF_ORDERNESS, "60000");
-
-                    map.put(Constant.KAFKA_BOOTSTRAP_SERVERS, "168.11.101.22:9092");
-                    map.put(Constant.KAFKA_GROUP_ID, "eagle-transaction-" + Constant.MODE_DEV);
+                    map.put(Constant.KAFKA_BOOTSTRAP_SERVERS, "localhost:9092");
+                    map.put(Constant.KAFKA_GROUP_ID, "eagle-detection-" + Constant.MODE_DEV);
                     map.put(Constant.KAFKA_TOPIC, "eagle-transaction");
-                    map.put(Constant.KAFKA_TOPIC_PARALLELISM, "3");
-
-                    map.put(Constant.ALERT_SINK_TYPE, "STDOUT");
-                    map.put(Constant.KAFKA_ALERT_BOOTSTRAP_SERVERS, "168.11.101.22:9092");
-                    map.put(Constant.KAFKA_ALERT_TOPIC, "eagle-transaction-alert");
-
-                    map.put(Constant.RULE_EXPORT_TYPE, "STDOUT");
-                    map.put(Constant.KAFKA_RULE_EXPORT_BOOTSTRAP_SERVERS, "168.11.101.22:9092");
-                    map.put(Constant.KAFKA_RULE_EXPORT_TOPIC, "eagle-transaction-rule");
-
-                    map.put(Constant.LATENCY_SINK_TYPE, "STDOUT");
-                    map.put(Constant.KAFKA_LATENCY_BOOTSTRAP_SERVERS, "168.11.101.22:9092");
-                    map.put(Constant.KAFKA_LATENCY_TOPIC, "eagle-transaction-rule");
+                    map.put(Constant.KAFKA_TOPIC_PARALLELISM, "1");
+                    map.put(Constant.TRANSACTIONS_OUT_OF_ORDERNESS, "60000");
 
                     break;
                 case Constant.MODE_TEST:
